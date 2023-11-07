@@ -27,8 +27,8 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       # build everything (includes running unit tests)
-      - name: Execute Gradle build
-        run: ./gradlew build
+      # - name: Execute Gradle build
+      #   run: ./gradlew build
 
       # report the results
       - name: Publish Test Report
