@@ -23,6 +23,9 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:31.1-jre'
+
+    implementation 'org.openjfx:javafx-controls:17'
+
 }
 
 application {
@@ -42,4 +45,9 @@ dependencies {
 javafx {
     version = "21.0.1"
     modules = [ 'javafx.controls' ]
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
