@@ -1,3 +1,5 @@
+package cse.project.team;
+
 public class Recipe {
     private String ingredients;
     private String instructions;

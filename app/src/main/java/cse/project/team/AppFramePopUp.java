@@ -1,3 +1,5 @@
+package cse.project.team;
+
 public class AppFramePopUp {
     private Recipe recipe;
 
