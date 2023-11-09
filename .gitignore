@@ -1,2 +1,4 @@
-.vscode
+lib/
 .vscode/launch.json
+bin/.DS_Store
+.DS_Store

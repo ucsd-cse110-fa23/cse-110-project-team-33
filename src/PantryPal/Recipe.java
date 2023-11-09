@@ -1,3 +1,4 @@
+package PantryPal;
 public class Recipe {
     private String ingredients;
     private String instructions;

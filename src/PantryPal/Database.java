@@ -1,3 +1,4 @@
+package PantryPal;
 // I'm not sure what exactly this class needs to have,
 // so that I leave that up to you, or if you want to 
 // make an interface instead, etc
