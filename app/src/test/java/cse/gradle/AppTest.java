@@ -6,8 +6,14 @@ package cse.gradle;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+
 class AppTest {
     @Test void test1() {
-        assertEquals(1,1);
+        Recipe recipe = new Recipe("1","2","3","4");
+        Recipe recipe2 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
+        
+        assertEquals("4", recipe.getName());
+        assertEquals("boiled potatoes", recipe2.getName());
     }
 }
