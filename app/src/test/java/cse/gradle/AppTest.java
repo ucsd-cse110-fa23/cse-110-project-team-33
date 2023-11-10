@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 
 class AppTest {
-    @Test void test1() {
+    @Test void getRecipeName() {
         Recipe recipe = new Recipe("1","2","3","4");
         Recipe recipe2 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
         
