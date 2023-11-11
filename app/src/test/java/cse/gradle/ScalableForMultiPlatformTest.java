@@ -23,9 +23,9 @@ public class ScalableForMultiPlatformTest {
      * --------------------------------- UNIT TESTS ---------------------------------
      */
     @Test
-    void postRequestTest() throws JsonMappingException, JsonProcessingException {
+    void fullCRUDTest() throws JsonMappingException, JsonProcessingException {
 
-        // Create recipie and use model to post it
+        // Create recipe and use model to POST it
         Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
         Model model = new Model();
 
@@ -34,14 +34,23 @@ public class ScalableForMultiPlatformTest {
         String expectedResponse = "Posted entry: " +  originalRecipe.toString();
         assertEquals(expectedResponse, response);
 
-        // Check that the recipe was added to the database
+        // Check that the recipe was added to the database with GET
         String getResponse = model.performRequest("GET", originalRecipe.getId().toString(), null);
-
-        System.out.println("getResponse: " + getResponse);
-        // Convert the response to a Recipe object
         Recipe getRecipe = Recipe.parseRecipeFromString(getResponse);
-        // Check that the recipe is the same as the original
         assertEquals(Recipe.equals(originalRecipe, getRecipe), true);
+
+        // Check that we can update the recipe with PUT
+        Recipe updatedRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "mashed potatoes");
+        updatedRecipe.setId(originalRecipe.getId());
+        
+        String putResponse = model.performRequest("PUT", originalRecipe.getId().toString(), updatedRecipe);
+        String expectedPutResponse = "Updated entry for id " + originalRecipe.getId().toString() + ". New recipe: " + updatedRecipe.toString();
+        assertEquals(expectedPutResponse, putResponse);
+
+        // Check that the recipe was updated in the database GET
+        getResponse = model.performRequest("GET", originalRecipe.getId().toString(), null);
+        getRecipe = Recipe.parseRecipeFromString(getResponse);
+        assertEquals(Recipe.equals(updatedRecipe, getRecipe), true);
 
 
         // Delete the recipe from the database
@@ -50,7 +59,6 @@ public class ScalableForMultiPlatformTest {
 
         // Check that the response is correct
         assertEquals(expectedDeleteResponse, deleteResponse);
-
         
     }
     /*
