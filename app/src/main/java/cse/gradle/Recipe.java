@@ -1,10 +1,52 @@
 package cse.gradle;
+import java.util.UUID;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Recipe {
     private String ingredients;
     private String instructions;
     private String category;
     private String name;
+    private UUID id;
+
+
+    // static parse method for populating a recipe from a JSON string
+    public static Recipe parseRecipeFromString(String json) {
+        try {
+            // Parse JSON using Jackson
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(json);
+
+            // Extract individual fields from the JSON
+            String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
+            String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
+            String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
+            String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
+            UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
+
+            // Create a recipe object
+            Recipe recipe = new Recipe(ingredients, instructions, category, name);
+            // set id
+            recipe.setId(id);
+
+            return recipe;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // static equals method for comparing two recipes
+    public static boolean equals(Recipe r1, Recipe r2) {
+        return r1.getIngredients().equals(r2.getIngredients()) &&
+               r1.getInstructions().equals(r2.getInstructions()) &&
+               r1.getCategory().equals(r2.getCategory()) &&
+               r1.getName().equals(r2.getName()) &&
+               r1.getId().equals(r2.getId());
+    }
 
     // empty constructor
     public Recipe() {
@@ -12,6 +54,7 @@ public class Recipe {
         this.instructions = "";
         this.category = "";
         this.name = "";
+        this.id = UUID.randomUUID();
     }
     
     // constructor with arguments
@@ -23,6 +66,7 @@ public class Recipe {
         this.instructions = instructions;
         this.category = category;
         this.name = name;
+        this.id = UUID.randomUUID();
     }
 
     // getters
@@ -41,6 +85,9 @@ public class Recipe {
     public String getName() {
         return name;
     }
+    public UUID getId() {
+        return id;
+    }
 
     // setters
     public void setIngredients(String newIngredients) {
@@ -57,5 +104,23 @@ public class Recipe {
 
     public void setName(String newName) {
         name = newName;
+    }
+    public void setId(UUID newId) {
+        id = newId;
+    }
+
+    // toString method for saving to file (csv)
+    public String toString() {
+        return ingredients + "," + instructions + "," + category + "," + name + "," + id;
+    }
+
+    // parse method for populating a recipe from a csv line
+    public void populateRecipieFromString(String csvLine) {
+        String[] splitLine = csvLine.split(",");
+        ingredients = splitLine[0];
+        instructions = splitLine[1];
+        category = splitLine[2];
+        name = splitLine[3];
+        id = UUID.fromString(splitLine[4]);
     }
 }
