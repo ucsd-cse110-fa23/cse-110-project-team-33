@@ -1,22 +1,16 @@
 package cse.gradle;
 
-// I'm not sure what exactly this class needs to have,
-// so that I leave that up to you, or if you want to 
-// make an interface instead, etc
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class Database {
-    // fields
+public interface Database {
 
-    // constructor(s)
+    public void createToDatabase(Recipe recipe);
 
-    public List<Recipe> readDatabase() {
-        return new ArrayList<Recipe>();
-    }
+    public List<Recipe> readDatabase();
 
-    public void saveToDatabase(List<Recipe> recipes) {
-        
-    }
+    public void updateDatabase(List<Recipe> recipes);
+
+    public void deleteFromDatabase(Recipe recipe);
+
 }

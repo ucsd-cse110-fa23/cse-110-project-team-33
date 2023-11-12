@@ -1,7 +1,5 @@
 package cse.gradle;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +8,9 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class App extends Application {
+import PantryPal.Database;
+
+public class App extends Application implements Database {
     
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -43,8 +43,19 @@ public class App extends Application {
         // Show the app
         primaryStage.show();
 
+        // Update the database right before the app closes
+        primaryStage.setOnCloseRequest(e -> {
+            updateDatabase(recipeList);
+        });
+
         System.out.println("Hello, World!");
     }
+
+    public void updateDatabase(List<Recipe> recipes) {
+        Model model = new Model();
+        String response = model.performRequest("PUT", null, recipes);
+    }
+
     public static void main(String[] args) throws Exception {
         launch(args);
     }
