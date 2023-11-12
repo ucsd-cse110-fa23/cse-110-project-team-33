@@ -25,19 +25,20 @@ public class App extends Application {
         
         arrayList.add(recipe);
         arrayList.add(recipe2);
-        RecipeList recipeList = new RecipeList(arrayList);
-        AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
+        //RecipeList recipeList = new RecipeList(arrayList);
+        //AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
 
-
+        
         // DisplayRecipe.DisplayRecipe(appFramePopUp);
 
         // Setting the Layout of the Window- Should contain a Header, Footer and the TaskList
-        RecipeList root = recipeList;
+        //RecipeList root = recipeList;
+        AppScenes appScenes = new AppScenes(primaryStage, arrayList);
 
         // Set the title of the app
         primaryStage.setTitle("PantryPal");
         // Create scene of mentioned size with the border pane
-        primaryStage.setScene(new Scene(root, 500, 600));
+        primaryStage.setScene(appScenes.getScene());
         // Make window non-resizable
         primaryStage.setResizable(false);
         // Show the app

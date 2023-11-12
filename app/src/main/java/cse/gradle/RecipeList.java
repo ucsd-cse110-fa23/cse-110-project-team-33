@@ -3,17 +3,24 @@ package cse.gradle;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 
 public class RecipeList extends BorderPane{
+    private AppScenes appScenes;
     private List<Recipe> recipes;
     private List<Button> buttons;
     private VBox vBox;
 
-    public RecipeList() {
+    private Button newRecipeButton;
+    private HBox newRecipeButtonBox;
+
+    public RecipeList(AppScenes appScenes) {
+        this.appScenes = appScenes;
+
         recipes = new ArrayList<Recipe>();
         buttons = new ArrayList<Button>();
         vBox = new VBox();
@@ -24,9 +31,24 @@ public class RecipeList extends BorderPane{
         scrollPane.setFitToWidth(true);
         //scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+
+
+        //make "New Recipe" button
+        newRecipeButton = new Button("New Recipe");
+        newRecipeButton.setPrefSize(100, 20);
+        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
+        newRecipeButton.setOnAction(e ->{
+            this.appScenes.displayNewRecipeScene();
+        });
+        newRecipeButtonBox = new HBox();
+        newRecipeButtonBox.setAlignment(Pos.CENTER);
+        newRecipeButtonBox.getChildren().add(newRecipeButton);
+        this.setBottom(newRecipeButtonBox);
     }
 
-    public RecipeList(List<Recipe> rList) {
+    public RecipeList(AppScenes appScenes, List<Recipe> rList) {
+        this.appScenes = appScenes;
+
         recipes = new ArrayList<Recipe>(rList);
         buttons = new ArrayList<Button>();
         vBox = new VBox();
@@ -44,6 +66,18 @@ public class RecipeList extends BorderPane{
         scrollPane.setFitToWidth(true);
         //scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+
+        //make "New Recipe" button
+        newRecipeButton = new Button("New Recipe");
+        newRecipeButton.setPrefSize(100, 20);
+        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
+        newRecipeButton.setOnAction(e ->{
+            this.appScenes.displayNewRecipeScene();
+        });
+        newRecipeButtonBox = new HBox();
+        newRecipeButtonBox.setAlignment(Pos.CENTER);
+        newRecipeButtonBox.getChildren().add(newRecipeButton);
+        this.setBottom(newRecipeButtonBox);
     }
     
     private void addButton(Recipe r){
