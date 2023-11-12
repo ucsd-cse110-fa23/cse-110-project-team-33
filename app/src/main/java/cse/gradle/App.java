@@ -8,7 +8,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import PantryPal.Database;
+import cse.gradle.Database;
 
 public class App extends Application implements Database {
     
@@ -45,15 +45,31 @@ public class App extends Application implements Database {
 
         // Update the database right before the app closes
         primaryStage.setOnCloseRequest(e -> {
-            updateDatabase(recipeList);
+            updateDatabase(recipeList.getRecipes());
         });
 
         System.out.println("Hello, World!");
     }
 
+    public void createToDatabase(Recipe recipe) {
+        // fill it in
+    }
+
+    public List<Recipe> readDatabase() {
+        // temporary code, fill it in
+        return new ArrayList<Recipe>();
+    }
+
     public void updateDatabase(List<Recipe> recipes) {
         Model model = new Model();
-        String response = model.performRequest("PUT", null, recipes);
+        for (Recipe recipe : recipes) {
+            String response = model.performRequest("PUT", null, recipe);
+            System.out.println("PUT " + recipe.getName());
+        }
+    }
+
+    public void deleteFromDatabase(Recipe recipe) {
+        // fill it in
     }
 
     public static void main(String[] args) throws Exception {
