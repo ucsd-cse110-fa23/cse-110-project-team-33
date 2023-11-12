@@ -25,6 +25,7 @@ public class RecipeList extends BorderPane{
         buttons = new ArrayList<Button>();
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
+        vBox.setSpacing(2);
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);
@@ -38,7 +39,9 @@ public class RecipeList extends BorderPane{
         newRecipeButton.setPrefSize(100, 20);
         newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
         newRecipeButton.setOnAction(e ->{
+            
             this.appScenes.displayNewRecipeScene();
+            System.out.println("New Recipe pressed");
         });
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
@@ -53,6 +56,7 @@ public class RecipeList extends BorderPane{
         buttons = new ArrayList<Button>();
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
+        vBox.setSpacing(2);
 
         for(int i = 0; i < recipes.size(); i++){
             //For each recipe, add new button with title of recipe
@@ -80,7 +84,7 @@ public class RecipeList extends BorderPane{
         this.setBottom(newRecipeButtonBox);
     }
     
-    private void addButton(Recipe r){
+    public void addButton(Recipe r){
         Button b = new Button(r.getName());
             buttons.add(b);
             b.setPrefSize(500, 20);
