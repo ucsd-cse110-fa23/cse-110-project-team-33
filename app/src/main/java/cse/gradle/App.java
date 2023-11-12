@@ -5,6 +5,7 @@ package cse.gradle;
 import java.util.ArrayList;
 import java.util.List;
 
+import cse.gradle.Server.Server;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,9 +14,13 @@ public class App extends Application {
     
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // start the server
+        Server server = new Server();
+
         // initialize relevant classes
         Recipe recipe = new Recipe("1","2","3","4");
         Recipe recipe2 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
+        System.out.println(recipe2);
         ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
         
         arrayList.add(recipe);
