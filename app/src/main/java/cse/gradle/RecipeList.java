@@ -26,6 +26,7 @@ public class RecipeList extends BorderPane{
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
+        //vBox.
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);

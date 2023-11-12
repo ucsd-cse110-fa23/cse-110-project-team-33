@@ -27,7 +27,7 @@ public class AppScenes {
         recipeListRoot = new RecipeList(this);
         recipeListScene = new Scene(recipeListRoot, 500, 600);
         newRecipeSceneConstructor();
-        ingredientsInputSceneConstructor();
+        //ingredientsInputSceneConstructor();
     }
 
 
@@ -38,20 +38,20 @@ public class AppScenes {
         recipeListRoot = new RecipeList(this, arrayList);
         recipeListScene = new Scene(recipeListRoot, 500, 600);
         newRecipeSceneConstructor();
-        ingredientsInputSceneConstructor();
+        //ingredientsInputSceneConstructor();
     }
 
     private void newRecipeSceneConstructor(){
-        NewRecipePane newRecipePane = new NewRecipePane(this, recipeListScene, ingredientsInputScene, "What type of meal do you want? For example, breakfast, lunch, or dinner.", "mealtype.wav");
+        NewRecipePane newRecipePane = new NewRecipePane(this, recipeListScene, ingredientsInputScene, "What ingredients do you have?", "ingredients.wav");
         newRecipeScene = new Scene(newRecipePane, 500, 600);
     }
-
+/* 
     private void ingredientsInputSceneConstructor(){
         NewRecipePane newRecipePane = new NewRecipePane(this, recipeListScene, recipeListScene, "What ingredients do you have?", "ingredients.wav");
         ingredientsInputScene = new Scene(newRecipePane, 500, 600);
         System.out.println("ingredients input pane made");
     }
-
+*/
     public void displayNewRecipeScene(){
         displayScene(newRecipeScene);
     }
@@ -149,16 +149,19 @@ class NewRecipePane extends BorderPane{
             if(recordingInProgress){
             appScenes.getAudioRecorder().stopRecording();
             //If nextScene and cancelScene are the same, make a new recipe and add it to RecipeList
-            if(this.nextScene == this.cancelScene){
+            //if(this.nextScene == this.cancelScene){
                 //Recipe newRecipe = 
                 //appScenes.getRecipeListRoot().addButton(newRecipe);
-            }
+            //}
             
             System.out.println("stopped recording");
             recordingInProgress = false;
             
             }
             //this.appScenes.displayScene(this.nextScene);
+            this.appScenes.getRecipeListRoot().addButton(CreateNewRecipe.generateNewRecipe());
+            //this.appScenes.getRecipeListRoot().addButton(new Recipe("a","b","c","d"));
+            this.appScenes.displayScene(this.cancelScene);
         });
 
 
