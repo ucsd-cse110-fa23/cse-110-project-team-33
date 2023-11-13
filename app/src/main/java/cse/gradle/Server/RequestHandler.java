@@ -81,21 +81,10 @@ public class RequestHandler implements HttpHandler {
      * Handles GET requests by returning the recipe associated with the id
      */
     private String handleGetAll(HttpExchange httpExchange) throws IOException {
-        String query = httpExchange.getRequestURI().getQuery();
-        String response;
-        
-        List<Recipe> recipes = new ArrayList<>(data.values());
+        String query = httpExchange.getRequestURI().getQuery();        
+        List<Recipe> recipes = new ArrayList<>(LocalDatabase.readLocal());
         ObjectMapper objectMapper = new ObjectMapper();
-        response = objectMapper.writeValueAsString(recipes); 
-        // String id = query.substring(query.indexOf("=") + 1);
-        // Recipe recipe = data.get(id);
-        // if (recipe != null) {
-        //     ObjectMapper objectMapper = new ObjectMapper();
-        //     response = objectMapper.writeValueAsString(recipe);
-        //     System.out.println("Queried for " + id + " and found " + recipe);
-        // } else {
-        //     response = "No recipe found for id " + id;
-        // }
+        String response = objectMapper.writeValueAsString(recipes); 
         return response;
     }
 
