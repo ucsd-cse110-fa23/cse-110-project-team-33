@@ -57,7 +57,7 @@ public class Recipe {
         this.id = UUID.randomUUID();
     }
     
-    // constructor with arguments
+    // constructor with String arguments
     public Recipe(String ingredients,
                   String instructions,
                   String category,

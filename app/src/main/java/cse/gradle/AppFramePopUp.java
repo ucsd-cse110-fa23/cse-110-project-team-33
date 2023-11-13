@@ -15,7 +15,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.TextArea;
 
-public class AppFramePopUp extends BorderPane{
+public class AppFramePopUp extends BorderPane {
     private Recipe recipe;
     private RecipeList recipeList;
     

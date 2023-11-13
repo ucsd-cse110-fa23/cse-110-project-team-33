@@ -53,7 +53,12 @@ public class RecipeList extends BorderPane{
     public RecipeList(AppScenes appScenes, List<Recipe> rList) {
         this.appScenes = appScenes;
 
+        // recipes = new ArrayList<Recipe>(rList);
         recipes = new ArrayList<Recipe>(rList);
+        // for (int i = 0; i < rList.size(); i++) {
+        //     recipes.add(rList.get(i));
+        // }
+        
         buttons = new ArrayList<Button>();
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
@@ -87,6 +92,7 @@ public class RecipeList extends BorderPane{
     
     public void addButton(Recipe r){
         Button b = new Button(r.getName());
+            System.out.println("new recipe name: " + r.getName());
             buttons.add(b);
             b.setPrefSize(500, 20);
             b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
