@@ -19,7 +19,7 @@ public class DisplayRecipe {
 
     public static void DisplayRecipe(AppFramePopUp Recipe) {
 
-        Scene newScene = new Scene(Recipe);
+        Scene newScene = new Scene(Recipe, 500, 500);
         Stage popUp = new Stage();
         popUp.setTitle(null);
         // Create scene of mentioned size with the border pane

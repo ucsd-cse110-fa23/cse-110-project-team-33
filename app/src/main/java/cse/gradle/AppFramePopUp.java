@@ -4,6 +4,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -11,8 +13,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.control.TextArea;
 
-public class AppFramePopUp extends BorderPane{
+public class AppFramePopUp extends BorderPane {
     private Recipe recipe;
     private RecipeList recipeList;
     
@@ -23,7 +26,7 @@ public class AppFramePopUp extends BorderPane{
     private TextField nameField;
     private TextField categoryField;
     private TextField ingredientsField;
-    private TextField instructionsField;
+    private TextArea instructionsField;
 
     // empty constructor
     // initialize pop up window here
@@ -47,7 +50,7 @@ public class AppFramePopUp extends BorderPane{
         nameField = new TextField(recipe.getName());
         categoryField = new TextField(recipe.getCategory());
         ingredientsField = new TextField(recipe.getIngredients());
-        instructionsField = new TextField(recipe.getInstructions());
+        instructionsField = new TextArea(recipe.getInstructions());
         
         vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
@@ -96,9 +99,17 @@ public class AppFramePopUp extends BorderPane{
         vBox.getChildren().add(ingredientsField); // add textlabel 
 
 
-        instructionsField.setPrefSize(500, 20); // set size of text field
+        instructionsField.setPrefSize(500, 100); // set size of text field
         instructionsField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color of texfield
-        instructionsField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
+        //instructionsField.lookup(".content").setStyle("-fx-background-color: #ADB6BA;"); // (this breaks the code for some reason)
+        //instructionsField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
+        instructionsField.setWrapText(true);
+        ScrollPane scrollPane = new ScrollPane(instructionsField);
+        //this.setCenter(scrollPane);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        //scrollPane.setPannable(true);
+        scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
         Label instructionsLabel = new Label();
         instructionsLabel.setText("Instructions: "); // create index label
@@ -107,7 +118,7 @@ public class AppFramePopUp extends BorderPane{
         instructionsLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
 
         vBox.getChildren().add(instructionsLabel); // add index label to task
-        vBox.getChildren().add(instructionsField); // add textlabel 
+        vBox.getChildren().add(scrollPane); // add textlabel 
 
 
 
