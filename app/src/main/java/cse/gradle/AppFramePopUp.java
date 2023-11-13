@@ -144,6 +144,14 @@ public class AppFramePopUp extends BorderPane{
         this.recipe.setInstructions(instructionsField.getText());
         
         this.recipeList.refresh();
+
+        Model model = new Model();
+        String getResponse = model.performRequest("GET", this.recipe.getId().toString(), null);
+        if (getResponse.contains("No recipe found for id ")) {
+            model.performRequest("POST", null, this.recipe);
+        } else {
+            model.performRequest("PUT", this.recipe.getId().toString(), this.recipe);
+        }
     }
 
 }

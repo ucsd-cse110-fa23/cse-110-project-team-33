@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cse.gradle.Server.LocalDatabase;
 import cse.gradle.Server.Server;
+import java.util.List;
 
 public class ScalableForMultiPlatformTest {
 
@@ -59,6 +61,18 @@ public class ScalableForMultiPlatformTest {
 
         // Check that the response is correct
         assertEquals(expectedDeleteResponse, deleteResponse);
+        
+    }
+
+    @Test
+    void updateCSVTest() {
+        Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
+        Model model = new Model();
+        String response = model.performRequest("POST", null, originalRecipe);
+        List<Recipe> readRecipes = LocalDatabase.readLocal();
+        System.out.println(readRecipes);
+
+        // revert csv back to original state
         
     }
     /*

@@ -105,6 +105,9 @@ public class RequestHandler implements HttpHandler{
         // Add recipe to the data
         data.put(id.toString(), recipe);
 
+        // Add recipe to CSV
+        LocalDatabase.saveRecipeToLocal(recipe);
+
         // Response
         String response = "Posted entry: " +  recipe.toString();
 
@@ -156,6 +159,15 @@ public class RequestHandler implements HttpHandler{
                 existingRecipe.setCategory(newCategory);
                 existingRecipe.setName(newName);
 
+                // Delete CSV and rewrite it from data
+                FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv", false);
+                
+                // Pull recipes from data and put them into the local CSV file
+                List<Recipe> recipes = new ArrayList<>(data.values());
+                LocalDatabase.saveListToLocal(recipes);
+
+                writer.close();
+
                 // Response
                 response = "Updated entry for id " + id + ". New recipe: " + existingRecipe.toString();
                 
@@ -183,12 +195,21 @@ public class RequestHandler implements HttpHandler{
                 data.remove(id);
                 response = "Deleted entry for id " + id;
                 System.out.println(response);
+
+                // Delete CSV and rewrite it from data
+                FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv", false);
+                
+                // Pull recipes from data and put them into the local CSV file
+                List<Recipe> recipes = new ArrayList<>(data.values());
+                LocalDatabase.saveListToLocal(recipes);
+
+                writer.close();
             } else {
                 response = "No recipe found for id " + id;
             }
         }
+
         return response;
     }
-
     
 }

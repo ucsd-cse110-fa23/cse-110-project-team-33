@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 import cse.gradle.Database;
 import cse.gradle.Server.LocalDatabase;
 
-public class App extends Application implements Database {
+public class App extends Application {
     
     @Override
     public void start(Stage primaryStage) throws Exception {
