@@ -45,6 +45,20 @@ public class RequestHandler implements HttpHandler {
             } else {
                 throw new Exception("Unsupported HTTP method: " + method);
             }
+
+            // Set the response character encoding to UTF-8
+            httpExchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
+
+            // Convert the response string to bytes with UTF-8 encoding
+            byte[] responseBytes = response.getBytes("UTF-8");
+
+            // Send the response
+            httpExchange.sendResponseHeaders(200, responseBytes.length);
+            try (OutputStream os = httpExchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
+
+
         } catch (Exception e) {
             System.out.println("An erroneous request");
             response = e.toString();
@@ -81,10 +95,9 @@ public class RequestHandler implements HttpHandler {
      * Handles GET requests by returning the recipe associated with the id
      */
     private String handleGetAll(HttpExchange httpExchange) throws IOException {
-        String query = httpExchange.getRequestURI().getQuery();        
         List<Recipe> recipes = new ArrayList<>(LocalDatabase.readLocal());
         ObjectMapper objectMapper = new ObjectMapper();
-        String response = objectMapper.writeValueAsString(recipes); 
+        String response = objectMapper.writeValueAsString(recipes);
         return response;
     }
 

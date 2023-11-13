@@ -89,6 +89,10 @@ public class RecipeList extends BorderPane{
         newRecipeButtonBox.getChildren().add(newRecipeButton);
         this.setBottom(newRecipeButtonBox);
     }
+
+    public RecipeList(List<Recipe> list) {
+        recipes = list;
+    }
     
     public void addButton(Recipe r){
         Button b = new Button(r.getName());

@@ -22,7 +22,7 @@ import cse.gradle.Server.LocalDatabase;
 import cse.gradle.Server.Server;
 import java.util.List;
 
-public class HTTPServerTests {
+public class Feature8Tests {
 
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
@@ -96,6 +96,7 @@ public class HTTPServerTests {
 
     }
 
+    /* --------------------------------- BDD TESTS --------------------------------- */
     @Test
     void getAllTest() throws JsonMappingException, JsonProcessingException {
         Recipe recipe1 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
