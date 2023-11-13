@@ -104,6 +104,7 @@ public class RecipeList extends BorderPane{
     }
 
     public void removeButton(Recipe r){
+        this.refresh();
         for(Button button: buttons){
             if(button.getText().equals(r.getName())){
                 vBox.getChildren().remove(button);
