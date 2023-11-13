@@ -26,6 +26,7 @@ public class LocalDatabase {
                 while ((loadedRecipe = reader.readLine()) != null) {
                     String[] recipeElems = loadedRecipe.split(";");
                     Recipe recipe = new Recipe(recipeElems[0], recipeElems[1], recipeElems[2], recipeElems[3]);
+                    recipe.setId(UUID.fromString(recipeElems[4]));
                     recipeList.add(recipe);
                 }
                 reader.close();
@@ -43,7 +44,7 @@ public class LocalDatabase {
     public static void saveListToLocal(List<Recipe> recipes) {
         try {
             FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv");
-            writer.write("Ingredients" + "," + "Instructions" + "," + "Category" + "," + "Name" + "," + "Id" + "\n");
+            writer.write("Ingredients" + ";" + "Instructions" + ";" + "Category" + ";" + "Name" + ";" + "Id" + "\n");
             for (int i = 0; i < recipes.size(); i++) {
                 String recipeIngredients = recipes.get(i).getIngredients();
                 String recipeInstructions = recipes.get(i).getInstructions();
@@ -51,8 +52,8 @@ public class LocalDatabase {
                 String recipeName = recipes.get(i).getName();
                 UUID Id = recipes.get(i).getId();
 
-                writer.write(recipeIngredients + "," + recipeInstructions + "," + recipeCategory + "," + recipeName
-                        + "," + Id + "\n");
+                writer.write(recipeIngredients + ";" + recipeInstructions + ";" + recipeCategory + ";" + recipeName
+                        + ";" + Id + "\n");
             }
             writer.close();
         } catch (IOException e) {
@@ -64,8 +65,8 @@ public class LocalDatabase {
         if ((new File("src/main/java/cse/gradle/Server/recipes.csv")).exists()) {
             try {
                 FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv", true);
-                writer.write(recipe.getIngredients() + "," + recipe.getInstructions() + "," + recipe.getCategory() + ","
-                        + recipe.getName() + "," + recipe.getId() + "\n");
+                writer.write(recipe.getIngredients() + ";" + recipe.getInstructions() + ";" + recipe.getCategory() + ";"
+                        + recipe.getName() + ";" + recipe.getId() + "\n");
                 writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -74,9 +75,9 @@ public class LocalDatabase {
             try {
                 FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv", true);
                 writer.write(
-                        "Ingredients" + "," + "Instructions" + "," + "Category" + "," + "Name" + "," + "Id" + "\n");
-                writer.write(recipe.getIngredients() + "," + recipe.getInstructions() + "," + recipe.getCategory() + ","
-                        + recipe.getName() + "," + recipe.getId() + "\n");
+                        "Ingredients" + ";" + "Instructions" + ";" + "Category" + ";" + "Name" + ";" + "Id" + "\n");
+                writer.write(recipe.getIngredients() + ";" + recipe.getInstructions() + ";" + recipe.getCategory() + ";"
+                        + recipe.getName() + ";" + recipe.getId() + "\n");
                 writer.close();
             } catch (IOException e) {
                 e.printStackTrace();

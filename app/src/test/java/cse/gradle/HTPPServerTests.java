@@ -1,3 +1,9 @@
+/*
+* 
+ * Functionality: Includes Unit and BDD Scenario Testing for All Features 
+ * that require using the HTTP Server
+ */
+
 package cse.gradle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +19,7 @@ import cse.gradle.Server.LocalDatabase;
 import cse.gradle.Server.Server;
 import java.util.List;
 
-public class ScalableForMultiPlatformTest {
+public class HTPPServerTests {
 
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
@@ -65,17 +71,26 @@ public class ScalableForMultiPlatformTest {
     }
 
     @Test
-    void updateCSVTest() {
+    void updateEditDeleteCSVTest() {
+        
+        // Create recipe and use model to POST it, then check the csv file to see if it was added properly
         Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
         Model model = new Model();
         String response = model.performRequest("POST", null, originalRecipe);
         List<Recipe> readRecipes = LocalDatabase.readLocal();
-        System.out.println(readRecipes);
+        assertEquals(Recipe.equals(originalRecipe, readRecipes.get(readRecipes.size() - 1)), true);
 
-        // revert csv back to original state
+        // update recipe and put request it, then check the csv file to see if it was updated properly
+        originalRecipe.setIngredients("tomaotes");
+        response = model.performRequest("PUT", originalRecipe.getId().toString(), originalRecipe);
+        readRecipes = LocalDatabase.readLocal();
+        assertEquals(Recipe.equals(originalRecipe, readRecipes.get(readRecipes.size() - 1)), true);
         
+        // delete recipe and delete request it, then check the csv file to see if it was deleted properly
+        response = model.performRequest("DELETE", originalRecipe.getId().toString(), null);
+        readRecipes = LocalDatabase.readLocal();
+        assertEquals(readRecipes.contains(originalRecipe), false);
+
     }
-    /*
-     * --------------------------------- BDD TESTS ---------------------------------
-     */
+
 }
