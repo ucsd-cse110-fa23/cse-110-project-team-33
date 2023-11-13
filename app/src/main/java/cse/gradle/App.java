@@ -24,9 +24,18 @@ public class App extends Application {
         // initialize relevant classes
         Model model = new Model();
         String response = model.performRequest("GET", null, null);
+
         ObjectMapper objectMapper = new ObjectMapper();
-        ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
-        ArrayList<Recipe> arrayList = new ArrayList<Recipe>(rList);
+        ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
+
+
+        try {
+            ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
+            arrayList = new ArrayList<Recipe>(rList);
+        } catch (Exception e) {
+            System.out.println("Error reading JSON from server on startup");
+        }
+
 
         
         // RecipeList recipeList = new RecipeList(arrayList);
