@@ -14,12 +14,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.TextArea;
+import javafx.stage.Stage;
+
 
 public class AppFramePopUp extends BorderPane {
     private Recipe recipe;
     private RecipeList recipeList;
     
     private Button saveButton;
+    private Button deleteButton;
     private HBox buttonsBox;
 
     private VBox vBox;
@@ -132,13 +135,21 @@ public class AppFramePopUp extends BorderPane {
         saveButton = new Button("Save");
         saveButton.setStyle("-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
 
+        deleteButton = new Button("Delete");
+        deleteButton.setStyle("-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
+
         buttonsBox.getChildren().add(saveButton);
+        buttonsBox.getChildren().add(deleteButton);
         buttonsBox.setAlignment(Pos.CENTER);
 
         this.setBottom(buttonsBox);
 
         saveButton.setOnAction(e -> {
             saveRecipe();
+        });
+
+        deleteButton.setOnAction(e -> {
+            deleteRecipe();
         });
     }
 
@@ -162,6 +173,19 @@ public class AppFramePopUp extends BorderPane {
             model.performRequest("POST", null, this.recipe);
         } else {
             model.performRequest("PUT", this.recipe.getId().toString(), this.recipe);
+        }
+    }
+
+    public void deleteRecipe(){
+        Model model = new Model();
+        String getResponse = model.performRequest("DELETE", this.recipe.getId().toString(), null);
+        if (!getResponse.contains("No recipe found for id ")) {
+            model.performRequest("DELETE", this.recipe.getId().toString(), null);
+            this.recipeList.removeButton(this.recipe);
+            this.recipeList.refresh();
+            Stage current = (Stage) getScene().getWindow();
+            current.close();
+            //this.recipeList.refresh();
         }
     }
 
