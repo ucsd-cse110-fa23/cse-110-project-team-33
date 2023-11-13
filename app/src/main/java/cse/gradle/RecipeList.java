@@ -110,4 +110,8 @@ public class RecipeList extends BorderPane{
         }
 
     }
+
+    public List<Recipe> getRecipes() {
+        return recipes;
+    }
 }

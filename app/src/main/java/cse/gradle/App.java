@@ -1,14 +1,18 @@
 package cse.gradle;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cse.gradle.Server.Server;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import cse.gradle.Database;
+import cse.gradle.Server.LocalDatabase;
 
 public class App extends Application {
     
@@ -18,15 +22,15 @@ public class App extends Application {
         Server server = new Server();
 
         // initialize relevant classes
-        Recipe recipe = new Recipe("1","2","3","4");
-        Recipe recipe2 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
-        System.out.println(recipe2);
-        ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
+        Model model = new Model();
+        String response = model.performRequest("GET", null, null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
+        ArrayList<Recipe> arrayList = new ArrayList<Recipe>(rList);
         
-        arrayList.add(recipe);
-        arrayList.add(recipe2);
-        //RecipeList recipeList = new RecipeList(arrayList);
+        // RecipeList recipeList = new RecipeList(arrayList);
         //AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
+
 
         
         // DisplayRecipe.DisplayRecipe(appFramePopUp);
@@ -34,6 +38,7 @@ public class App extends Application {
         // Setting the Layout of the Window- Should contain a Header, Footer and the TaskList
         //RecipeList root = recipeList;
         AppScenes appScenes = new AppScenes(primaryStage, arrayList);
+        RecipeList recipeList = new RecipeList(appScenes, arrayList);
 
         // Set the title of the app
         primaryStage.setTitle("PantryPal");
@@ -44,8 +49,44 @@ public class App extends Application {
         // Show the app
         primaryStage.show();
 
+        // Update the database right before the app closes
+        primaryStage.setOnCloseRequest(e -> {
+            // SAVE COMMENTED CODE FOR WHEN WE IMPLEMENT TIER 3 DATABASE
+            // updateDatabase(recipeList.getRecipes());
+
+            LocalDatabase.saveListToLocal(recipeList.getRecipes());
+        });
+
         System.out.println("Hello, World!");
     }
+
+    // SAVE COMMENTED CODE FOR WHEN WE IMPLEMENT TIER 3 DATABASE
+    // // TODO: Part of Task 5d
+    // @Override
+    // public List<Recipe> readDatabase() {
+    //     return new ArrayList<Recipe>();
+    // }
+
+    // SAVE COMMENTED CODE FOR WHEN WE IMPLEMENT TIER 3 DATABASE
+    // // Part of Task 7a
+    // @Override
+    // public void updateDatabase(List<Recipe> recipes) {
+    //     Model model = new Model();
+    //     for (Recipe recipe : recipes) {
+    //         String response = model.performRequest("PUT", null, recipe);
+    //         System.out.println("PUT " + recipe.getName());
+    //     }
+    // }
+
+    // SAVE COMMENTED CODE FOR WHEN WE IMPLEMENT TIER 3 DATABASE
+    // // Part of Task 7a
+    // @Override
+    // public void deleteFromDatabase(Recipe recipe) {
+    //     Model model = new Model();
+    //     String response = model.performRequest("DELETE", null, recipe);
+    //     System.out.println("DELETE " + recipe.getName());
+    // }
+
     public static void main(String[] args) throws Exception {
         launch(args);
     }
