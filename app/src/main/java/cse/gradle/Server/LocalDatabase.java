@@ -46,11 +46,14 @@ public class LocalDatabase {
             FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv");
             writer.write("Ingredients" + ";" + "Instructions" + ";" + "Category" + ";" + "Name" + ";" + "Id" + "\n");
             for (int i = 0; i < recipes.size(); i++) {
-                String recipeIngredients = recipes.get(i).getIngredients();
-                String recipeInstructions = recipes.get(i).getInstructions();
-                String recipeCategory = recipes.get(i).getCategory();
-                String recipeName = recipes.get(i).getName();
-                UUID Id = recipes.get(i).getId();
+                Recipe currentRecipe = recipes.get(i);
+                currentRecipe = removeNewLines(currentRecipe);
+
+                String recipeIngredients = currentRecipe.getIngredients();
+                String recipeInstructions = currentRecipe.getInstructions();
+                String recipeCategory = currentRecipe.getCategory();
+                String recipeName = currentRecipe.getName();
+                UUID Id = currentRecipe.getId();
 
                 writer.write(recipeIngredients + ";" + recipeInstructions + ";" + recipeCategory + ";" + recipeName
                         + ";" + Id + "\n");
@@ -61,7 +64,18 @@ public class LocalDatabase {
         }
     }
 
+
+    public static Recipe removeNewLines(Recipe r) {
+        r.setIngredients(r.getIngredients().replaceAll("\n", " "));
+        r.setInstructions(r.getInstructions().replaceAll("\n", " "));
+        r.setCategory(r.getCategory().replaceAll("\n", " "));
+        r.setName(r.getName().replaceAll("\n", " "));
+        return r;
+    }
+    
     public static void saveRecipeToLocal(Recipe recipe) {
+        recipe = removeNewLines(recipe);
+
         if ((new File("src/main/java/cse/gradle/Server/recipes.csv")).exists()) {
             try {
                 FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv", true);
