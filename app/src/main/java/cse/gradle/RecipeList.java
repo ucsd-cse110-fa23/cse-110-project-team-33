@@ -103,6 +103,16 @@ public class RecipeList extends BorderPane{
             vBox.getChildren().add(b);
     }
 
+    public void removeButton(Recipe r){
+        for(Button button: buttons){
+            if(button.getText().equals(r.getName())){
+                vBox.getChildren().remove(button);
+                buttons.remove(button);
+                break;
+            }
+        }
+    }
+
     public void refresh() {
         for (int i = 0; i < recipes.size(); i++) {
             //this.recipes.set(i, this.recipes.get(i));
