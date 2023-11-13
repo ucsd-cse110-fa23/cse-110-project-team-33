@@ -3,6 +3,9 @@ package cse.gradle;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cse.gradle.Server.Server;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -19,15 +22,14 @@ public class App extends Application {
         Server server = new Server();
 
         // initialize relevant classes
-        Recipe recipe = new Recipe("1","2","3","4");
-        Recipe recipe2 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
-        System.out.println(recipe2);
-        ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
+        Model model = new Model();
+        String response = model.performRequest("GET", null, null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
+        ArrayList<Recipe> arrayList = new ArrayList<Recipe>(rList);
         
-        arrayList.add(recipe);
-        arrayList.add(recipe2);
         RecipeList recipeList = new RecipeList(arrayList);
-        AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
+        //AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
 
 
         // DisplayRecipe.DisplayRecipe(appFramePopUp);
