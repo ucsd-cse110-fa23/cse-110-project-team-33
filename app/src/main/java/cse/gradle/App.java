@@ -27,6 +27,7 @@ public class App extends Application {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
         ArrayList<Recipe> arrayList = new ArrayList<Recipe>(rList);
+
         
         // RecipeList recipeList = new RecipeList(arrayList);
         //AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
@@ -53,8 +54,6 @@ public class App extends Application {
         primaryStage.setOnCloseRequest(e -> {
             // SAVE COMMENTED CODE FOR WHEN WE IMPLEMENT TIER 3 DATABASE
             // updateDatabase(recipeList.getRecipes());
-
-            LocalDatabase.saveListToLocal(recipeList.getRecipes());
         });
 
         System.out.println("Hello, World!");
