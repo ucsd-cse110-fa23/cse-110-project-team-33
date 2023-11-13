@@ -21,13 +21,13 @@ public class App extends Application {
         // initialize relevant classes
         Recipe recipe = new Recipe("1","2","3","4");
         Recipe recipe2 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
-        System.out.println(recipe2);
+        // System.out.println(recipe2);
         ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
         
         arrayList.add(recipe);
         arrayList.add(recipe2);
         RecipeList recipeList = new RecipeList(arrayList);
-        AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
+        //AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
 
 
         // DisplayRecipe.DisplayRecipe(appFramePopUp);
