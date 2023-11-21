@@ -28,7 +28,6 @@ public class App extends Application {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
 
-
         try {
             ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
             arrayList = new ArrayList<Recipe>(rList);
@@ -36,17 +35,7 @@ public class App extends Application {
             System.out.println("Error reading JSON from server on startup");
         }
 
-
-        
-        // RecipeList recipeList = new RecipeList(arrayList);
-        //AppFramePopUp appFramePopUp = new AppFramePopUp(recipeList, recipe);
-
-
-        
-        // DisplayRecipe.DisplayRecipe(appFramePopUp);
-
         // Setting the Layout of the Window- Should contain a Header, Footer and the TaskList
-        //RecipeList root = recipeList;
         AppScenes appScenes = new AppScenes(primaryStage, arrayList);
         RecipeList recipeList = new RecipeList(appScenes, arrayList);
 

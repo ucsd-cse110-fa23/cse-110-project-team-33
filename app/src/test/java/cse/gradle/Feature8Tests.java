@@ -81,13 +81,13 @@ public class Feature8Tests {
         Model model = new Model();
         String response = model.performRequest("POST", null, originalRecipe);
         List<Recipe> readRecipes = LocalDatabase.readLocal();
-        assertEquals(Recipe.equals(originalRecipe, readRecipes.get(readRecipes.size() - 1)), true);
+        assertEquals(Recipe.equals(originalRecipe, readRecipes.get(0)), true);
 
         // update recipe and put request it, then check the csv file to see if it was updated properly
         originalRecipe.setIngredients("tomaotes");
         response = model.performRequest("PUT", originalRecipe.getId().toString(), originalRecipe);
         readRecipes = LocalDatabase.readLocal();
-        assertEquals(Recipe.equals(originalRecipe, readRecipes.get(readRecipes.size() - 1)), true);
+        assertEquals(Recipe.equals(originalRecipe, readRecipes.get(0)), true);
         
         // delete recipe and delete request it, then check the csv file to see if it was deleted properly
         response = model.performRequest("DELETE", originalRecipe.getId().toString(), null);
@@ -114,7 +114,7 @@ public class Feature8Tests {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<Recipe> rList2 = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
         for (int i = 0; i < rList2.size(); i++) {
-            assertEquals(true, Recipe.equals(rList.get(i), rList2.get(i)));
+            assertEquals(true, Recipe.equals(rList.get(i), rList2.get(rList2.size()-1-i)));
             model.performRequest("DELETE", rList.get(i).getId().toString(), null);
         }   
     }

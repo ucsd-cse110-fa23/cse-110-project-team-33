@@ -205,8 +205,8 @@ class NewRecipePane extends BorderPane{
             //this.appScenes.displayScene(this.nextScene);
             //this.appScenes.getRecipeListRoot().addButton(new RecipeGenerator().generateNewRecipe());
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
-            this.appScenes.getRecipeListRoot().addButton(newRecipe);
-            this.appScenes.getRecipeListRoot().getRecipes().add(newRecipe);
+            this.appScenes.getRecipeListRoot().addButton(0, newRecipe);
+            this.appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
             //this.appScenes.getRecipeListRoot().addButton(new Recipe("a","b","c","d"));
             this.appScenes.displayScene(this.cancelScene);
         });

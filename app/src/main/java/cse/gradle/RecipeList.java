@@ -94,6 +94,7 @@ public class RecipeList extends BorderPane{
         recipes = list;
     }
     
+    // adds button to the end of button array
     public void addButton(Recipe r){
         Button b = new Button(r.getName());
             System.out.println("new recipe name: " + r.getName());
@@ -105,6 +106,20 @@ public class RecipeList extends BorderPane{
             });
             //add button to vBox
             vBox.getChildren().add(b);
+    }
+
+    // overloaded method for adding a button at a specific index
+    public void addButton(int index, Recipe r){
+        Button b = new Button(r.getName());
+            System.out.println("new recipe name: " + r.getName());
+            buttons.add(index, b);
+            b.setPrefSize(500, 20);
+            b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
+            b.setOnAction(e ->{
+                DisplayRecipe.DisplayRecipe(new AppFramePopUp(this, r));
+            });
+            //add button to vBox
+            vBox.getChildren().add(index, b);
     }
 
     public void removeButton(Recipe r){
