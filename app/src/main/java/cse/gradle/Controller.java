@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Controller {
+    // Handles the saving of a recipe in the database caused by the UI save button being pressed
     public static void saveRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
         recipe.setName(popUp.getNameField().getText());
         recipe.setCategory(popUp.getCategoryField().getText());
@@ -21,6 +22,7 @@ public class Controller {
         }
     }
 
+    // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
     public static void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
         Model model = new Model();
         String getResponse = model.performRequest("DELETE", recipe.getId().toString(), null);
@@ -33,6 +35,7 @@ public class Controller {
         }
     }
 
+    // Sets the listensers for all the buttons within the recipe creation window
     static void setListeners(NewRecipePane recipePane, View appScenes, Scene cancelScene) {
 
         recipePane.getRecordMealTypeButton().setOnAction(e -> {
