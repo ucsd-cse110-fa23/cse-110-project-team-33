@@ -17,7 +17,7 @@ import javafx.stage.WindowEvent;
 
 public class DisplayRecipe {
 
-    public static void DisplayRecipe(AppFramePopUp Recipe) {
+    public static void display(AppFramePopUp Recipe) {
 
         Scene newScene = new Scene(Recipe, 500, 500);
         Stage popUp = new Stage();

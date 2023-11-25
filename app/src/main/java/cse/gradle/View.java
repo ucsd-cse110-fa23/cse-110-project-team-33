@@ -17,8 +17,6 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
-
-
 public class View {
     private Scene recipeListScene;
     private Scene newRecipeScene;
@@ -27,61 +25,50 @@ public class View {
     private AudioRecorder audioRecorder;
     private Stage stage;
 
-
-    public View(Stage stage){
+    public View(Stage stage) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
         recipeListRoot = new RecipeList(this);
         recipeListScene = new Scene(recipeListRoot, 500, 600);
         newRecipeSceneConstructor();
-        //ingredientsInputSceneConstructor();
     }
 
-
-    public View(Stage stage, List<Recipe> arrayList){
+    public View(Stage stage, List<Recipe> arrayList) {
         audioRecorder = new AudioRecorder();
-        //System.out.println("AppScenes object is made");
         this.stage = stage;
         recipeListRoot = new RecipeList(this, arrayList);
         recipeListScene = new Scene(recipeListRoot, 500, 600);
         newRecipeSceneConstructor();
-        //ingredientsInputSceneConstructor();
     }
 
-    private void newRecipeSceneConstructor(){
+    private void newRecipeSceneConstructor() {
         NewRecipePane newRecipePane = new NewRecipePane(this, recipeListScene, ingredientsInputScene,
-            "Record your preferred meal type, and then record your available ingredients and click generate.");
+                "Record your preferred meal type, and then record your available ingredients and click generate.");
         newRecipeScene = new Scene(newRecipePane, 500, 600);
     }
-/* 
-    private void ingredientsInputSceneConstructor(){
-        NewRecipePane newRecipePane = new NewRecipePane(this, recipeListScene, recipeListScene, "What ingredients do you have?", "ingredients.wav");
-        ingredientsInputScene = new Scene(newRecipePane, 500, 600);
-        System.out.println("ingredients input pane made");
-    }
-*/
-    public void displayNewRecipeScene(){
+
+    public void displayNewRecipeScene() {
         displayScene(newRecipeScene);
     }
 
-    public void displayScene(Scene s){
+    public void displayScene(Scene s) {
         stage.setScene(s);
     }
 
-    public Scene getScene(){
+    public Scene getScene() {
         return recipeListScene;
     }
-    
-    public RecipeList getRecipeListRoot(){
+
+    public RecipeList getRecipeListRoot() {
         return recipeListRoot;
     }
 
-    public AudioRecorder getAudioRecorder(){
+    public AudioRecorder getAudioRecorder() {
         return audioRecorder;
     }
 }
 
-class NewRecipePane extends BorderPane{
+class NewRecipePane extends BorderPane {
     private Scene cancelScene;
     private Scene nextScene;
     private View appScenes;
@@ -93,17 +80,12 @@ class NewRecipePane extends BorderPane{
     private Button backButton;
     private Label newRecipeLabel;
     private boolean recordingInProgress;
-    // private String fileName;
 
-
-    public NewRecipePane(View appScenes, Scene cancelScene, Scene nextScene, String prompt){
+    public NewRecipePane(View appScenes, Scene cancelScene, Scene nextScene, String prompt) {
         this.appScenes = appScenes;
         this.cancelScene = cancelScene;
         this.nextScene = nextScene;
-        // this.fileName = fileName;
         recordingInProgress = false;
-        //System.out.println("Making new AudioRecorder");
-        //audioRecorder = new AudioRecorder(fileName);
 
         recordMealTypeButton = new Button("Record Meal Type");
         recordMealTypeButton.setPrefSize(100, 20);
@@ -112,33 +94,31 @@ class NewRecipePane extends BorderPane{
         stopRecordMealType = new Button("Stop recording Meal Type");
         stopRecordMealType.setPrefSize(100, 20);
         stopRecordMealType.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
-        
+
         recordIngredientsButton = new Button("Record Ingredients");
         recordIngredientsButton.setPrefSize(100, 20);
-        recordIngredientsButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); 
+        recordIngredientsButton
+                .setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
         stopRecordIngredientsButton = new Button("Stop recording Meal Type");
         stopRecordIngredientsButton.setPrefSize(100, 20);
-        stopRecordIngredientsButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); 
+        stopRecordIngredientsButton
+                .setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
         generateRecipeButton = new Button("Generate Recipe");
         generateRecipeButton.setPrefSize(100, 20);
-        generateRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); 
-       
+        generateRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+
         backButton = new Button("Back");
         backButton.setPrefSize(100, 20);
-        backButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); 
+        backButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
         Controller.setListeners(this, appScenes, cancelScene);
-
-        //System.out.println("NewRecipePane is made");
 
         newRecipeLabel = new Label("New Recipe");
         newRecipeLabel.setScaleX(1.5);
         newRecipeLabel.setScaleY(1.5);
-        //newRecipeLabel.setAlignment(Pos.CENTER);
         Label promptLabel = new Label(prompt);
-        //promptLabel.setAlignment(Pos.CENTER);
 
         VBox labelsBox = new VBox();
         VBox buttonsBox = new VBox();
@@ -151,7 +131,7 @@ class NewRecipePane extends BorderPane{
         // add new user instructions here
         labelsBox.getChildren().addAll(newRecipeLabel, promptLabel);
         buttonsBox.getChildren().addAll(recordMealTypeButton, stopRecordMealType, recordIngredientsButton,
-                                        stopRecordIngredientsButton, generateRecipeButton, backButton);
+                stopRecordIngredientsButton, generateRecipeButton, backButton);
 
         this.setTop(labelsBox);
         this.setBottom(buttonsBox);
@@ -164,11 +144,11 @@ class NewRecipePane extends BorderPane{
     public Button getStopRecordMealType() {
         return stopRecordMealType;
     }
-    
+
     public Button getRecordIngredientsButton() {
         return recordIngredientsButton;
     }
-    
+
     public Button getStopRecordIngredientsButton() {
         return stopRecordIngredientsButton;
     }
@@ -279,16 +259,10 @@ class AppFramePopUp extends BorderPane {
         instructionsField.setPrefSize(500, 100); // set size of text field
         instructionsField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color of
                                                                                            // texfield
-        // instructionsField.lookup(".content").setStyle("-fx-background-color:
-        // #ADB6BA;"); // (this breaks the code for some reason)
-        // instructionsField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding
-        // to the text field
         instructionsField.setWrapText(true);
         ScrollPane scrollPane = new ScrollPane(instructionsField);
-        // this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        // scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
         Label instructionsLabel = new Label();
@@ -345,7 +319,7 @@ class AppFramePopUp extends BorderPane {
     }
 }
 
-class RecipeList extends BorderPane{
+class RecipeList extends BorderPane {
     private View appScenes;
     private List<Recipe> recipes;
     private List<Button> buttons;
@@ -362,21 +336,22 @@ class RecipeList extends BorderPane{
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
-        //vBox.
+        // vBox
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        //scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
-
-        //make "New Recipe" button
+        // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
         newRecipeButton.setPrefSize(100, 20);
-        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
-        newRecipeButton.setOnAction(e ->{
-            
+        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets
+                                                                                                                    // style
+                                                                                                                    // of
+                                                                                                                    // button
+        newRecipeButton.setOnAction(e -> {
+
             this.appScenes.displayNewRecipeScene();
             System.out.println("New Recipe pressed");
         });
@@ -389,19 +364,15 @@ class RecipeList extends BorderPane{
     public RecipeList(View appScenes, List<Recipe> rList) {
         this.appScenes = appScenes;
 
-        // recipes = new ArrayList<Recipe>(rList);
         recipes = new ArrayList<Recipe>(rList);
-        // for (int i = 0; i < rList.size(); i++) {
-        //     recipes.add(rList.get(i));
-        // }
-        
+
         buttons = new ArrayList<Button>();
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
 
-        for(int i = 0; i < recipes.size(); i++){
-            //For each recipe, add new button with title of recipe
+        for (int i = 0; i < recipes.size(); i++) {
+            // For each recipe, add new button with title of recipe
             Recipe r = recipes.get(i);
             addButton(r);
         }
@@ -410,14 +381,16 @@ class RecipeList extends BorderPane{
         this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        //scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
-        //make "New Recipe" button
+        // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
         newRecipeButton.setPrefSize(100, 20);
-        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
-        newRecipeButton.setOnAction(e ->{
+        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets
+                                                                                                                    // style
+                                                                                                                    // of
+                                                                                                                    // button
+        newRecipeButton.setOnAction(e -> {
             this.appScenes.displayNewRecipeScene();
         });
         newRecipeButtonBox = new HBox();
@@ -429,39 +402,41 @@ class RecipeList extends BorderPane{
     public RecipeList(List<Recipe> list) {
         recipes = list;
     }
-    
+
     // adds button to the end of button array
-    public void addButton(Recipe r){
+    public void addButton(Recipe r) {
         Button b = new Button(r.getName());
-            System.out.println("new recipe name: " + r.getName());
-            buttons.add(b);
-            b.setPrefSize(500, 20);
-            b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
-            b.setOnAction(e ->{
-                DisplayRecipe.DisplayRecipe(new AppFramePopUp(this, r));
-            });
-            //add button to vBox
-            vBox.getChildren().add(b);
+        System.out.println("new recipe name: " + r.getName());
+        buttons.add(b);
+        b.setPrefSize(500, 20);
+        b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
+                                                                                                      // button
+        b.setOnAction(e -> {
+            DisplayRecipe.display(new AppFramePopUp(this, r));
+        });
+        // add button to vBox
+        vBox.getChildren().add(b);
     }
 
     // overloaded method for adding a button at a specific index
-    public void addButton(int index, Recipe r){
+    public void addButton(int index, Recipe r) {
         Button b = new Button(r.getName());
-            System.out.println("new recipe name: " + r.getName());
-            buttons.add(index, b);
-            b.setPrefSize(500, 20);
-            b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of button
-            b.setOnAction(e ->{
-                DisplayRecipe.DisplayRecipe(new AppFramePopUp(this, r));
-            });
-            //add button to vBox
-            vBox.getChildren().add(index, b);
+        System.out.println("new recipe name: " + r.getName());
+        buttons.add(index, b);
+        b.setPrefSize(500, 20);
+        b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
+                                                                                                      // button
+        b.setOnAction(e -> {
+            DisplayRecipe.display(new AppFramePopUp(this, r));
+        });
+        // add button to vBox
+        vBox.getChildren().add(index, b);
     }
 
-    public void removeButton(Recipe r){
+    public void removeButton(Recipe r) {
         this.refresh();
-        for(Button button: buttons){
-            if(button.getText().equals(r.getName())){
+        for (Button button : buttons) {
+            if (button.getText().equals(r.getName())) {
                 vBox.getChildren().remove(button);
                 buttons.remove(button);
                 break;
@@ -471,7 +446,7 @@ class RecipeList extends BorderPane{
 
     public void refresh() {
         for (int i = 0; i < recipes.size(); i++) {
-            //this.recipes.set(i, this.recipes.get(i));
+            // this.recipes.set(i, this.recipes.get(i));
             this.buttons.get(i).setText(recipes.get(i).getName());
         }
 
