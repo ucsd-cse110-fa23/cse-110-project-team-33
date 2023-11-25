@@ -1,9 +1,46 @@
 package cse.gradle;
 
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class Controller {
-    static void setListeners(NewRecipePane recipePane, AppScenes appScenes, Scene cancelScene) {
+    public static void saveRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+        /*
+         * private TextField nameField;
+         * private TextField categoryField;
+         * private TextField ingredientsField;
+         * private TextField instructionsField;
+         */
+        recipe.setName(popUp.getNameField().getText());
+        recipe.setCategory(popUp.getCategoryField().getText());
+        recipe.setIngredients(popUp.getIngredientsField().getText());
+        recipe.setInstructions(popUp.getInstructionsField().getText());
+
+        rList.refresh();
+
+        Model model = new Model();
+        String getResponse = model.performRequest("GET", recipe.getId().toString(), null);
+        if (getResponse.contains("No recipe found for id ")) {
+            model.performRequest("POST", null, recipe);
+        } else {
+            model.performRequest("PUT", recipe.getId().toString(), recipe);
+        }
+    }
+
+    public static void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+        Model model = new Model();
+        String getResponse = model.performRequest("DELETE", recipe.getId().toString(), null);
+        if (!getResponse.contains("No recipe found for id ")) {
+            model.performRequest("DELETE", recipe.getId().toString(), null);
+            rList.removeButton(recipe);
+            rList.refresh();
+            Stage current = (Stage) popUp.getScene().getWindow();
+            current.close();
+            // this.recipeList.refresh();
+        }
+    }
+
+    static void setListeners(NewRecipePane recipePane, View appScenes, Scene cancelScene) {
 
         recipePane.getRecordMealTypeButton().setOnAction(e -> {
             if (!recipePane.getRecordingInProgress()) {

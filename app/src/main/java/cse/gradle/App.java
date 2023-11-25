@@ -36,7 +36,7 @@ public class App extends Application {
         }
 
         // Setting the Layout of the Window- Should contain a Header, Footer and the TaskList
-        AppScenes appScenes = new AppScenes(primaryStage, arrayList);
+        View appScenes = new View(primaryStage, arrayList);
         RecipeList recipeList = new RecipeList(appScenes, arrayList);
 
         // Set the title of the app
