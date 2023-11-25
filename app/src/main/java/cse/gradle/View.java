@@ -80,7 +80,7 @@ class NewRecipePane extends BorderPane{
     private AppScenes appScenes;
     private Button recordMealTypeButton;
     private Button stopRecordMealType;
-    private Button recordIngedientsButton;
+    private Button recordIngredientsButton;
     private Button stopRecordIngredientsButton;
     private Button generateRecipeButton;
     private Button backButton;
@@ -106,9 +106,9 @@ class NewRecipePane extends BorderPane{
         stopRecordMealType.setPrefSize(100, 20);
         stopRecordMealType.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
         
-        recordIngedientsButton = new Button("Record Ingredients");
-        recordIngedientsButton.setPrefSize(100, 20);
-        recordIngedientsButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); 
+        recordIngredientsButton = new Button("Record Ingredients");
+        recordIngredientsButton.setPrefSize(100, 20);
+        recordIngredientsButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); 
 
         stopRecordIngredientsButton = new Button("Stop recording Meal Type");
         stopRecordIngredientsButton.setPrefSize(100, 20);
@@ -122,7 +122,7 @@ class NewRecipePane extends BorderPane{
         backButton.setPrefSize(100, 20);
         backButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); 
 
-        setListeners();
+        Controller.setListeners(this, appScenes, cancelScene);
 
         //System.out.println("NewRecipePane is made");
 
@@ -143,79 +143,43 @@ class NewRecipePane extends BorderPane{
 
         // add new user instructions here
         labelsBox.getChildren().addAll(newRecipeLabel, promptLabel);
-        buttonsBox.getChildren().addAll(recordMealTypeButton, stopRecordMealType, recordIngedientsButton,
+        buttonsBox.getChildren().addAll(recordMealTypeButton, stopRecordMealType, recordIngredientsButton,
                                         stopRecordIngredientsButton, generateRecipeButton, backButton);
 
         this.setTop(labelsBox);
         this.setBottom(buttonsBox);
     }
 
-    void setListeners(){
+    public Button getRecordMealTypeButton() {
+        return recordMealTypeButton;
+    }
 
-        recordMealTypeButton.setOnAction(e ->{
-            if(!recordingInProgress){
-            //System.out.println("Pressed RECORD");
-            appScenes.getAudioRecorder().startRecording("mealType.wav");
-            recordingInProgress = true;            
-            }
-        });
+    public Button getStopRecordMealType() {
+        return stopRecordMealType;
+    }
+    
+    public Button getRecordIngredientsButton() {
+        return recordIngredientsButton;
+    }
+    
+    public Button getStopRecordIngredientsButton() {
+        return stopRecordIngredientsButton;
+    }
 
+    public Button getGenerateRecipeButton() {
+        return generateRecipeButton;
+    }
 
-        stopRecordMealType.setOnAction(e ->{
-            if(recordingInProgress){
-            appScenes.getAudioRecorder().stopRecording();
-            //If nextScene and cancelScene are the same, make a new recipe and add it to RecipeList
-            //if(this.nextScene == this.cancelScene){
-                //Recipe newRecipe = 
-                //appScenes.getRecipeListRoot().addButton(newRecipe);
-            //}
-            
-            System.out.println("stopped recording");
-            recordingInProgress = false;
-            
-            }
-            //this.appScenes.displayScene(this.nextScene);
-            // this.appScenes.getRecipeListRoot().addButton(CreateNewRecipe.generateNewRecipe());
-            //this.appScenes.getRecipeListRoot().addButton(new Recipe("a","b","c","d"));
-            // this.appScenes.displayScene(this.cancelScene);
-        });
+    public Button getBackButton() {
+        return backButton;
+    }
 
-        recordIngedientsButton.setOnAction(e ->{
-            if(!recordingInProgress){
-            //System.out.println("Pressed RECORD");
-            appScenes.getAudioRecorder().startRecording("ingredients.wav");
-            recordingInProgress = true;            
-            }
-        });
+    public boolean getRecordingInProgress() {
+        return recordingInProgress;
+    }
 
-        stopRecordIngredientsButton.setOnAction(e ->{
-            if(recordingInProgress){
-            appScenes.getAudioRecorder().stopRecording();            
-            System.out.println("stopped recording");
-            recordingInProgress = false;
-            
-            }
-            //this.appScenes.displayScene(this.nextScene);
-            // this.appScenes.getRecipeListRoot().addButton(CreateNewRecipe.generateNewRecipe());
-            //this.appScenes.getRecipeListRoot().addButton(new Recipe("a","b","c","d"));
-            // this.appScenes.displayScene(this.cancelScene);
-        });
-
-        generateRecipeButton.setOnAction(e ->{
-            //this.appScenes.displayScene(this.nextScene);
-            //this.appScenes.getRecipeListRoot().addButton(new RecipeGenerator().generateNewRecipe());
-            Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
-            this.appScenes.getRecipeListRoot().addButton(0, newRecipe);
-            this.appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
-            //this.appScenes.getRecipeListRoot().addButton(new Recipe("a","b","c","d"));
-            this.appScenes.displayScene(this.cancelScene);
-        });
-
-        //Display cancelScene when backButton is pushed
-        backButton.setOnAction(e ->{
-            //System.out.println("Cancel pressed");
-            this.appScenes.displayScene(this.cancelScene);
-        });
+    public void setRecordingInProgress(boolean recordingInProgress) {
+        this.recordingInProgress = recordingInProgress;
     }
 
 }
