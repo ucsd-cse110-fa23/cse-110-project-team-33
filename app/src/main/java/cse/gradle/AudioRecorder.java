@@ -15,15 +15,12 @@ public class AudioRecorder {
     private boolean currentlyRecording;
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
-    //private Label recordingLabel;
-    //private String fileName;
 
-    public AudioRecorder(){
+    public AudioRecorder() {
         audioFormat = getAudioFormat();
-        //this.fileName = fileName;
         currentlyRecording = false;
     }
-    
+
     private AudioFormat getAudioFormat() {
         // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -50,54 +47,48 @@ public class AudioRecorder {
     }
 
     public void startRecording(String fileName) {
-        if(!currentlyRecording){
+        if (!currentlyRecording) {
             currentlyRecording = true;
-        Thread t = new Thread(
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-                //System.out.println("Start recording");
-            // the format of the TargetDataLine
-            DataLine.Info dataLineInfo = new DataLine.Info(
-                    TargetDataLine.class,
-                    audioFormat);
-            // the TargetDataLine used to capture audio data from the microphone
-            targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-            targetDataLine.open(audioFormat);
-            targetDataLine.start();
-            //recordingLabel.setVisible(true);
+            Thread t = new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // System.out.println("Start recording");
+                                // the format of the TargetDataLine
+                                DataLine.Info dataLineInfo = new DataLine.Info(
+                                        TargetDataLine.class,
+                                        audioFormat);
+                                // the TargetDataLine used to capture audio data from the microphone
+                                targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+                                targetDataLine.open(audioFormat);
+                                targetDataLine.start();
 
-            // the AudioInputStream that will be used to write the audio data to a file
-            AudioInputStream audioInputStream = new AudioInputStream(
-                    targetDataLine);
+                                // the AudioInputStream that will be used to write the audio data to a file
+                                AudioInputStream audioInputStream = new AudioInputStream(
+                                        targetDataLine);
 
-            // the file that will contain the audio data
-            //File audioFile = new File("recording.wav");
-            File audioFile = new File(fileName);
-            AudioSystem.write(
-                    audioInputStream,
-                    AudioFileFormat.Type.WAVE,
-                    audioFile);
-            //recordingLabel.setVisible(false);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-            //calcField.setText("Computation complete!");
-            //recordingLabel.setVisible(false);
-          }
-        });
-    t.start();
+                                // the file that will contain the audio data
+                                // File audioFile = new File("recording.wav");
+                                File audioFile = new File(fileName);
+                                AudioSystem.write(
+                                        audioInputStream,
+                                        AudioFileFormat.Type.WAVE,
+                                        audioFile);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    });
+            t.start();
         }
     }
 
     public void stopRecording() {
-        if(currentlyRecording){
-         //System.out.println("Stop recording");
-
-        targetDataLine.stop();
-        targetDataLine.close();
-        currentlyRecording = false;
+        if (currentlyRecording) {
+            targetDataLine.stop();
+            targetDataLine.close();
+            currentlyRecording = false;
         }
     }
 }
