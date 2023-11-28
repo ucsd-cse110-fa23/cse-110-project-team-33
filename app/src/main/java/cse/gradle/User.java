@@ -9,7 +9,7 @@ public class User {
     private String username;
     private List<Recipe> recipeList;
 
-    public User(String username, List<Recipe>recipeList) {
+    public User(String username, List<Recipe> recipeList) {
         this.username = username;
         this.recipeList = recipeList;
         this.id = UUID.randomUUID();
@@ -23,11 +23,11 @@ public class User {
         return recipeList;
     }
 
-    public void setRecipeList(List<Recipe> recipeList) {
-        this.recipeList = recipeList;
-    }
-
     public UUID getId() {
         return id;
+    }
+
+    public void setRecipeList(List<Recipe> recipeList) {
+        this.recipeList = recipeList;
     }
 }
