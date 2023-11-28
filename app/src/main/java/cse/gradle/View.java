@@ -23,6 +23,7 @@ public class View {
     private Scene newRecipeScene;
     private Scene ingredientsInputScene;
     private Scene userAcccountScene;
+    private Scene mainLoginScene;
     private RecipeList recipeListRoot;
     private AudioRecorder audioRecorder;
     private Stage stage;
@@ -30,6 +31,7 @@ public class View {
     public View(Stage stage) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
+        UserLoginConstructor();
         UserAccountSceneConstructor();
         recipeListRoot = new RecipeList(this);
         recipeListScene = new Scene(recipeListRoot, 500, 600);
@@ -39,6 +41,7 @@ public class View {
     public View(Stage stage, List<Recipe> arrayList) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
+        UserLoginConstructor();
         UserAccountSceneConstructor();
         recipeListRoot = new RecipeList(this, arrayList);
         recipeListScene = new Scene(recipeListRoot, 500, 600);
@@ -56,12 +59,21 @@ public class View {
     }
     //////////////////////////// NEW
     public void UserAccountSceneConstructor(){
-        UserCreateAccount userCreateAccount = new UserCreateAccount(this, null, recipeListScene);
+        UserCreateAccount userCreateAccount = new UserCreateAccount(this, mainLoginScene, recipeListScene);
         userAcccountScene = new Scene(userCreateAccount, 500, 600);
     }
 
     public void displayUserAccountSceneConstructor(){
         displayScene(userAcccountScene);
+    }
+
+     public void UserLoginConstructor(){
+        UserLogin userLoginAccount = new UserLogin(this, userAcccountScene, recipeListScene);
+        mainLoginScene = new Scene(userLoginAccount, 500, 600);
+    }
+
+    public void displayUserLoginConstructor(){
+        displayScene(mainLoginScene);
     }
     /////////////////////////////
     public void displayScene(Scene s) {
@@ -69,7 +81,7 @@ public class View {
     }
 
     public Scene getScene() {
-        return userAcccountScene;
+        return mainLoginScene;
     }
 
     public RecipeList getRecipeListRoot() {
@@ -532,5 +544,70 @@ class UserCreateAccount extends BorderPane{
 
     public Button getBackButton(){
         return BackButton;
+    }
+}
+
+class UserLogin extends BorderPane{
+    private TextField usernameField;
+    private PasswordField passwordField;
+    private Button CreateButton;
+    private Button LoginButton;
+
+    public UserLogin(View appScenes, Scene createScene, Scene accepedtScene){
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Login");
+        title.setStyle("-fx-font-size: 24;");
+
+        usernameField = new TextField();
+        passwordField = new PasswordField();
+
+        usernameField.setPromptText("Username");
+        usernameField.setStyle("-fx-pref-width: 50; -fx-font-size: 14;");
+
+        passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-pref-width: 50; -fx-font-size: 14;");
+
+
+        CreateButton = new Button("Create Account");
+        CreateButton.setPrefSize(200, 20);
+        CreateButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+
+        LoginButton = new Button("Login");
+        LoginButton.setPrefSize(200, 20);
+        LoginButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+
+        HBox hbox = new HBox();
+        hbox.setAlignment(Pos.CENTER);
+        hbox.getChildren().addAll(CreateButton, LoginButton);
+
+        Controller.setListeners(this, appScenes, createScene, accepedtScene);
+        vbox.getChildren().addAll(usernameField, passwordField);
+
+        VBox vbox2 = new VBox();
+        vbox2.setAlignment(Pos.TOP_CENTER);
+        vbox2.getChildren().addAll(title);
+        
+        this.setCenter(vbox);
+        this.setBottom(hbox);
+        this.setTop(vbox2);
+    }
+
+
+    public TextField getUsernameField(){
+        return usernameField;
+    }
+
+    public PasswordField getPasswordField(){
+        return passwordField;
+    }
+
+    public Button getCreateButton(){
+        return CreateButton;
+    }
+
+    public Button getLoginButton(){
+        return LoginButton;
     }
 }

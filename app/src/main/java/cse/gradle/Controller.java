@@ -87,12 +87,25 @@ public class Controller {
     static void setListeners(UserCreateAccount createPane, View appScenes, Scene cancelScene, Scene nextScene) {
 
         createPane.getCreateButton().setOnAction(e -> {
-            
+            appScenes.displayScene(cancelScene);
         });    
 
         // Display cancelScene when backButton is pushed
         createPane.getBackButton().setOnAction(e -> {
+            appScenes.displayScene(nextScene);
+        });
+    }
 
+    // Sets the listensers for all the buttons within the recipe creation window
+    static void setListeners(UserLogin createPane, View appScenes, Scene createScene, Scene accepedtScene) {
+
+        createPane.getCreateButton().setOnAction(e -> {
+            appScenes.displayScene(createScene);
+        });    
+
+        // Display cancelScene when backButton is pushed
+        createPane.getLoginButton().setOnAction(e -> {
+            appScenes.displayScene(accepedtScene);
         });
     }
 }
