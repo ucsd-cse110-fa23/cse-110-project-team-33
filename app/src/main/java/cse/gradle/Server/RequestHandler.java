@@ -120,26 +120,21 @@ public class RequestHandler implements HttpHandler {
         JsonNode jsonNode = objectMapper.readTree(postData.toString());
 
         // Extract individual fields from the JSON
-        String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
-        String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
-        String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
-        String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
-        UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
+        String username = jsonNode.has("username") ? jsonNode.get("user").asText() : "";
+        String password = jsonNode.has("password") ? jsonNode.get("password").asText() : "";
+        List<Recipe> recipeList = jsonNode.has("recipeList") ? jsonNode.get("recipeList") : new List<Recipe>();
+        UUID userId = jsonNode.has("userId") ? UUID.fromString(jsonNode.get("userId")) : UUID.randomUUID();
 
-        // Create a recipe object
-        Recipe recipe = new Recipe(ingredients, instructions, category, name);
+        // Create a user object
+        User user = new User(username, password);
 
-        // Add id to the recipe
-        recipe.setId(id);
+        // Add user to the data
+        data.put(user.getUserId().toString(), user);
 
-        // Add recipe to the data
-        data.put(id.toString(), recipe);
-
-        // Add recipe to CSV
-        LocalDatabase.saveRecipeToLocal(recipe);
+        
 
         // Response
-        String response = "Posted entry: " + recipe.toString();
+        String response = "Posted entry: \n" + user.toString();
 
         System.out.println(response);
 
