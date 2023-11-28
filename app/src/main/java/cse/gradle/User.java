@@ -35,4 +35,8 @@ public class User {
     public void setRecipeList(List<Recipe> recipeList) {
         this.recipeList = recipeList;
     }
+
+    public String toString() {
+        return "Username: " + username + "\nPassword: " + password + "\nUserID: " + userId.toString();
+    }
 }
