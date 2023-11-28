@@ -8,8 +8,11 @@ package cse.gradle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.bson.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
+
 
 import java.util.ArrayList;
 
@@ -19,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cse.gradle.Server.LocalDatabase;
+import cse.gradle.Server.MongoDB;
 import cse.gradle.Server.Server;
 import java.util.List;
 
@@ -73,7 +77,9 @@ public class HTTPServerTests {
         
     }
 
+    @Deprecated
     @Test
+    @Disabled
     void updateEditDeleteCSVTest() {
         
         // Create recipe and use model to POST it, then check the csv file to see if it was added properly
@@ -96,7 +102,9 @@ public class HTTPServerTests {
 
     }
 
+    @Deprecated
     @Test
+    @Disabled
     void getAllTest() throws JsonMappingException, JsonProcessingException {
         Recipe recipe1 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
         Recipe recipe2 = new Recipe("cheese", "boil the cheese", "breakfast", "boiled cheese");
@@ -116,6 +124,42 @@ public class HTTPServerTests {
             assertEquals(true, Recipe.equals(rList.get(i), rList2.get(i)));
             model.performRequest("DELETE", rList.get(i).getId().toString(), null);
         }   
+    }
+
+    @Test
+    void mongoDBQueryTest() {
+        // Note: recipes_db is for testing purposes only, the real database will be users_db 
+        // where each user has a list of recipes
+        MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "recipe_db", "recipes");
+        mongoDB.connect();
+
+        // mongoDB.collection.insertOne(new Document().append("test", "test"));
+
+        // insert a recipe
+        Recipe recipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
+        mongoDB.insertOne(recipe.toDocument());
+
+        // find the recipe
+        Document result = mongoDB.findOne("name", "boiled potatoes");
+        Recipe resultRecipe = Recipe.parseRecipeFromDocument(result);
+        assertEquals(Recipe.equals(recipe, resultRecipe), true);
+
+        // update the recipe
+        recipe.setCategory("breakfast");
+        mongoDB.updateOne("name", "boiled potatoes", recipe.toDocument());
+
+        // find the updated recipe
+        result = mongoDB.findOne("name", "boiled potatoes");
+        resultRecipe = Recipe.parseRecipeFromDocument(result);
+        assertEquals(Recipe.equals(recipe, resultRecipe), true);
+
+        // delete the recipe
+        mongoDB.deleteOne("name", "boiled potatoes");
+
+        // find the deleted recipe
+        result = mongoDB.findOne("name", "boiled potatoes");
+        assertEquals(result, null);
+
     }
 
 }
