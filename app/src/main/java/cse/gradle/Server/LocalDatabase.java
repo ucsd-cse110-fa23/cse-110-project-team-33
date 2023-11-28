@@ -76,27 +76,9 @@ public class LocalDatabase {
     public static void saveRecipeToLocal(Recipe recipe) {
         recipe = removeNewLines(recipe);
 
-        if ((new File("src/main/java/cse/gradle/Server/recipes.csv")).exists()) {
-            try {
-                FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv", true);
-                writer.write(recipe.getIngredients() + ";" + recipe.getInstructions() + ";" + recipe.getCategory() + ";"
-                        + recipe.getName() + ";" + recipe.getId() + "\n");
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                FileWriter writer = new FileWriter("src/main/java/cse/gradle/Server/recipes.csv", true);
-                writer.write(
-                        "Ingredients" + ";" + "Instructions" + ";" + "Category" + ";" + "Name" + ";" + "Id" + "\n");
-                writer.write(recipe.getIngredients() + ";" + recipe.getInstructions() + ";" + recipe.getCategory() + ";"
-                        + recipe.getName() + ";" + recipe.getId() + "\n");
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        ArrayList<Recipe> newRecipes = (ArrayList<Recipe>)LocalDatabase.readLocal();
+        newRecipes.add(0, recipe);
+        LocalDatabase.saveListToLocal(newRecipes);
     }
 
     public static void deleteRecipeFromLocal(Recipe recipeFromServer) {
