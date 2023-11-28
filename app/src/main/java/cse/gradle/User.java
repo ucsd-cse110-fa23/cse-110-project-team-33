@@ -1,30 +1,35 @@
 package cse.gradle;
 
 import java.util.UUID;
-import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private UUID id;
+    private UUID userId;
     private String username;
+    private String password;
     private List<Recipe> recipeList;
 
-    public User(String username, List<Recipe> recipeList) {
+    public User(String username, String password, List<Recipe> recipeList) {
         this.username = username;
+        this.password = password;
         this.recipeList = recipeList;
-        this.id = UUID.randomUUID();
+        this.userId = UUID.randomUUID();
     }
 
     public String getUsername() {
         return username;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public List<Recipe> getRecipeList() {
         return recipeList;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getUserId() {
+        return userId;
     }
 
     public void setRecipeList(List<Recipe> recipeList) {

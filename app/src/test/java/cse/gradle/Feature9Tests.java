@@ -24,7 +24,7 @@ class Feature9Tests {
         rList.add(r1);
         rList.add(r2);
         
-        User user = new User("Barry", rList);
+        User user = new User("Barry", "123", rList);
         assertEquals(2, user.getRecipeList().size());
         
         ArrayList<Recipe> rList2 = new ArrayList<Recipe>();
