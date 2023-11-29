@@ -66,6 +66,41 @@ public class Model {
         }
     }
 
+    // overloaded method to create a new user with username and password
+    public String performRequest(String method, String username, String password) {
+        try {
+            String urlString = "http://localhost:8100/";
+            if (username != null) {
+                urlString += ("?=" + username);
+            }
+            URL url = new URI(urlString).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod(method);
+            conn.setDoOutput(true);
+
+            if (method.equals("POST")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String jsonRecipe = objectMapper.writeValueAsString(password);
+
+                try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
+                    out.write(jsonRecipe);
+                }
+            }
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                return response.toString();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Error: " + ex.getMessage();
+        }
+    }
+
     // Whisper stuff
     private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
     private static final String TOKEN = "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";

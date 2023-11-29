@@ -18,9 +18,12 @@ public class RequestHandler implements HttpHandler {
     // private final String uri = "mongodb+srv://mtan:U0h5GjAbFXT68Ki1@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority";
     // private final MongoDatabase users_db;
     // private final MongoCollection<Document> users;
+        HashMap<String, Recipe> data;
+        MongoDB mongoDB;
 
     public RequestHandler() {
-        
+        data = new HashMap<String, Recipe>();
+        mongoDB = new MongoDB(null, null, null);
     }
 
     /*
@@ -126,8 +129,6 @@ public class RequestHandler implements HttpHandler {
         // Extract individual fields from the JSON
         String username = jsonNode.has("username") ? jsonNode.get("user").asText() : "";
         String password = jsonNode.has("password") ? jsonNode.get("password").asText() : "";
-        List<Recipe> recipeList = jsonNode.has("recipeList") ? jsonNode.get("recipeList") : new List<Recipe>();
-        UUID userId = jsonNode.has("userId") ? UUID.fromString(jsonNode.get("userId")) : UUID.randomUUID();
 
         // Create a user object
         User user = new User(username, password);
@@ -135,7 +136,8 @@ public class RequestHandler implements HttpHandler {
         // Add user to MongoDB JSON
         MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "users_db", "users");
         mongoDB.connect();
-        users.insertOne(user.toDocument());
+        
+        mongoDB.insertOne(user.toDocument());
 
         // Response
         String response = "Posted entry: \n" + user.toString();

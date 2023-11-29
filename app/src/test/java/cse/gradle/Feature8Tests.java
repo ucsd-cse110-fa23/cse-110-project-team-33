@@ -51,8 +51,9 @@ public class Feature8Tests {
         String expectedResponse = "Posted entry: " +  originalRecipe.toString();
         assertEquals(expectedResponse, response);
 
+        Recipe rcp = null;
         // Check that the recipe was added to the database with GET
-        String getResponse = model.performRequest("GET", originalRecipe.getId().toString(), null);
+        String getResponse = model.performRequest("GET", originalRecipe.getId().toString(), rcp);
         Recipe getRecipe = Recipe.parseRecipeFromString(getResponse);
         assertEquals(Recipe.equals(originalRecipe, getRecipe), true);
 
@@ -65,13 +66,13 @@ public class Feature8Tests {
         assertEquals(expectedPutResponse, putResponse);
 
         // Check that the recipe was updated in the database GET
-        getResponse = model.performRequest("GET", originalRecipe.getId().toString(), null);
+        getResponse = model.performRequest("GET", originalRecipe.getId().toString(), rcp);
         getRecipe = Recipe.parseRecipeFromString(getResponse);
         assertEquals(Recipe.equals(updatedRecipe, getRecipe), true);
 
 
         // Delete the recipe from the database
-        String deleteResponse = model.performRequest("DELETE", originalRecipe.getId().toString(), null);
+        String deleteResponse = model.performRequest("DELETE", originalRecipe.getId().toString(), rcp);
         String expectedDeleteResponse = "Deleted entry for id " + originalRecipe.getId().toString();
 
         // Check that the response is correct
@@ -97,8 +98,9 @@ public class Feature8Tests {
         readRecipes = LocalDatabase.readLocal();
         assertEquals(Recipe.equals(originalRecipe, readRecipes.get(0)), true);
         
+        Recipe rcp = null;
         // delete recipe and delete request it, then check the csv file to see if it was deleted properly
-        response = model.performRequest("DELETE", originalRecipe.getId().toString(), null);
+        response = model.performRequest("DELETE", originalRecipe.getId().toString(), rcp);
         readRecipes = LocalDatabase.readLocal();
         assertEquals(readRecipes.contains(originalRecipe), false);
 
@@ -119,12 +121,13 @@ public class Feature8Tests {
             model.performRequest("POST", null, rList.get(i));
         }
 
-        String response = model.performRequest("GET", null, null);
+        Recipe rcp = null;
+        String response = model.performRequest("GET", null, rcp);
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<Recipe> rList2 = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
         for (int i = 0; i < rList2.size(); i++) {
             assertEquals(true, Recipe.equals(rList.get(i), rList2.get(rList2.size()-1-i)));
-            model.performRequest("DELETE", rList.get(i).getId().toString(), null);
+            model.performRequest("DELETE", rList.get(i).getId().toString(), rcp);
         }   
     }
 

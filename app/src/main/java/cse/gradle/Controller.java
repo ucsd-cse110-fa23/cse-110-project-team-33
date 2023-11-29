@@ -1,5 +1,7 @@
 package cse.gradle;
 
+import java.util.UUID;
+
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -7,7 +9,7 @@ public class Controller {
 
     public static void createUser(String username, String password) {
         Model model = new Model();
-        String postResponse = model.permformRequest("POST", username, password);
+        String postResponse = model.performRequest("POST", username, password);
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
@@ -24,9 +26,10 @@ public class Controller {
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
     public static void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
         Model model = new Model();
-        String getResponse = model.performRequest("DELETE", recipe.getId().toString(), null);
+        Recipe rcp = null;
+        String getResponse = model.performRequest("DELETE", recipe.getId().toString(), rcp);
         if (!getResponse.contains("No recipe found for id ")) {
-            model.performRequest("DELETE", recipe.getId().toString(), null);
+            model.performRequest("DELETE", recipe.getId().toString(), rcp);
             rList.removeButton(recipe);
             rList.refresh();
             Stage current = (Stage) popUp.getScene().getWindow();
@@ -86,8 +89,8 @@ public class Controller {
     static void setListeners(UserCreateAccount createPane, View appScenes) {
 
         createPane.getCreateButton().setOnAction(e -> {
-            String username = createPane.getUsernameField();
-            String password = createPane.getPasswordField();
+            String username = createPane.getUsernameField().getText().toString();
+            String password = createPane.getPasswordField().getText().toString();
             createUser(username, password);
             appScenes.displayRecipeListScene();
         });    

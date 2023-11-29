@@ -326,7 +326,7 @@ class AppFramePopUp extends BorderPane {
         this.setBottom(buttonsBox);
 
         saveButton.setOnAction(e -> {
-            Controller.saveRecipe(this, recipe, recipeList);
+            // Controller.saveRecipe(this, recipe, recipeList);
         });
 
         deleteButton.setOnAction(e -> {

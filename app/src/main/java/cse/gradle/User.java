@@ -1,6 +1,11 @@
 package cse.gradle;
 
 import java.util.UUID;
+
+import org.bson.Document;
+import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -12,7 +17,7 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.recipeList = new List<Recipe>();
+        this.recipeList = new ArrayList<Recipe>();
         this.userId = UUID.randomUUID();
     }
 
@@ -43,7 +48,7 @@ public class User {
     // toDocument method for saving to database
     public Document toDocument() {
         Document doc = new Document("_id", new ObjectId());
-        newUser.append("userId", userId)
+        doc.append("userId", userId.toString())
                 .append("username", username)
                 .append("password", password)
                 .append("recipeList", recipeList);
