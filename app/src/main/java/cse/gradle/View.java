@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -21,6 +22,8 @@ public class View {
     private Scene recipeListScene;
     private Scene newRecipeScene;
     private Scene ingredientsInputScene;
+    private Scene userAcccountScene;
+    private Scene mainLoginScene;
     private RecipeList recipeListRoot;
     private AudioRecorder audioRecorder;
     private Stage stage;
@@ -29,7 +32,8 @@ public class View {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
         recipeListRoot = new RecipeList(this);
-        recipeListScene = new Scene(recipeListRoot, 500, 600);
+        UserLoginConstructor();
+        UserAccountSceneConstructor();
         newRecipeSceneConstructor();
     }
 
@@ -37,8 +41,18 @@ public class View {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
         recipeListRoot = new RecipeList(this, arrayList);
-        recipeListScene = new Scene(recipeListRoot, 500, 600);
+        newRecipeListSceneConstructor();
+        UserLoginConstructor();
+        UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+    }
+
+    private void newRecipeListSceneConstructor(){
+        recipeListScene = new Scene(recipeListRoot, 500, 600);
+    }
+
+    public void displayRecipeListScene() {
+        displayScene(recipeListScene);
     }
 
     private void newRecipeSceneConstructor() {
@@ -51,12 +65,30 @@ public class View {
         displayScene(newRecipeScene);
     }
 
+    public void UserAccountSceneConstructor(){
+        UserCreateAccount userCreateAccount = new UserCreateAccount(this);
+        userAcccountScene = new Scene(userCreateAccount, 500, 600);
+    }
+
+    public void displayUserAccountSceneConstructor(){
+        displayScene(userAcccountScene);
+    }
+
+     public void UserLoginConstructor(){
+        UserLogin userLoginAccount = new UserLogin(this);
+        mainLoginScene = new Scene(userLoginAccount, 500, 600);
+    }
+
+    public void displayUserLoginConstructor(){
+        displayScene(mainLoginScene);
+    }
+
     public void displayScene(Scene s) {
         stage.setScene(s);
     }
 
     public Scene getScene() {
-        return recipeListScene;
+        return mainLoginScene;
     }
 
     public RecipeList getRecipeListRoot() {
@@ -454,5 +486,135 @@ class RecipeList extends BorderPane {
 
     public List<Recipe> getRecipes() {
         return recipes;
+    }
+}
+
+class UserCreateAccount extends BorderPane{
+    private TextField usernameField;
+    private PasswordField passwordField;
+    private Button CreateButton;
+    private Button BackButton;
+
+    public UserCreateAccount(View appScenes){
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Create Account");
+        title.setStyle("-fx-font-size: 24;");
+
+        usernameField = new TextField();
+        passwordField = new PasswordField();
+
+        usernameField.setPromptText("Choose Username");
+        usernameField.setStyle("-fx-pref-width: 50; -fx-font-size: 14;");
+
+        passwordField.setPromptText("Choose Password");
+        passwordField.setStyle("-fx-pref-width: 50; -fx-font-size: 14;");
+
+
+        CreateButton = new Button("Create");
+        CreateButton.setPrefSize(100, 20);
+        CreateButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+
+        BackButton = new Button("Back");
+        BackButton.setPrefSize(100, 20);
+        BackButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+
+        HBox hbox = new HBox();
+        hbox.setAlignment(Pos.CENTER);
+        hbox.getChildren().addAll(CreateButton, BackButton);
+
+        Controller.setListeners(this, appScenes);
+        vbox.getChildren().addAll(usernameField, passwordField);
+
+        VBox vbox2 = new VBox();
+        vbox2.setAlignment(Pos.TOP_CENTER);
+        vbox2.getChildren().addAll(title);
+        
+        this.setCenter(vbox);
+        this.setBottom(hbox);
+        this.setTop(vbox2);
+    }
+
+
+    public TextField getUsernameField(){
+        return usernameField;
+    }
+
+    public PasswordField getPasswordField(){
+        return passwordField;
+    }
+
+    public Button getCreateButton(){
+        return CreateButton;
+    }
+
+    public Button getBackButton(){
+        return BackButton;
+    }
+}
+
+class UserLogin extends BorderPane{
+    private TextField usernameField;
+    private PasswordField passwordField;
+    private Button CreateButton;
+    private Button LoginButton;
+
+    public UserLogin(View appScenes){
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Login");
+        title.setStyle("-fx-font-size: 24;");
+
+        usernameField = new TextField();
+        passwordField = new PasswordField();
+
+        usernameField.setPromptText("Username");
+        usernameField.setStyle("-fx-pref-width: 50; -fx-font-size: 14;");
+
+        passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-pref-width: 50; -fx-font-size: 14;");
+
+
+        CreateButton = new Button("Create Account");
+        CreateButton.setPrefSize(200, 20);
+        CreateButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+
+        LoginButton = new Button("Login");
+        LoginButton.setPrefSize(200, 20);
+        LoginButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+
+        HBox hbox = new HBox();
+        hbox.setAlignment(Pos.CENTER);
+        hbox.getChildren().addAll(CreateButton, LoginButton);
+
+        Controller.setListeners(this, appScenes);
+        vbox.getChildren().addAll(usernameField, passwordField);
+
+        VBox vbox2 = new VBox();
+        vbox2.setAlignment(Pos.TOP_CENTER);
+        vbox2.getChildren().addAll(title);
+        
+        this.setCenter(vbox);
+        this.setBottom(hbox);
+        this.setTop(vbox2);
+    }
+
+
+    public TextField getUsernameField(){
+        return usernameField;
+    }
+
+    public PasswordField getPasswordField(){
+        return passwordField;
+    }
+
+    public Button getCreateButton(){
+        return CreateButton;
+    }
+
+    public Button getLoginButton(){
+        return LoginButton;
     }
 }
