@@ -1,5 +1,7 @@
 package cse.gradle;
 
+import java.util.concurrent.TimeUnit;
+
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -24,10 +26,12 @@ public class Controller {
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
     public static void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+        saveRecipe(popUp, recipe, rList);
         Model model = new Model();
         String getResponse = model.performRequest("DELETE", recipe.getId().toString(), null);
         if (!getResponse.contains("No recipe found for id ")) {
             model.performRequest("DELETE", recipe.getId().toString(), null);
+            rList.refresh();
             rList.removeButton(recipe);
             rList.refresh();
             Stage current = (Stage) popUp.getScene().getWindow();
@@ -72,8 +76,9 @@ public class Controller {
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
-            appScenes.getRecipeListRoot().addButton(0, newRecipe);
             appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
+            appScenes.getRecipeListRoot().addButton(0, newRecipe);
+            appScenes.getRecipeListRoot().refresh();
             appScenes.displayScene(cancelScene);
         });
 

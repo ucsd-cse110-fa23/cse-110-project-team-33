@@ -34,12 +34,13 @@ public class RecipeGenerator {
         }
         
         try {
-            System.out.println("Instructions:");
-            instructionsString = Model.useChatGPT(100, ("Give only instructions to make a recipe for a " + mealTypeString + " meal using only the following ingredients: " + ingredientsString + ". Make this concise and within 100 words"));
-            TimeUnit.SECONDS.sleep(12);
-
             System.out.println("Title:");
-            titleString = Model.useChatGPT(100, ("Give a 3-word name to the recipe the follow recipe you created: " + instructionsString));
+            titleString = Model.useChatGPT(100, ("Give a 3 to 5 word name for a " + mealTypeString + " recipe using the following ingredients: " + ingredientsTranscript + ". Output nothing but the recipe name."));
+            System.out.println("Instructions:");
+            instructionsString = Model.useChatGPT(100, ("Give only instructions to make a recipe for a " + mealTypeString + " meal using only the following ingredients: " + ingredientsTranscript + ". Base it on this recipe name: " + titleString + ". Make this concise and within 100 words"));
+            //TimeUnit.SECONDS.sleep(12);
+
+            
         } catch(Exception e) {
             System.out.println(e);
             System.out.println("mealtype: " + mealtypeTranscript);

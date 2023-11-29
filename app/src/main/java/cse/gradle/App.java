@@ -44,7 +44,7 @@ public class App extends Application {
         // Create scene of mentioned size with the border pane
         primaryStage.setScene(appScenes.getScene());
         // Make window non-resizable
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         // Show the app
         primaryStage.show();
 
