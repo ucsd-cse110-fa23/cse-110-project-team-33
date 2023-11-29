@@ -25,7 +25,7 @@ public class DisplayRecipe {
         // Create scene of mentioned size with the border pane
         popUp.setScene(newScene);
         // Make window non-resizable
-        popUp.setResizable(false);
+        popUp.setResizable(true);
 
         // Show the app
         popUp.show();                

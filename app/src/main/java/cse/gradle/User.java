@@ -6,6 +6,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 public class User {
@@ -47,11 +48,11 @@ public class User {
 
     // toDocument method for saving to database
     public Document toDocument() {
-        Document doc = new Document("_id", new ObjectId());
-        doc.append("userId", userId.toString())
-                .append("username", username)
-                .append("password", password)
-                .append("recipeList", recipeList);
+        Document doc = new Document();
+        doc.append("username", username);
+        doc.append("password", password);
+        doc.append("userId", userId.toString());
+        doc.append("recipeList", recipeList);
         return doc;
     }
 }

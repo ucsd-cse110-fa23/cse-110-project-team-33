@@ -66,24 +66,20 @@ public class Model {
         }
     }
 
-    public String performRequest(String method, String uid, String recipe) {
+
+    // make a request to register a new user
+    public String registerUser(String username, String password) {
         try {
-            String urlString = "http://localhost:8100/";
-            if (uid != null) {
-                urlString += ("?=" + uid);
-            }
+            String urlString = "http://localhost:8100/register";
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod(method);
+            conn.setRequestMethod("POST");
             conn.setDoOutput(true);
 
-            if (method.equals("POST") || method.equals("PUT")) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String jsonRecipe = objectMapper.writeValueAsString(recipe);
+            String jsonUser = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
 
-                try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
-                    out.write(jsonRecipe);
-                }
+            try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
+                out.write(jsonUser);
             }
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {

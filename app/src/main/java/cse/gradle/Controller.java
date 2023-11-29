@@ -1,6 +1,7 @@
 package cse.gradle;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -9,7 +10,7 @@ public class Controller {
 
     public static void createUser(String username, String password) {
         Model model = new Model();
-        String postResponse = model.performRequest("POST", username, password);
+        String postResponse = model.registerUser(username, password);
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
@@ -25,6 +26,7 @@ public class Controller {
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
     public static void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+        // saveRecipe(popUp, recipe, rList);
         Model model = new Model();
         Recipe rcp = null;
         String getResponse = model.performRequest("DELETE", recipe.getId().toString(), rcp);
@@ -74,8 +76,9 @@ public class Controller {
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
-            appScenes.getRecipeListRoot().addButton(0, newRecipe);
             appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
+            appScenes.getRecipeListRoot().addButton(0, newRecipe);
+            appScenes.getRecipeListRoot().refresh();
             appScenes.displayScene(cancelScene);
         });
 
