@@ -31,21 +31,28 @@ public class View {
     public View(Stage stage) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
+        recipeListRoot = new RecipeList(this);
         UserLoginConstructor();
         UserAccountSceneConstructor();
-        recipeListRoot = new RecipeList(this);
-        recipeListScene = new Scene(recipeListRoot, 500, 600);
         newRecipeSceneConstructor();
     }
 
     public View(Stage stage, List<Recipe> arrayList) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
+        recipeListRoot = new RecipeList(this, arrayList);
+        newRecipeListSceneConstructor();
         UserLoginConstructor();
         UserAccountSceneConstructor();
-        recipeListRoot = new RecipeList(this, arrayList);
-        recipeListScene = new Scene(recipeListRoot, 500, 600);
         newRecipeSceneConstructor();
+    }
+
+    private void newRecipeListSceneConstructor(){
+        recipeListScene = new Scene(recipeListRoot, 500, 600);
+    }
+
+    public void displayRecipeListScene() {
+        displayScene(recipeListScene);
     }
 
     private void newRecipeSceneConstructor() {
@@ -57,9 +64,9 @@ public class View {
     public void displayNewRecipeScene() {
         displayScene(newRecipeScene);
     }
-    //////////////////////////// NEW
+
     public void UserAccountSceneConstructor(){
-        UserCreateAccount userCreateAccount = new UserCreateAccount(this, mainLoginScene, recipeListScene);
+        UserCreateAccount userCreateAccount = new UserCreateAccount(this);
         userAcccountScene = new Scene(userCreateAccount, 500, 600);
     }
 
@@ -68,14 +75,14 @@ public class View {
     }
 
      public void UserLoginConstructor(){
-        UserLogin userLoginAccount = new UserLogin(this, userAcccountScene, recipeListScene);
+        UserLogin userLoginAccount = new UserLogin(this);
         mainLoginScene = new Scene(userLoginAccount, 500, 600);
     }
 
     public void displayUserLoginConstructor(){
         displayScene(mainLoginScene);
     }
-    /////////////////////////////
+
     public void displayScene(Scene s) {
         stage.setScene(s);
     }
@@ -488,7 +495,7 @@ class UserCreateAccount extends BorderPane{
     private Button CreateButton;
     private Button BackButton;
 
-    public UserCreateAccount(View appScenes, Scene cancelScene, Scene nextScene){
+    public UserCreateAccount(View appScenes){
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
 
@@ -517,7 +524,7 @@ class UserCreateAccount extends BorderPane{
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(CreateButton, BackButton);
 
-        Controller.setListeners(this, appScenes, cancelScene, nextScene);
+        Controller.setListeners(this, appScenes);
         vbox.getChildren().addAll(usernameField, passwordField);
 
         VBox vbox2 = new VBox();
@@ -553,7 +560,7 @@ class UserLogin extends BorderPane{
     private Button CreateButton;
     private Button LoginButton;
 
-    public UserLogin(View appScenes, Scene createScene, Scene accepedtScene){
+    public UserLogin(View appScenes){
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
 
@@ -582,7 +589,7 @@ class UserLogin extends BorderPane{
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(CreateButton, LoginButton);
 
-        Controller.setListeners(this, appScenes, createScene, accepedtScene);
+        Controller.setListeners(this, appScenes);
         vbox.getChildren().addAll(usernameField, passwordField);
 
         VBox vbox2 = new VBox();
