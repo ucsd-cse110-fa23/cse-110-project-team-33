@@ -80,7 +80,7 @@ public class RegisterHandler implements HttpHandler {
 
         // Create a new User object using the username and password and insert it into the database
         // Intially, the user will have no recipes and the constructor creates a UUID for the user
-        User user = new User(username, password, new ArrayList<Recipe>());
+        User user = new User(username, password);
         mongoDB.insertOne(user.toDocument());
 
         scanner.close();
