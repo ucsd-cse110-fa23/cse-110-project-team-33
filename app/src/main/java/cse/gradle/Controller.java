@@ -5,21 +5,14 @@ import javafx.stage.Stage;
 
 public class Controller {
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
-    public static void saveRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+    public static void saveRecipe(AppFramePopUp popUp, UUID userId, Recipe recipe) {
         recipe.setName(popUp.getNameField().getText());
         recipe.setCategory(popUp.getCategoryField().getText());
         recipe.setIngredients(popUp.getIngredientsField().getText());
         recipe.setInstructions(popUp.getInstructionsField().getText());
 
-        rList.refresh();
-
         Model model = new Model();
-        String getResponse = model.performRequest("GET", recipe.getId().toString(), null);
-        if (getResponse.contains("No recipe found for id ")) {
-            model.performRequest("POST", null, recipe);
-        } else {
-            model.performRequest("PUT", recipe.getId().toString(), recipe);
-        }
+        String postResponse = model.performRequest("PUT", userId.toString(), recipe);
     }
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
