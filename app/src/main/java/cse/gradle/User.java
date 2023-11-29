@@ -39,4 +39,14 @@ public class User {
     public String toString() {
         return "Username: " + username + "\nPassword: " + password + "\nUserID: " + userId.toString();
     }
+
+    // toDocument method for saving to database
+    public Document toDocument() {
+        Document doc = new Document("_id", new ObjectId());
+        newUser.append("userId", userId)
+                .append("username", username)
+                .append("password", password)
+                .append("recipeList", recipeList);
+        return doc;
+    }
 }

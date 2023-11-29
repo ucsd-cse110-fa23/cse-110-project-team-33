@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cse.gradle.Recipe;
+import cse.gradle.User;
 import cse.gradle.Server.MongoDB;
 
 import java.io.*;
@@ -137,12 +138,9 @@ public class RequestHandler implements HttpHandler {
         User user = new User(username, password);
 
         // Add user to MongoDB JSON
-        Document newUser = new Document("_id", new ObjectId());
-        newUser.append("userId", userId)
-                .append("username", username)
-                .append("password", password)
-                .append("recipeList", recipeList);
-        users.insertOne(newUser);
+        MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "users_db", "users");
+        mongoDB.connect();
+        users.insertOne(user.toDocument());
 
         // Response
         String response = "Posted entry: \n" + user.toString();

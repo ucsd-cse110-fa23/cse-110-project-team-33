@@ -4,6 +4,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Controller {
+
+    public static void createUser(AppFramePopUp popUp, String username, String password) {
+        Model model = new Model();
+        String postResponse = model.permformRequest("POST", username, password);
+    }
+
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
     public static void saveRecipe(AppFramePopUp popUp, UUID userId, Recipe recipe) {
         recipe.setName(popUp.getNameField().getText());
