@@ -1,6 +1,9 @@
 package cse.gradle;
 
 import java.util.UUID;
+
+import org.bson.Document;
+
 import java.util.List;
 
 public class User {
@@ -38,5 +41,15 @@ public class User {
 
     public String toString() {
         return "Username: " + username + "\nPassword: " + password + "\nUserID: " + userId.toString();
+    }
+
+    // toDocument method for saving to database
+    public Document toDocument() {
+        Document doc = new Document();
+        doc.append("username", username);
+        doc.append("password", password);
+        doc.append("userId", userId.toString());
+        doc.append("recipeList", recipeList);
+        return doc;
     }
 }
