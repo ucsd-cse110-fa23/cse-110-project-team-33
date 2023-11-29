@@ -1,6 +1,8 @@
 package cse.gradle;
 import java.util.UUID;
 
+import org.bson.Document;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -114,6 +116,17 @@ public class Recipe {
         return ingredients + "," + instructions + "," + category + "," + name + "," + id;
     }
 
+    // toDocument method for saving to database
+    public Document toDocument() {
+        Document doc = new Document();
+        doc.append("ingredients", ingredients);
+        doc.append("instructions", instructions);
+        doc.append("category", category);
+        doc.append("name", name);
+        doc.append("id", id.toString());
+        return doc;
+    }
+
     // parse method for populating a recipe from a csv line
     public void populateRecipieFromString(String csvLine) {
         String[] splitLine = csvLine.split(",");
@@ -122,5 +135,16 @@ public class Recipe {
         category = splitLine[2];
         name = splitLine[3];
         id = UUID.fromString(splitLine[4]);
+    }
+
+    // parse method for populating a recipe from a database document
+    public static Recipe parseRecipeFromDocument(Document result) {
+        Recipe recipe = new Recipe();
+        recipe.setIngredients(result.getString("ingredients"));
+        recipe.setInstructions(result.getString("instructions"));
+        recipe.setCategory(result.getString("category"));
+        recipe.setName(result.getString("name"));
+        recipe.setId(UUID.fromString(result.getString("id")));
+        return recipe;
     }
 }
