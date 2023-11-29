@@ -28,6 +28,8 @@ public class Server {
         // Create a context for the server at root path "/" and associate it with
         // HttpHandler object "RequestHandler"
         server.createContext("/", new RequestHandler(data));
+        // create a context for the server at path "/registers" and associate it with RegisterHandler
+        server.createContext("/register", new RegisterHandler());
         // Set the server's executor object to be threadPoolExecutor
         server.setExecutor(threadPoolExecutor);
         // Start the server
