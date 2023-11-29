@@ -368,6 +368,7 @@ class RecipeList extends BorderPane {
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
+        vBox.setAlignment(Pos.TOP_CENTER);
         // vBox
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
@@ -402,6 +403,7 @@ class RecipeList extends BorderPane {
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
+        vBox.setAlignment(Pos.TOP_CENTER);
 
         for (int i = 0; i < recipes.size(); i++) {
             // For each recipe, add new button with title of recipe
@@ -448,6 +450,7 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(b);
+        refresh();
     }
 
     // overloaded method for adding a button at a specific index
@@ -463,6 +466,7 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(index, b);
+        refresh();
     }
 
     public void removeButton(Recipe r) {
@@ -479,7 +483,12 @@ class RecipeList extends BorderPane {
     public void refresh() {
         for (int i = 0; i < recipes.size(); i++) {
             // this.recipes.set(i, this.recipes.get(i));
+            System.out.println("button text before: " + this.buttons.get(i));
+            System.out.println("recipe name before: " + recipes.get(i).getName());
+            recipes.get(i).setName(recipes.get(i).getName().replace("\n", "").replace("\r", ""));
             this.buttons.get(i).setText(recipes.get(i).getName());
+            System.out.println("button text after: " + this.buttons.get(i));
+            System.out.println("recipe name after: " + recipes.get(i).getName());
         }
 
     }
