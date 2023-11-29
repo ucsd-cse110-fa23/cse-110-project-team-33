@@ -127,7 +127,7 @@ public class RequestHandler implements HttpHandler {
         JsonNode jsonNode = objectMapper.readTree(postData.toString());
 
         // Extract individual fields from the JSON
-        String username = jsonNode.has("username") ? jsonNode.get("user").asText() : "";
+        String username = jsonNode.has("username") ? jsonNode.get("username").asText() : "";
         String password = jsonNode.has("password") ? jsonNode.get("password").asText() : "";
 
         // Create a user object

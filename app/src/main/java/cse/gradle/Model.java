@@ -66,21 +66,20 @@ public class Model {
         }
     }
 
-    // overloaded method to create a new user with username and password
-    public String performRequest(String method, String username, String password) {
+    public String performRequest(String method, String uid, String recipe) {
         try {
             String urlString = "http://localhost:8100/";
-            if (username != null) {
-                urlString += ("?=" + username);
+            if (uid != null) {
+                urlString += ("?=" + uid);
             }
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
 
-            if (method.equals("POST")) {
+            if (method.equals("POST") || method.equals("PUT")) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                String jsonRecipe = objectMapper.writeValueAsString(password);
+                String jsonRecipe = objectMapper.writeValueAsString(recipe);
 
                 try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
                     out.write(jsonRecipe);
