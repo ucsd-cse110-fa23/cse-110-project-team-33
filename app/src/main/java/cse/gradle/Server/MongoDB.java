@@ -58,6 +58,19 @@ public class MongoDB {
         return document;
     }
 
+    // find one document that matches key-value pair
+    // if no document is found, return null
+    public Document findOne(String keyUsername, String valueUsername, String keyPassword, String valuePassword) {
+        Document document = collection.find(and(eq(keyUsername, valueUsername), eq(keyPassword, valuePassword))).first();
+        if (document == null) {
+            System.out.println("No document found with " + keyUsername + " = " + valueUsername + 
+                               " and " + keyPassword + " = " + valuePassword);
+            return null;
+        }
+        System.out.println("Found document: " + document.toJson());
+        return document;
+    }
+
     // update one document that matches key-value pair
     public void updateOne(String key, String value, Document document) {
         collection.updateOne(eq(key, value), new Document("$set", document));

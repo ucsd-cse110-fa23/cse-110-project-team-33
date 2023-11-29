@@ -11,13 +11,8 @@ import cse.gradle.Recipe;
 import java.io.*;
 import java.util.*;
 
-public class RequestHandler implements HttpHandler {
-
-    private final Map<String, Recipe> data;
-
-    public RequestHandler(Map<String, Recipe> data) {
-        this.data = data;
-    }
+// remake to recipe handler
+public class RecipeHandler implements HttpHandler {
 
     /*
      * Handles HTTP requests by calling the appropriate method
@@ -78,6 +73,9 @@ public class RequestHandler implements HttpHandler {
         String query = httpExchange.getRequestURI().getQuery();
         String response = "Invalid GET request";
         if (query != null) {
+            // // correct uri for users_db?
+            // MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "users_db", "users");
+            // mongoDB.connect();
             String id = query.substring(query.indexOf("=") + 1);
             Recipe recipe = data.get(id);
             if (recipe != null) {

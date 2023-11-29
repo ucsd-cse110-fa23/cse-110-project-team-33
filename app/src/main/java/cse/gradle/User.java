@@ -1,6 +1,9 @@
 package cse.gradle;
 
 import java.util.UUID;
+
+import org.bson.Document;
+
 import java.util.List;
 
 public class User {
@@ -14,6 +17,31 @@ public class User {
         this.password = password;
         this.recipeList = recipeList;
         this.userId = UUID.randomUUID();
+    }
+
+    // toDocument method for saving to or querying database
+    public Document toDocument() {
+        /**
+         * TO DO (see commented out code for reference)
+         */
+        Document doc = new Document();
+        // doc.append("ingredients", ingredients);
+        // doc.append("instructions", instructions);
+        // doc.append("category", category);
+        // doc.append("name", name);
+        // doc.append("id", id.toString());
+        return doc;
+    }
+
+    // parse method for populating a recipe from a database document
+    public static Recipe parseRecipeFromDocument(Document result) {
+        Recipe recipe = new Recipe();
+        recipe.setIngredients(result.getString("ingredients"));
+        recipe.setInstructions(result.getString("instructions"));
+        recipe.setCategory(result.getString("category"));
+        recipe.setName(result.getString("name"));
+        recipe.setId(UUID.fromString(result.getString("id")));
+        return recipe;
     }
 
     public String getUsername() {
