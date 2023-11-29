@@ -81,4 +81,30 @@ public class Controller {
             appScenes.displayScene(cancelScene);
         });
     }
+
+    // Sets the listensers for all the buttons within the recipe creation window
+    static void setListeners(UserCreateAccount createPane, View appScenes) {
+
+        createPane.getCreateButton().setOnAction(e -> {
+            appScenes.displayRecipeListScene();
+        });    
+
+        // Display cancelScene when backButton is pushed
+        createPane.getBackButton().setOnAction(e -> {
+            appScenes.displayUserLoginConstructor();
+        });
+    }
+
+    // Sets the listensers for all the buttons within the recipe creation window
+    static void setListeners(UserLogin createPane, View appScenes) {
+
+        createPane.getCreateButton().setOnAction(e -> {
+            appScenes.displayUserAccountSceneConstructor();;
+        });    
+
+        // Display cancelScene when backButton is pushed
+        createPane.getLoginButton().setOnAction(e -> {
+            appScenes.displayRecipeListScene();;
+        });
+    }
 }
