@@ -144,7 +144,6 @@ public class RequestHandler implements HttpHandler {
 
         // Response
         String response = "Posted entry: \n" + user.toString();
-
         System.out.println(response);
 
         // Close scanner

@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 public class Controller {
 
-    public static void createUser(AppFramePopUp popUp, String username, String password) {
+    public static void createUser(String username, String password) {
         Model model = new Model();
         String postResponse = model.permformRequest("POST", username, password);
     }
@@ -86,6 +86,9 @@ public class Controller {
     static void setListeners(UserCreateAccount createPane, View appScenes) {
 
         createPane.getCreateButton().setOnAction(e -> {
+            String username = createPane.getUsernameField();
+            String password = createPane.getPasswordField();
+            createUser(username, password);
             appScenes.displayRecipeListScene();
         });    
 
@@ -99,12 +102,12 @@ public class Controller {
     static void setListeners(UserLogin createPane, View appScenes) {
 
         createPane.getCreateButton().setOnAction(e -> {
-            appScenes.displayUserAccountSceneConstructor();;
+            appScenes.displayUserAccountSceneConstructor();
         });    
 
         // Display cancelScene when backButton is pushed
         createPane.getLoginButton().setOnAction(e -> {
-            appScenes.displayRecipeListScene();;
+            appScenes.displayRecipeListScene();
         });
     }
 }

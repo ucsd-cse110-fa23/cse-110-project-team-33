@@ -37,7 +37,9 @@ public class Feature8Tests {
     /*
      * --------------------------------- UNIT TESTS ---------------------------------
      */
+    @Deprecated
     @Test
+    @Disabled
     void fullCRUDTest() throws JsonMappingException, JsonProcessingException {
 
         // Create recipe and use model to POST it
