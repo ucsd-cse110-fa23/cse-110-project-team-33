@@ -326,7 +326,7 @@ class AppFramePopUp extends BorderPane {
         this.setBottom(buttonsBox);
 
         saveButton.setOnAction(e -> {
-            Controller.saveRecipe(this, recipe, recipeList);
+            // Controller.saveRecipe(this, recipe, recipeList);
         });
 
         deleteButton.setOnAction(e -> {
@@ -498,7 +498,7 @@ class RecipeList extends BorderPane {
     }
 }
 
-class UserCreateAccount extends BorderPane{
+class UserCreateAccount extends BorderPane {
     private TextField usernameField;
     private PasswordField passwordField;
     private Button CreateButton;
@@ -563,7 +563,7 @@ class UserCreateAccount extends BorderPane{
     }
 }
 
-class UserLogin extends BorderPane{
+class UserLogin extends BorderPane {
     private TextField usernameField;
     private PasswordField passwordField;
     private Button CreateButton;

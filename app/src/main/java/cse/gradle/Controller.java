@@ -1,37 +1,37 @@
 package cse.gradle;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Controller {
+
+    public static void createUser(String username, String password) {
+        Model model = new Model();
+        String postResponse = model.registerUser(username, password);
+    }
+
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
-    public static void saveRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+    public static void saveRecipe(AppFramePopUp popUp, UUID userId, Recipe recipe) {
         recipe.setName(popUp.getNameField().getText());
         recipe.setCategory(popUp.getCategoryField().getText());
         recipe.setIngredients(popUp.getIngredientsField().getText());
         recipe.setInstructions(popUp.getInstructionsField().getText());
 
-        rList.refresh();
-
         Model model = new Model();
-        String getResponse = model.performRequest("GET", recipe.getId().toString(), null);
-        if (getResponse.contains("No recipe found for id ")) {
-            model.performRequest("POST", null, recipe);
-        } else {
-            model.performRequest("PUT", recipe.getId().toString(), recipe);
-        }
+        String postResponse = model.performRequest("PUT", userId.toString(), recipe);
     }
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
     public static void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
-        saveRecipe(popUp, recipe, rList);
+        // saveRecipe(popUp, recipe, rList);
         Model model = new Model();
-        String getResponse = model.performRequest("DELETE", recipe.getId().toString(), null);
+        Recipe rcp = null;
+        String getResponse = model.performRequest("DELETE", recipe.getId().toString(), rcp);
         if (!getResponse.contains("No recipe found for id ")) {
-            model.performRequest("DELETE", recipe.getId().toString(), null);
-            rList.refresh();
+            model.performRequest("DELETE", recipe.getId().toString(), rcp);
             rList.removeButton(recipe);
             rList.refresh();
             Stage current = (Stage) popUp.getScene().getWindow();
@@ -92,6 +92,9 @@ public class Controller {
     static void setListeners(UserCreateAccount createPane, View appScenes) {
 
         createPane.getCreateButton().setOnAction(e -> {
+            String username = createPane.getUsernameField().getText().toString();
+            String password = createPane.getPasswordField().getText().toString();
+            createUser(username, password);
             appScenes.displayRecipeListScene();
         });    
 
@@ -102,15 +105,15 @@ public class Controller {
     }
 
     // Sets the listensers for all the buttons within the recipe creation window
-    static void setListeners(UserLogin createPane, View appScenes) {
+    static void setListeners(UserLogin userPane, View appScenes) {
 
-        createPane.getCreateButton().setOnAction(e -> {
-            appScenes.displayUserAccountSceneConstructor();;
+        userPane.getCreateButton().setOnAction(e -> {
+            appScenes.displayUserAccountSceneConstructor();
         });    
 
         // Display cancelScene when backButton is pushed
-        createPane.getLoginButton().setOnAction(e -> {
-            appScenes.displayRecipeListScene();;
+        userPane.getLoginButton().setOnAction(e -> {
+            appScenes.displayRecipeListScene();
         });
     }
 }

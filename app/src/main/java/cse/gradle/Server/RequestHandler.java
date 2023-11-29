@@ -7,16 +7,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cse.gradle.Recipe;
+import cse.gradle.User;
+import cse.gradle.Server.MongoDB;
 
 import java.io.*;
 import java.util.*;
 
 public class RequestHandler implements HttpHandler {
 
-    private final Map<String, Recipe> data;
+    // private final String uri = "mongodb+srv://mtan:U0h5GjAbFXT68Ki1@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority";
+    // private final MongoDatabase users_db;
+    // private final MongoCollection<Document> users;
+        HashMap<String, Recipe> data;
+        MongoDB mongoDB;
 
-    public RequestHandler(Map<String, Recipe> data) {
-        this.data = data;
+    public RequestHandler() {
+        data = new HashMap<String, Recipe>();
+        mongoDB = new MongoDB(null, null, null);
     }
 
     /*
@@ -120,27 +127,20 @@ public class RequestHandler implements HttpHandler {
         JsonNode jsonNode = objectMapper.readTree(postData.toString());
 
         // Extract individual fields from the JSON
-        String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
-        String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
-        String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
-        String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
-        UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
+        String username = jsonNode.has("username") ? jsonNode.get("username").asText() : "";
+        String password = jsonNode.has("password") ? jsonNode.get("password").asText() : "";
 
-        // Create a recipe object
-        Recipe recipe = new Recipe(ingredients, instructions, category, name);
+        // Create a user object
+        User user = new User(username, password);
 
-        // Add id to the recipe
-        recipe.setId(id);
-
-        // Add recipe to the data
-        data.put(id.toString(), recipe);
-
-        // Add recipe to CSV
-        LocalDatabase.saveRecipeToLocal(recipe);
+        // Add user to MongoDB JSON
+        MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "users_db", "users");
+        mongoDB.connect();
+        
+        mongoDB.insertOne(user.toDocument());
 
         // Response
-        String response = "Posted entry: " + recipe.toString();
-
+        String response = "Posted entry: \n" + user.toString();
         System.out.println(response);
 
         // Close scanner

@@ -128,7 +128,7 @@ public class Recipe {
     }
 
     // parse method for populating a recipe from a csv line
-    public void populateRecipieFromString(String csvLine) {
+    public void populateRecipeFromString(String csvLine) {
         String[] splitLine = csvLine.split(",");
         ingredients = splitLine[0];
         instructions = splitLine[1];

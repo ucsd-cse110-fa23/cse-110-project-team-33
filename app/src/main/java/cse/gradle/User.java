@@ -3,6 +3,9 @@ package cse.gradle;
 import java.util.UUID;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -12,10 +15,10 @@ public class User {
     private String password;
     private List<Recipe> recipeList;
 
-    public User(String username, String password, List<Recipe> recipeList) {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.recipeList = recipeList;
+        this.recipeList = new ArrayList<Recipe>();
         this.userId = UUID.randomUUID();
     }
 

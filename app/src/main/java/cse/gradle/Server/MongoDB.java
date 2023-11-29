@@ -73,8 +73,7 @@ public class MongoDB {
     public void close() {
         mongoClient.close();
         db = null;
-        collection = null;
-        
+        collection = null;  
     }
 
     

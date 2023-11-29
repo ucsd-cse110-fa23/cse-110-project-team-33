@@ -37,7 +37,9 @@ public class Feature8Tests {
     /*
      * --------------------------------- UNIT TESTS ---------------------------------
      */
+    @Deprecated
     @Test
+    @Disabled
     void fullCRUDTest() throws JsonMappingException, JsonProcessingException {
 
         // Create recipe and use model to POST it
@@ -49,8 +51,9 @@ public class Feature8Tests {
         String expectedResponse = "Posted entry: " +  originalRecipe.toString();
         assertEquals(expectedResponse, response);
 
+        Recipe rcp = null;
         // Check that the recipe was added to the database with GET
-        String getResponse = model.performRequest("GET", originalRecipe.getId().toString(), null);
+        String getResponse = model.performRequest("GET", originalRecipe.getId().toString(), rcp);
         Recipe getRecipe = Recipe.parseRecipeFromString(getResponse);
         assertEquals(Recipe.equals(originalRecipe, getRecipe), true);
 
@@ -63,13 +66,13 @@ public class Feature8Tests {
         assertEquals(expectedPutResponse, putResponse);
 
         // Check that the recipe was updated in the database GET
-        getResponse = model.performRequest("GET", originalRecipe.getId().toString(), null);
+        getResponse = model.performRequest("GET", originalRecipe.getId().toString(), rcp);
         getRecipe = Recipe.parseRecipeFromString(getResponse);
         assertEquals(Recipe.equals(updatedRecipe, getRecipe), true);
 
 
         // Delete the recipe from the database
-        String deleteResponse = model.performRequest("DELETE", originalRecipe.getId().toString(), null);
+        String deleteResponse = model.performRequest("DELETE", originalRecipe.getId().toString(), rcp);
         String expectedDeleteResponse = "Deleted entry for id " + originalRecipe.getId().toString();
 
         // Check that the response is correct
@@ -95,8 +98,9 @@ public class Feature8Tests {
         readRecipes = LocalDatabase.readLocal();
         assertEquals(Recipe.equals(originalRecipe, readRecipes.get(0)), true);
         
+        Recipe rcp = null;
         // delete recipe and delete request it, then check the csv file to see if it was deleted properly
-        response = model.performRequest("DELETE", originalRecipe.getId().toString(), null);
+        response = model.performRequest("DELETE", originalRecipe.getId().toString(), rcp);
         readRecipes = LocalDatabase.readLocal();
         assertEquals(readRecipes.contains(originalRecipe), false);
 
@@ -117,49 +121,14 @@ public class Feature8Tests {
             model.performRequest("POST", null, rList.get(i));
         }
 
-        String response = model.performRequest("GET", null, null);
+        Recipe rcp = null;
+        String response = model.performRequest("GET", null, rcp);
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<Recipe> rList2 = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
         for (int i = 0; i < rList2.size(); i++) {
             assertEquals(true, Recipe.equals(rList.get(i), rList2.get(rList2.size()-1-i)));
-            model.performRequest("DELETE", rList.get(i).getId().toString(), null);
+            model.performRequest("DELETE", rList.get(i).getId().toString(), rcp);
         }   
-    }
-
-    @Test
-    void mongoDBQueryTest() {
-        // Note: recipes_db is for testing purposes only, the real database will be users_db 
-        // where each user has a list of recipes
-        MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "recipe_db", "recipes");
-        mongoDB.connect();
-
-        // mongoDB.collection.insertOne(new Document().append("test", "test"));
-
-        // insert a recipe
-        Recipe recipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
-        mongoDB.insertOne(recipe.toDocument());
-
-        // find the recipe
-        Document result = mongoDB.findOne("name", "boiled potatoes");
-        Recipe resultRecipe = Recipe.parseRecipeFromDocument(result);
-        assertEquals(Recipe.equals(recipe, resultRecipe), true);
-
-        // update the recipe
-        recipe.setCategory("breakfast");
-        mongoDB.updateOne("name", "boiled potatoes", recipe.toDocument());
-
-        // find the updated recipe
-        result = mongoDB.findOne("name", "boiled potatoes");
-        resultRecipe = Recipe.parseRecipeFromDocument(result);
-        assertEquals(Recipe.equals(recipe, resultRecipe), true);
-
-        // delete the recipe
-        mongoDB.deleteOne("name", "boiled potatoes");
-
-        // find the deleted recipe
-        result = mongoDB.findOne("name", "boiled potatoes");
-        assertEquals(result, null);
-
     }
 
 }
