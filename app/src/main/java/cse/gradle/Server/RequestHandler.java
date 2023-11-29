@@ -19,14 +19,9 @@ public class RequestHandler implements HttpHandler {
     // private final MongoDatabase users_db;
     // private final MongoCollection<Document> users;
 
-    // public RequestHandler() {
-    //     try (MongoClient mongoClient = MongoClients.create(uri)) {
-    //         this.users_db = mongoClient.getDatabase("user_db");
-    //         this.users = users_db.getCollection("users");
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+    public RequestHandler() {
+        
+    }
 
     /*
      * Handles HTTP requests by calling the appropriate method

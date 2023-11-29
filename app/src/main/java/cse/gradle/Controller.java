@@ -99,14 +99,14 @@ public class Controller {
     }
 
     // Sets the listensers for all the buttons within the recipe creation window
-    static void setListeners(UserLogin createPane, View appScenes) {
+    static void setListeners(UserLogin userPane, View appScenes) {
 
-        createPane.getCreateButton().setOnAction(e -> {
+        userPane.getCreateButton().setOnAction(e -> {
             appScenes.displayUserAccountSceneConstructor();
         });    
 
         // Display cancelScene when backButton is pushed
-        createPane.getLoginButton().setOnAction(e -> {
+        userPane.getLoginButton().setOnAction(e -> {
             appScenes.displayRecipeListScene();
         });
     }

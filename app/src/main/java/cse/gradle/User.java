@@ -9,10 +9,10 @@ public class User {
     private String password;
     private List<Recipe> recipeList;
 
-    public User(String username, String password, List<Recipe> recipeList) {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.recipeList = recipeList;
+        this.recipeList = new List<Recipe>();
         this.userId = UUID.randomUUID();
     }
 
