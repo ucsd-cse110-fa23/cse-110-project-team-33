@@ -72,7 +72,7 @@ public class LoginHandler implements HttpHandler {
         Scanner scanner = new Scanner(inStream);
         StringBuilder postData = new StringBuilder();
 
-        while (scanner.hasNextLine()) {
+        while (scanner.hasNextLine()) 
             postData.append(scanner.nextLine());
         }
 

@@ -11,7 +11,10 @@ import cse.gradle.Recipe;
 import java.io.*;
 import java.util.*;
 
-// remake to recipe handler
+import org.bson.Document;
+import org.json.JSONArray;
+
+// remake to recipe handler which requires a user id as a part of the http request
 public class RecipeHandler implements HttpHandler {
 
     /*
@@ -22,21 +25,25 @@ public class RecipeHandler implements HttpHandler {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
         try {
+
+            // Check if user id is in the request
+            String query = httpExchange.getRequestURI().getQuery();
+            if (query == null) {
+                throw new Exception("No user id in request");
+            }
+
+            // Get user id from request
+            String userId = query.substring(query.indexOf("=") + 1);
+
+
             if (method.equals("GET")) {
-                String query = httpExchange.getRequestURI().getQuery();
-                if (query == null) {
-                    response = handleGetAll(httpExchange);
-                } else if (query.contains("=")) {
-                    response = handleGet(httpExchange);
-                } else {
-                    throw new Exception("Unsupported HTTP method: " + method);
-                }
+                response = handleGetAll(httpExchange, userId);
             } else if (method.equals("POST")) {
-                response = handlePost(httpExchange);
+                response = handlePost(httpExchange, userId);
             } else if (method.equals("PUT")) {
-                response = handlePut(httpExchange);
+                response = handlePut(httpExchange, userId);
             } else if (method.equals("DELETE")) {
-                response = handleDelete(httpExchange);
+                response = handleDelete(httpExchange, userId);
             } else {
                 throw new Exception("Unsupported HTTP method: " + method);
             }
@@ -66,43 +73,48 @@ public class RecipeHandler implements HttpHandler {
         outStream.close();
     }
 
-    /*
-     * Handles GET requests by returning the recipe associated with the id
-     */
-    private String handleGet(HttpExchange httpExchange) throws IOException {
-        String query = httpExchange.getRequestURI().getQuery();
-        String response = "Invalid GET request";
-        if (query != null) {
-            // // correct uri for users_db?
-            // MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "users_db", "users");
-            // mongoDB.connect();
-            String id = query.substring(query.indexOf("=") + 1);
-            Recipe recipe = data.get(id);
-            if (recipe != null) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                response = objectMapper.writeValueAsString(recipe);
-                System.out.println("Queried for " + id + " and found " + recipe);
-            } else {
-                response = "No recipe found for id " + id;
-            }
-        }
-        return response;
-    }
+    // /*
+    //  * Handles GET requests by returning the recipe associated with the id
+    //  */
+    // private String handleGet(HttpExchange httpExchange) throws IOException {
+    //     String query = httpExchange.getRequestURI().getQuery();
+    //     String response = "Invalid GET request";
+    //     if (query != null) {
+    //         // // correct uri for users_db?
+    //         // MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "users_db", "users");
+    //         // mongoDB.connect();
+    //         String id = query.substring(query.indexOf("=") + 1);
+    //         Recipe recipe = data.get(id);
+    //         if (recipe != null) {
+    //             ObjectMapper objectMapper = new ObjectMapper();
+    //             response = objectMapper.writeValueAsString(recipe);
+    //             System.out.println("Queried for " + id + " and found " + recipe);
+    //         } else {
+    //             response = "No recipe found for id " + id;
+    //         }
+    //     }
+    //     return response;
+    // }
 
     /*
      * Handles GET requests by returning the recipe associated with the id
      */
-    private String handleGetAll(HttpExchange httpExchange) throws IOException {
-        List<Recipe> recipes = new ArrayList<>(LocalDatabase.readLocal());
-        ObjectMapper objectMapper = new ObjectMapper();
-        String response = objectMapper.writeValueAsString(recipes);
-        return response;
+    private String handleGetAll(HttpExchange httpExchange, String userId) throws IOException {
+        // Search for the current user's recipe list
+        MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "user_db", "users");
+        mongoDB.connect();
+        Document user = mongoDB.findOne("userId", userId);
+        List<Document> recipeList = (List<Document>) user.get("recipeList");    
+
+        JSONArray jsonArray = new JSONArray(recipeList);
+
+        return jsonArray.toString();
     }
 
     /*
      * Handles POST requests by adding the recipe, which is contained in the query
      */
-    private String handlePost(HttpExchange httpExchange) throws IOException {
+    private String handlePost(HttpExchange httpExchange, String userId) throws IOException {
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         StringBuilder postData = new StringBuilder();
@@ -130,11 +142,21 @@ public class RecipeHandler implements HttpHandler {
         // Add id to the recipe
         recipe.setId(id);
 
-        // Add recipe to the data
-        data.put(id.toString(), recipe);
+        MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "user_db", "users");
+        mongoDB.connect();
 
-        // Add recipe to CSV
-        LocalDatabase.saveRecipeToLocal(recipe);
+
+        // get existing recipe list
+        Document user = mongoDB.findOne("userId", userId);
+        List<Document> recipeList = (List<Document>) user.get("recipeList"); 
+        
+        // append new recipe to recipe list
+        recipeList.add(recipe.toDocument());
+        
+        Document updatedUser = new Document("$set", new Document("recipeList", recipeList));
+
+        mongoDB.collection.updateOne(user, updatedUser);
+        
 
         // Response
         String response = "Posted entry: " + recipe.toString();
@@ -150,7 +172,7 @@ public class RecipeHandler implements HttpHandler {
     /*
      * Handles PUT requests by updating the recipe associated with the id
      */
-    private String handlePut(HttpExchange httpExchange) throws IOException {
+    private String handlePut(HttpExchange httpExchange, String userId) throws IOException {
         String query = httpExchange.getRequestURI().getQuery();
         String response = "Invalid PUT request";
 
@@ -216,7 +238,7 @@ public class RecipeHandler implements HttpHandler {
     /*
      * Handles DELETE requests by deleting the recipe associated with the id
      */
-    private String handleDelete(HttpExchange httpExchange) throws IOException {
+    private String handleDelete(HttpExchange httpExchange, String userId) throws IOException {
         String query = httpExchange.getRequestURI().getQuery();
         String response = "Invalid DELETE request";
         if (query != null) {

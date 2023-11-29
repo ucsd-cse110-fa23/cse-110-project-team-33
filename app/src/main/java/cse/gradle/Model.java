@@ -32,11 +32,11 @@ public class Model {
      * For DELETE requests, uid should be the id of the recipe to delete and recipe
      * should be null
      */
-    public String performRequest(String method, String uid, Recipe recipe) {
+    public String performRequest(String method, String uid, Recipe recipe, String userId) {
         try {
             String urlString = "http://localhost:8100/";
             if (uid != null) {
-                urlString += ("?=" + uid);
+                urlString += ("?=" + userId);
             }
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
