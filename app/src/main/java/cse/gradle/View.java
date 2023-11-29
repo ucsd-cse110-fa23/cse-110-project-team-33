@@ -358,7 +358,11 @@ class RecipeList extends BorderPane {
     private VBox vBox;
 
     private Button newRecipeButton;
+    private Button logoutButton;
     private HBox newRecipeButtonBox;
+    private HBox TitleBox;
+    private HBox logoutButtonBox;
+    private VBox topBox;
 
     public RecipeList(View appScenes) {
         this.appScenes = appScenes;
@@ -375,6 +379,21 @@ class RecipeList extends BorderPane {
         scrollPane.setFitToWidth(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
+        Label title = new Label("Recipes");
+        TitleBox = new HBox();
+        logoutButtonBox = new HBox();
+        topBox = new VBox();
+        title.setStyle("-fx-font-size: 24;");
+        logoutButton = new Button("Logout");
+        title.setAlignment(Pos.CENTER);
+        logoutButton.setAlignment(Pos.CENTER);
+        TitleBox.setAlignment(Pos.TOP_CENTER);
+        TitleBox.getChildren().add(title);
+        logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
+        logoutButtonBox.getChildren().add(logoutButton);
+        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+        this.setTop(topBox); 
+
         // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
         newRecipeButton.setPrefSize(100, 20);
@@ -387,6 +406,11 @@ class RecipeList extends BorderPane {
             this.appScenes.displayNewRecipeScene();
             System.out.println("New Recipe pressed");
         });
+
+        logoutButton.setOnAction(e -> {
+            this.appScenes.displayUserLoginConstructor();
+        });
+
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
         newRecipeButtonBox.getChildren().add(newRecipeButton);
@@ -409,6 +433,21 @@ class RecipeList extends BorderPane {
             addButton(r);
         }
 
+        Label title = new Label("Recipes");
+        TitleBox = new HBox();
+        logoutButtonBox = new HBox();
+        topBox = new VBox();
+        title.setStyle("-fx-font-size: 24;");
+        logoutButton = new Button("Logout");
+        title.setAlignment(Pos.CENTER);
+        logoutButton.setAlignment(Pos.CENTER);
+        TitleBox.setAlignment(Pos.TOP_CENTER);
+        TitleBox.getChildren().add(title);
+        logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
+        logoutButtonBox.getChildren().add(logoutButton);
+        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+        this.setTop(topBox); 
+
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);
@@ -425,6 +464,11 @@ class RecipeList extends BorderPane {
         newRecipeButton.setOnAction(e -> {
             this.appScenes.displayNewRecipeScene();
         });
+
+        logoutButton.setOnAction(e -> {
+            this.appScenes.displayUserLoginConstructor();
+        });
+
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
         newRecipeButtonBox.getChildren().add(newRecipeButton);
