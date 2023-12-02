@@ -15,6 +15,14 @@ import java.util.*;
 import org.bson.Document;
 
 public class RegisterHandler implements HttpHandler {
+
+    MongoDB usersDB;
+
+    public RegisterHandler(MongoDB mongoDB) {
+        this.usersDB = mongoDB;
+        usersDB.connect();
+    }
+
     // Handles a POST request for a new user registration
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -51,44 +59,47 @@ public class RegisterHandler implements HttpHandler {
     // Handles a POST request for a new user registration
     // Accepted JSON Format: {"username": "username", "password": "password"}
     private String handlePost(HttpExchange httpExchange) throws IOException {
-        InputStream inStream = httpExchange.getRequestBody();
-        Scanner scanner = new Scanner(inStream);
-        StringBuilder postData = new StringBuilder();
+        String response = "Invalid POST request";
+        try {
+            InputStream inStream = httpExchange.getRequestBody();
+            Scanner scanner = new Scanner(inStream);
+            StringBuilder postData = new StringBuilder();
 
-        while (scanner.hasNextLine()) {
-            postData.append(scanner.nextLine());
+            while (scanner.hasNextLine()) {
+                postData.append(scanner.nextLine());
+            }
+
+            scanner.close();
+            inStream.close();
+
+            System.out.println("Received JSON data: " + postData);
+
+            // Parse the JSON request body into a JsonNode tree
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(postData.toString());
+
+            // Get the username and password from the request body
+            String username = root.get("username").asText();
+            String password = root.get("password").asText();
+
+            if (usersDB.findOne("username", username) != null) {
+                response += "Username " + username + " already exists";
+                throw new Exception(response);
+            }
+
+            // Create a new User object using the username and password and insert it into the database
+            // Intially, the user will have no recipes and the constructor creates a UUID for the user
+            User user = new User(username, password);
+            usersDB.insertOne(user.toDocument());
+
+            response = "User " + username + " successfully registered";
+
+        } catch (Exception e) {
+            // If an exception is thrown, return an error message
+            e.printStackTrace();
         }
 
-        System.out.println("Received JSON data: " + postData);
-
-        // Parse the JSON request body into a JsonNode tree
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(postData.toString());
-
-        // Get the username and password from the request body
-        String username = root.get("username").asText();
-        String password = root.get("password").asText();
-
-        // Create a MongoDB object to access the database and check if the username already exists
-        MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "user_db", "users");
-        mongoDB.connect();
-
-        if (mongoDB.findOne("username", username) != null) {
-            // If the username already exists, return an error message
-            return "Username " + username + " already exists";
-        }
-
-        // Create a new User object using the username and password and insert it into the database
-        // Intially, the user will have no recipes and the constructor creates a UUID for the user
-        User user = new User(username, password);
-        mongoDB.insertOne(user.toDocument());
-
-        scanner.close();
-        inStream.close();
-                
-        // Return a success message 
-        return "User " + username + " successfully registered";
-
+        return response;
     } 
 
 

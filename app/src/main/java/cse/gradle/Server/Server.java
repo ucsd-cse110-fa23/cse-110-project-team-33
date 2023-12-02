@@ -15,12 +15,14 @@ public class Server {
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_HOSTNAME = "localhost";
 
+    private HttpServer server;
+
     public Server() throws IOException {
         // create a thread pool to handle requests
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
         // Create a server
-        HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT), 0);
+         server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT), 0);
 
 
         // Create a MongoDB object that accesses the users colleciton in the user_db database
@@ -30,8 +32,8 @@ public class Server {
 
         // Register the handlers
         server.createContext("/recipe", new RecipeHandler(usersDb));
-        server.createContext("/login", new LoginHandler());
-        server.createContext("/register", new RegisterHandler());
+        server.createContext("/login", new LoginHandler(usersDb));
+        server.createContext("/register", new RegisterHandler(usersDb));
 
         // Set the server's executor object to be threadPoolExecutor
         server.setExecutor(threadPoolExecutor);
@@ -39,6 +41,10 @@ public class Server {
         server.start();
 
         System.out.println("Server started at " + SERVER_HOSTNAME + ":" + SERVER_PORT);
+    }
+
+    public void stop() {
+        server.stop(0);
     }
 
 }
