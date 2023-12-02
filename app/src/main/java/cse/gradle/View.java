@@ -59,7 +59,7 @@ public class View {
     }
 
     private void newRecipeListSceneConstructor(){
-        recipeListScene = new Scene(recipeListRoot, 500, 600);
+        this.recipeListScene = new Scene(recipeListRoot, 500, 600);
     }
 
     public void displayRecipeListScene() {
@@ -337,7 +337,7 @@ class AppFramePopUp extends BorderPane {
         this.setBottom(buttonsBox);
 
         saveButton.setOnAction(e -> {
-            // Controller.saveRecipe(this, recipe, recipeList);
+            //recipeList.appScenes.getController().saveRecipe(this, recipe, recipeList);
         });
 
         deleteButton.setOnAction(e -> {

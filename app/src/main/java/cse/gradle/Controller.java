@@ -28,13 +28,13 @@ public class Controller {
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
-    public void saveRecipe(AppFramePopUp popUp, UUID userId, Recipe recipe) {
+    public void saveRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
         recipe.setName(popUp.getNameField().getText());
         recipe.setCategory(popUp.getCategoryField().getText());
         recipe.setIngredients(popUp.getIngredientsField().getText());
         recipe.setInstructions(popUp.getInstructionsField().getText());
 
-        String postResponse = model.performRecipeRequest("PUT", userId.toString(), recipe);
+        String postResponse = model.performRecipeRequest("POST", null, recipe);
     }
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
@@ -91,16 +91,16 @@ public class Controller {
             appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
             appScenes.getRecipeListRoot().addButton(0, newRecipe);
             appScenes.getRecipeListRoot().refresh();
-            appScenes.displayScene(cancelScene);
+            appScenes.displayRecipeListScene();
         });
 
         // Display cancelScene when backButton is pushed
         recipePane.getBackButton().setOnAction(e -> {
-            appScenes.displayScene(cancelScene);
+            appScenes.displayRecipeListScene();
         });
     }
 
-    // Sets the listensers for all the buttons within the recipe creation window
+    // Sets the listensers for all the buttons within the account creation window
     void setListeners(UserCreateAccount createPane, View appScenes) {
 
         createPane.getCreateButton().setOnAction(e -> {
@@ -117,7 +117,7 @@ public class Controller {
         });
     }
 
-    // Sets the listensers for all the buttons within the recipe creation window
+    // Sets the listensers for all the buttons within the account login window
     void setListeners(UserLogin userPane, View appScenes) {
 
         userPane.getCreateButton().setOnAction(e -> {
@@ -134,7 +134,9 @@ public class Controller {
             String response = model.performRecipeRequest("GET", null, null);
             System.out.println("response: " + response);
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
+            //System.out.println("\n" + recipeArrayList.toString() + "\n");
             appScenes.setRecipeListRoot(recipeArrayList);
+            //System.out.println("\n" + appScenes.getRecipeListRoot().toString() + "\n");
             appScenes.displayRecipeListScene();
         });
     }
