@@ -71,6 +71,19 @@ public class Recipe {
         this.id = UUID.randomUUID();
     }
 
+    // constructor with String and UUID arguments
+    public Recipe(String ingredients,
+                  String instructions,
+                  String category,
+                  String name,
+                  UUID id) {
+        this.ingredients = ingredients;
+        this.instructions = instructions;
+        this.category = category;
+        this.name = name;
+        this.id = id;
+    }
+
     // getters
     public String getIngredients() {
         return ingredients;

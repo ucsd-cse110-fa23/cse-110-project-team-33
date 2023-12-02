@@ -77,6 +77,40 @@ public class MongoDB {
         System.out.println("Updated document: " + document.toJson());
     }
 
+
+    /*
+     * Pushes a new document to a list in a document
+     * @param key: the key of the document to update
+     * @param value: the value of the document to update
+     * @param listName: the name of the list in the document to push to
+     * @param newDocument: the document to push to the list
+     */
+    public void pushToDocumentList(String key, String value, String listName, Document newDocument) {
+        try {
+            // Create the update document
+            Document updateDocument = new Document("$push", new Document(listName, newDocument));
+
+            // Update the user with the new document
+            collection.updateOne(eq(key, value), updateDocument);
+            System.out.println("Updated user's " + collectionName + " with a new document.");
+        } catch (Exception e) {
+            System.out.println("Error updating " + collectionName + ": " + e.getMessage());
+        }
+    }
+
+    public void updateDocumentList(String key, String value, String listName, List<Document> newDocuments) {
+        try {
+            // Create the update document
+            Document updateDocument = new Document("$set", new Document(listName, newDocuments));
+
+            // Update the user with the new document
+            collection.updateOne(eq(key, value), updateDocument);
+            System.out.println("Updated user's " + collectionName + " with a new document.");
+        } catch (Exception e) {
+            System.out.println("Error updating " + collectionName + ": " + e.getMessage());
+        }
+    }
+
     // delete one document that matches key-value pair
     public void deleteOne(String key, String value) {
         collection.deleteOne(eq(key, value));
@@ -86,8 +120,7 @@ public class MongoDB {
     public void close() {
         mongoClient.close();
         db = null;
-        collection = null;
-        
+        collection = null;  
     }
 
     

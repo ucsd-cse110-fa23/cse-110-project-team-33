@@ -5,13 +5,17 @@ import com.sun.net.httpserver.HttpHandler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 
 import cse.gradle.Recipe;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.checkerframework.checker.units.qual.m;
 import org.json.JSONArray;
 
@@ -34,17 +38,21 @@ public class RecipeHandler implements HttpHandler {
         String method = httpExchange.getRequestMethod();
         try {
 
-            // Check if user id is in the request
-            String query = httpExchange.getRequestURI().getQuery();
-            if (query == null) {
-                throw new Exception("No user id in request");
-            }
-
             // Get user id from request, first query is user id, second is recipe id (if
             // applicable)
-            // Example: http://localhost:8100/?userId=123&recipeId=456
+            // Example: http://localhost:8100/recipe?userId=123&recipeId=456
+            
+            URI uri = httpExchange.getRequestURI();
+            System.out.println("URI: " + uri);
+            String query = uri.getRawQuery();
+            System.out.println("Query: " + query);
             String userId = query.substring(query.indexOf("=") + 1, query.indexOf("&"));
             String recipeId = query.substring(query.lastIndexOf("=") + 1);
+
+             // If there is no user id, return an error
+             if (userId.equals("")) {
+                 throw new Exception("No user id provided");
+             }
 
             if (method.equals("GET")) {
                 if (recipeId.equals("")) {
@@ -95,6 +103,13 @@ public class RecipeHandler implements HttpHandler {
         if (query != null) {
             // Search for the current user's recipe list
             Document user = usersDB.findOne("userId", userId);
+
+            // Break if no user was found
+            if (user == null) {
+                response += "No user found for id " + userId;
+                return response;
+            }
+
             List<Document> recipeList = user.getList("recipeList", Document.class);
 
             // Break if no recipe list was found
@@ -129,9 +144,24 @@ public class RecipeHandler implements HttpHandler {
      * Handles GET requests by returning the recipe associated with the id
      */
     private String handleGetAll(HttpExchange httpExchange, String userId) throws IOException {
+        String response = "Invalid GET request";
+        
         // Search for the current user's recipe list
         Document user = usersDB.findOne("userId", userId);
-        List<Document> recipeList = (List<Document>) user.get("recipeList");
+
+        // Break if no user was found
+        if (user == null) {
+            response += "No user found for id " + userId;
+            return response;
+        }
+
+        List<Document> recipeList = user.getList("recipeList", Document.class);
+
+        // Break if no recipe list was found
+        if (recipeList == null) {
+            response += "No recipe list found for user " + userId;
+            return response;
+        }
 
         JSONArray jsonArray = new JSONArray(recipeList);
 
@@ -149,41 +179,28 @@ public class RecipeHandler implements HttpHandler {
         while (scanner.hasNextLine()) {
             postData.append(scanner.nextLine());
         }
+        
+        scanner.close();
 
         System.out.println("Received JSON data: " + postData);
 
-        // Parse JSON using Jackson
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(postData.toString());
-
-        // Extract individual fields from the JSON
-        String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
-        String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
-        String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
-        String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
-        UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
-
-        // Create a recipe object
-        Recipe recipe = new Recipe(ingredients, instructions, category, name);
-
-        // Add id to the recipe
-        recipe.setId(id);
-
-        // get existing recipe list
-        Document user = usersDB.findOne("userId", userId);
-        List<Document> recipeList = user.getList("recipeList", null);
-
-        // append new recipe to recipe list
-        recipeList.add(recipe.toDocument());
-
-        // Update the user with the new recipe list
-        Document updatedUser = new Document("$set", new Document("recipeList", recipeList));
-        usersDB.updateOne("userId", userId, updatedUser);
+        // Parse recipe from JSON
+        Recipe recipe = Recipe.parseRecipeFromString(postData.toString());
 
         // Response
         String response = "Posted entry: " + recipe.toString();
 
-        System.out.println(response);
+        // Convert the recipe to a Document
+        Document newRecipeDocument = recipe.toDocument();
+
+        // Search for the user to make sure they exist
+        Document user = usersDB.findOne("userId", userId);
+        // Break if no user was found
+        if (user == null) {
+            return "No user found for id " + userId;
+        }
+        // Push the recipe to the user's recipe list
+        usersDB.pushToDocumentList("userId", userId, "recipeList", newRecipeDocument);
 
         // Close scanner
         scanner.close();
@@ -202,6 +219,12 @@ public class RecipeHandler implements HttpHandler {
 
             // get existing recipe list
             Document user = usersDB.findOne("userId", userId);
+
+            // Break if no user was found
+            if (user == null) {
+                return "No user found for id " + userId;
+            }
+        
             List<Document> recipeList = user.getList("recipeList", Document.class);
 
             // Break if no recipe list was found
@@ -219,53 +242,40 @@ public class RecipeHandler implements HttpHandler {
                 }
             }
 
-            // Break if no recipe was found
+            // Break if no recipe with matching id was found
             if (existingRecipeDocument == null) {
                 response += "No recipe found for id " + recipeId;
                 return response;
             }
 
-            // Create a recipe object from the existing recipe
-            Recipe existingRecipe = Recipe.parseRecipeFromDocument(existingRecipeDocument);
+            // Remove the existing recipe
+            recipeList.remove(existingRecipeDocument);
 
-            // Extract fields from the JSON and update the existing recipe
+            // Parse the new recipe from the request body
             InputStream inStream = httpExchange.getRequestBody();
             Scanner scanner = new Scanner(inStream);
             StringBuilder postData = new StringBuilder();
             while (scanner.hasNextLine()) {
-                postData.append(scanner.nextLine());
+                postData.append(scanner.nextLine());       
             }
+
+            // Print JSON data
             System.out.println("Received JSON data: " + postData);
 
-            // Parse JSON using Jackson
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(postData.toString());
+            // Parse recipe from JSON
+            Recipe newRecipe = Recipe.parseRecipeFromString(postData.toString());
 
-            // Extract individual fields from the JSON
-            String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText()
-                    : existingRecipe.getIngredients();
-            String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : existingRecipe
-                    .getInstructions();
-            String category = jsonNode.has("category") ? jsonNode.get("category").asText() : existingRecipe
-                    .getCategory();
-            String name = jsonNode.has("name") ? jsonNode.get("name").asText() : existingRecipe.getName();
+            // Convert the recipe to a Document
+            Document newRecipeDocument = newRecipe.toDocument();
 
-            // Update the existing recipe
-            existingRecipe.setIngredients(ingredients);
-            existingRecipe.setInstructions(instructions);
-            existingRecipe.setCategory(category);
-            existingRecipe.setName(name);
+            // Add the new recipe to the recipe list
+            recipeList.add(newRecipeDocument);
 
-            // Update the recipe list
-            recipeList.remove(existingRecipeDocument);
-            recipeList.add(existingRecipe.toDocument());
-
-            // Update the user
-            Document updatedUser = new Document("$set", new Document("recipeList", recipeList));
-            usersDB.collection.updateOne(user, updatedUser);
+            // Update the recipe in the user's recipe list
+            usersDB.updateDocumentList("userId", userId, "recipeList", recipeList);
 
             // Response
-            response = "Updated entry: " + existingRecipe.toString();
+            response = "Updated entry: " + Recipe.parseRecipeFromDocument(existingRecipeDocument).toString() + " with: " + newRecipe.toString();
 
             // Close scanner
             scanner.close();
@@ -285,12 +295,15 @@ public class RecipeHandler implements HttpHandler {
 
         if (query != null) {
 
-            // Use MongoDB to find the user and existing recipe with the given ids
-            MongoDB mongoDB = new MongoDB("mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority", "users", response);
-            mongoDB.connect();
 
             // get existing recipe list
-            Document user = mongoDB.findOne("userId", userId);
+            Document user = usersDB.findOne("userId", userId);
+
+            // Break if no user was found
+            if (user == null) {
+                return "No user found for id " + userId;
+            }
+
             List<Document> recipeList = user.getList("recipeList", Document.class);
 
             // Break if no recipe list was found
@@ -318,11 +331,10 @@ public class RecipeHandler implements HttpHandler {
             recipeList.remove(existingRecipeDocument);
 
             // Update the user with the new recipe list 
-            Document updatedUser = new Document("$set", new Document("recipeList", recipeList));
-            mongoDB.updateOne("userId", userId, updatedUser);
+            usersDB.updateDocumentList("userId", userId, "recipeList", recipeList);
 
             // Response
-            response = "Deleted entry: " + existingRecipeDocument.toString();
+            response = "Deleted entry: " + Recipe.parseRecipeFromDocument(existingRecipeDocument).toString();
         }
 
         return response;

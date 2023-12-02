@@ -22,22 +22,29 @@ public class App extends Application {
         Server server = new Server();
 
         // initialize relevant classes
-        Model model = new Model();
         Recipe rcp = null;
-        String response = model.performRequest("GET", null, rcp);
 
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
 
         try {
-            ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
-            arrayList = new ArrayList<Recipe>(rList);
+            // TODO: Move this code to run after the user logs in
+            // ArrayList<Recipe> rList = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
+            // arrayList = new ArrayList<Recipe>(rList);
         } catch (Exception e) {
             System.out.println("Error reading JSON from server on startup");
         }
 
-        // Setting the Layout of the Window- Should contain a Header, Footer and the TaskList
-        View appScenes = new View(primaryStage, arrayList);
+
+        // Create a Model object
+        Model model = new Model("http://localhost:8100/");
+
+        // Create a controller object to mediate between the view and the model
+        Controller controller = new Controller(model);
+
+        // Create a View object to handle the UI and pass it the controller for button listeners
+        View appScenes = new View(primaryStage, arrayList, controller);
+
         RecipeList recipeList = new RecipeList(appScenes, arrayList);
 
         // Set the title of the app

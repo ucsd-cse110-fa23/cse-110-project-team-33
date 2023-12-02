@@ -23,8 +23,8 @@ import java.net.*;
 import org.json.*;
 
 public class Model {
-    private String userId;
-    private String urlString;
+    protected String userId;
+    protected String urlString;
 
     public Model(String urlString) {
         this.userId = null;
@@ -46,11 +46,13 @@ public class Model {
             return "Error: Must login before performing requests";
         }
         try {
-            // Builds a URL string in the format http://localhost:8100/recipes?userId=123&recipeId=456
-            String recipeRequestURL = urlString + "/recipes?userId=" + userId;
+            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&recipeId=456
+            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&recipeId=";
             if (recipeId != null) {
-                recipeRequestURL += "&recipeId=" + recipeId;
+                recipeRequestURL += recipeId;
             }
+
+            System.out.println("Sending request to " + recipeRequestURL);
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

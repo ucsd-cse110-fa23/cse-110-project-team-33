@@ -29,7 +29,7 @@ public class Server {
                 "user_db", "users");
 
         // Register the handlers
-        server.createContext("/", new RecipeHandler(usersDb));
+        server.createContext("/recipe", new RecipeHandler(usersDb));
         server.createContext("/login", new LoginHandler());
         server.createContext("/register", new RegisterHandler());
 

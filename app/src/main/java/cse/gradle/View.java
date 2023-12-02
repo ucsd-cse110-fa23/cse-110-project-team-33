@@ -27,8 +27,9 @@ public class View {
     private RecipeList recipeListRoot;
     private AudioRecorder audioRecorder;
     private Stage stage;
+    private Controller controller;
 
-    public View(Stage stage) {
+    public View(Stage stage, Controller controller) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
         recipeListRoot = new RecipeList(this);
@@ -37,7 +38,7 @@ public class View {
         newRecipeSceneConstructor();
     }
 
-    public View(Stage stage, List<Recipe> arrayList) {
+    public View(Stage stage, List<Recipe> arrayList, Controller controller) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
         recipeListRoot = new RecipeList(this, arrayList);
@@ -45,6 +46,10 @@ public class View {
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+    }
+
+    public Controller getController(){
+        return controller;
     }
 
     private void newRecipeListSceneConstructor(){
@@ -145,7 +150,7 @@ class NewRecipePane extends BorderPane {
         backButton.setPrefSize(100, 20);
         backButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
-        Controller.setListeners(this, appScenes, cancelScene);
+        appScenes.getController().setListeners(this, appScenes, cancelScene);
 
         newRecipeLabel = new Label("New Recipe");
         newRecipeLabel.setScaleX(1.5);
@@ -330,7 +335,7 @@ class AppFramePopUp extends BorderPane {
         });
 
         deleteButton.setOnAction(e -> {
-            Controller.deleteRecipe(this, recipe, recipeList);
+            recipeList.appScenes.getController().deleteRecipe(this, recipe, recipeList);
         });
     }
 
@@ -352,7 +357,7 @@ class AppFramePopUp extends BorderPane {
 }
 
 class RecipeList extends BorderPane {
-    private View appScenes;
+    public View appScenes;
     private List<Recipe> recipes;
     private List<Button> buttons;
     private VBox vBox;
@@ -577,7 +582,7 @@ class UserCreateAccount extends BorderPane {
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(CreateButton, BackButton);
 
-        Controller.setListeners(this, appScenes);
+        appScenes.getController().setListeners(this, appScenes);
         vbox.getChildren().addAll(usernameField, passwordField);
 
         VBox vbox2 = new VBox();
@@ -642,7 +647,7 @@ class UserLogin extends BorderPane {
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(CreateButton, LoginButton);
 
-        Controller.setListeners(this, appScenes);
+        appScenes.getController().setListeners(this, appScenes);
         vbox.getChildren().addAll(usernameField, passwordField);
 
         VBox vbox2 = new VBox();
