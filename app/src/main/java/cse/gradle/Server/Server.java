@@ -25,9 +25,15 @@ public class Server {
         // Create a server
         HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT), 0);
 
+
+        // Create a MongoDB object that accesses the users colleciton in the user_db database
+        MongoDB usersDb = new MongoDB(
+            "mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority",
+                "user_db", "users");
+
         // Create a context for the server at root path "/" and associate it with
         // HttpHandler object "RequestHandler"
-        server.createContext("/", new RecipeHandler());
+        server.createContext("/", new RecipeHandler(usersDb));
         server.createContext("/login", new LoginHandler());
         // user handler
         // Set the server's executor object to be threadPoolExecutor

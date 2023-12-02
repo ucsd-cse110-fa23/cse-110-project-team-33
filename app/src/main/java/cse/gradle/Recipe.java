@@ -139,12 +139,19 @@ public class Recipe {
 
     // parse method for populating a recipe from a database document
     public static Recipe parseRecipeFromDocument(Document result) {
+
         Recipe recipe = new Recipe();
-        recipe.setIngredients(result.getString("ingredients"));
-        recipe.setInstructions(result.getString("instructions"));
-        recipe.setCategory(result.getString("category"));
-        recipe.setName(result.getString("name"));
-        recipe.setId(UUID.fromString(result.getString("id")));
+
+        try {
+            recipe.setIngredients(result.getString("ingredients"));
+            recipe.setInstructions(result.getString("instructions"));
+            recipe.setCategory(result.getString("category"));
+            recipe.setName(result.getString("name"));
+            recipe.setId(UUID.fromString(result.getString("id")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+      
         return recipe;
     }
 }
