@@ -19,7 +19,7 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // start the server
-        Server server = new Server();
+        Server.startServer();
 
         // initialize relevant classes
         Recipe rcp = null;
@@ -37,15 +37,13 @@ public class App extends Application {
 
 
         // Create a Model object
-        Model model = new Model("http://localhost:8100/");
+        Model model = new Model("http://localhost:8100");
 
         // Create a controller object to mediate between the view and the model
         Controller controller = new Controller(model);
 
         // Create a View object to handle the UI and pass it the controller for button listeners
         View appScenes = new View(primaryStage, arrayList, controller);
-
-        RecipeList recipeList = new RecipeList(appScenes, arrayList);
 
         // Set the title of the app
         primaryStage.setTitle("PantryPal");

@@ -41,15 +41,21 @@ public class View {
     public View(Stage stage, List<Recipe> arrayList, Controller controller) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
+        this.controller = controller;
         recipeListRoot = new RecipeList(this, arrayList);
-        newRecipeListSceneConstructor();
+        // newRecipeListSceneConstructor();
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
     }
 
     public Controller getController(){
-        return controller;
+        return this.controller;
+    }
+
+    public void setRecipeListRoot(List<Recipe> arrayList){
+        this.recipeListRoot = new RecipeList(this, arrayList);
+        newRecipeListSceneConstructor();
     }
 
     private void newRecipeListSceneConstructor(){

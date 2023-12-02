@@ -1,9 +1,12 @@
 package cse.gradle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bson.Document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,6 +17,18 @@ public class Recipe {
     private String name;
     private UUID id;
 
+    // static parse method for populating a List<Recipe> from a JSON string
+    public static List<Recipe> parseRecipeListFromString(String json) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ArrayList<Recipe> recipeArrayList = (ArrayList<Recipe>)objectMapper.readValue(json, new TypeReference<List<Recipe>>() {});
+
+            return recipeArrayList;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     // static parse method for populating a recipe from a JSON string
     public static Recipe parseRecipeFromString(String json) {

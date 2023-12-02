@@ -1,5 +1,7 @@
 package cse.gradle;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +20,11 @@ public class Controller {
 
     public void createUser(String username, String password) {
         String postResponse = model.performRegisterRequest(username, password);
+    }
+
+    public void loginUser(String username, String password) {
+        String postResponse = model.performLoginRequest(username, password);
+        System.out.println("login response: " + postResponse);
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
@@ -100,6 +107,7 @@ public class Controller {
             String username = createPane.getUsernameField().getText().toString();
             String password = createPane.getPasswordField().getText().toString();
             createUser(username, password);
+            // Start user with empty recipe list
             appScenes.displayRecipeListScene();
         });    
 
@@ -116,8 +124,17 @@ public class Controller {
             appScenes.displayUserAccountSceneConstructor();
         });    
 
-        // Display cancelScene when backButton is pushed
+        // When the login button is pressed, make a request to the server to login the user
+        // then make a get all recipes request and display the recipe list scene
         userPane.getLoginButton().setOnAction(e -> {
+            String username = userPane.getUsernameField().getText().toString();
+            String password = userPane.getPasswordField().getText().toString();
+            loginUser(username, password);
+
+            String response = model.performRecipeRequest("GET", null, null);
+            System.out.println("response: " + response);
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
+            appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
         });
     }

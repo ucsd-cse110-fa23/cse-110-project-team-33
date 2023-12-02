@@ -83,8 +83,7 @@ public class Feature8Tests extends HTTPServerTests{
         }
 
         String response = model.performRecipeRequest("GET", null, null);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayList<Recipe> rList2 = (ArrayList<Recipe>)objectMapper.readValue(response, new TypeReference<List<Recipe>>() {});
+        List<Recipe> rList2 = Recipe.parseRecipeListFromString(response); 
 
         for (int i = 0; i < rList2.size(); i++) {
             System.out.println("rList.get(i) " + rList.get(i));
