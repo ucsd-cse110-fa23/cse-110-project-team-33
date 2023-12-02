@@ -446,6 +446,9 @@ class RecipeList extends BorderPane {
             addButton(r);
         }
 
+        // Refresh the vbox after adding all the buttons
+        refresh();
+
         Label title = new Label("Recipes");
         TitleBox = new HBox();
         logoutButtonBox = new HBox();
@@ -505,7 +508,8 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(b);
-        refresh();
+        System.err.println("vbox size: " + vBox.getChildren().size());
+        // refresh();
     }
 
     // overloaded method for adding a button at a specific index
@@ -521,7 +525,7 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(index, b);
-        refresh();
+        // refresh();
     }
 
     public void removeButton(Recipe r) {
@@ -536,6 +540,7 @@ class RecipeList extends BorderPane {
     }
 
     public void refresh() {
+        System.out.println(recipes.size());
         for (int i = 0; i < recipes.size(); i++) {
             // this.recipes.set(i, this.recipes.get(i));
             System.out.println("button text before: " + this.buttons.get(i));
