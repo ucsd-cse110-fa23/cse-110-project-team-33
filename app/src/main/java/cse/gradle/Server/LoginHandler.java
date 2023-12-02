@@ -29,7 +29,7 @@ public class LoginHandler implements HttpHandler {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
         try {
-            if (method.equals("GET")) {
+            if (method.equals("POST")) {
                 response = handleGet(httpExchange);
             } else {
                 throw new Exception("Unsupported HTTP method: " + method);
@@ -56,7 +56,7 @@ public class LoginHandler implements HttpHandler {
     }
 
     // TODO: Write a test for this method
-    // Handles a POST request for a new user login
+    // Handles a GET request for a new user login
     // Accepted JSON Format: {"username": "username", "password": "password"}
     private String handleGet(HttpExchange httpExchange) throws IOException {
 
@@ -91,7 +91,7 @@ public class LoginHandler implements HttpHandler {
                 // If the user exists, check if the password is correct
                 if (user.get("password").equals(password)) {
                     // If the password is correct, return the user's id 
-                    return user.get("id").toString();
+                    return user.get("userId").toString();
                 } else {
                     // If the password is incorrect, return an error message
                     response += "Incorrect password for user " + username;

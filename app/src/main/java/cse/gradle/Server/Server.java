@@ -14,15 +14,15 @@ import java.util.concurrent.*;
 public class Server {
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_HOSTNAME = "localhost";
+    public static HttpServer server;
 
-    private HttpServer server;
 
-    public Server() throws IOException {
+    public static void startServer() throws IOException {
         // create a thread pool to handle requests
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
         // Create a server
-         server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT), 0);
+        server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT), 0);
 
 
         // Create a MongoDB object that accesses the users colleciton in the user_db database
@@ -43,7 +43,7 @@ public class Server {
         System.out.println("Server started at " + SERVER_HOSTNAME + ":" + SERVER_PORT);
     }
 
-    public void stop() {
+    public static void stopServer() {
         server.stop(0);
     }
 

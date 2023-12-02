@@ -9,9 +9,7 @@ package cse.gradle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.bson.Document;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 
 import java.util.ArrayList;
@@ -21,18 +19,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cse.gradle.Server.LocalDatabase;
 import cse.gradle.Server.MongoDB;
-import cse.gradle.Server.Server;
 import java.util.List;
 
-public class Feature8Tests {
-
-    @BeforeAll
-    public static void setUpBeforeClass() throws Exception {
-        Server server = new Server();
-        System.out.println("Server started before running tests.");
-    }
+public class Feature8Tests extends HTTPServerTests{
 
     /*
      * --------------------------------- UNIT TESTS ---------------------------------
