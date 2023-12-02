@@ -11,10 +11,8 @@ import javafx.stage.Stage;
 public class Controller {
 
     private Model model;
-    private View appScenes;
 
     public Controller(Model model) {
-        this.appScenes = appScenes;
         this.model = model;
     }
 
@@ -28,27 +26,52 @@ public class Controller {
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
-    public void saveRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
-        recipe.setName(popUp.getNameField().getText());
-        recipe.setCategory(popUp.getCategoryField().getText());
-        recipe.setIngredients(popUp.getIngredientsField().getText());
-        recipe.setInstructions(popUp.getInstructionsField().getText());
+    public void saveRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
 
-        String postResponse = model.performRecipeRequest("POST", null, recipe);
+            recipe.setName(popUp.getNameField().getText());
+            recipe.setCategory(popUp.getCategoryField().getText());
+            recipe.setIngredients(popUp.getIngredientsField().getText());
+            recipe.setInstructions(popUp.getInstructionsField().getText());
+
+            System.out.println("NEW RECIPE: " + recipe.toString());
+
+            // Check if the recipe already exists in the database
+            String getResponse = model.performRecipeRequest("GET", recipe.getId().toString(), null);
+            if (getResponse.equals("No recipe found for id + " + recipe.getId().toString())) {
+                // Save the recipe to the database
+                String postResponse = model.performRecipeRequest("POST", null, recipe);
+
+                System.out.println("save recipe post response: " + postResponse);
+            } else {
+                // Update the recipe in the database
+                String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);
+
+                System.out.println("save recipe put response: " + putResponse);
+            }
+
+            // Update recipeList to reflect the state of the database
+            String getAllResponse = model.performRecipeRequest("GET", null, null);
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
+            appScenes.setRecipeListRoot(recipeArrayList);
+            appScenes.displayRecipeListScene();
+
     }
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
-    public void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+    public void deleteRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
         // saveRecipe(popUp, recipe, rList);
         Recipe rcp = null;
         String getResponse = model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
-        if (!getResponse.contains("No recipe found for id ")) {
-            model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
-            rList.removeButton(recipe);
-            rList.refresh();
-            Stage current = (Stage) popUp.getScene().getWindow();
-            current.close();
-        }
+
+        // Update recipeList to reflect the state of the database
+        getResponse = model.performRecipeRequest("GET", null, null);
+        List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
+        appScenes.setRecipeListRoot(recipeArrayList);
+        appScenes.displayRecipeListScene();
+        
+        Stage current = (Stage) popUp.getScene().getWindow();
+        current.close();
+
     }
 
     // Sets the listensers for all the buttons within the recipe creation window
@@ -131,12 +154,10 @@ public class Controller {
             String password = userPane.getPasswordField().getText().toString();
             loginUser(username, password);
 
+            // Get all recipes from the database and display
             String response = model.performRecipeRequest("GET", null, null);
-            System.out.println("response: " + response);
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
-            //System.out.println("\n" + recipeArrayList.toString() + "\n");
             appScenes.setRecipeListRoot(recipeArrayList);
-            //System.out.println("\n" + appScenes.getRecipeListRoot().toString() + "\n");
             appScenes.displayRecipeListScene();
         });
     }
