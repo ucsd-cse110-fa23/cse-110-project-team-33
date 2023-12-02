@@ -23,6 +23,14 @@ import java.net.*;
 import org.json.*;
 
 public class Model {
+    private String userId;
+    private String urlString;
+
+    public Model(String urlString) {
+        this.userId = null;
+        this.urlString = urlString;
+    }
+
     /*
      * Performs an HTTP request to the server
      * For GET requests, uid should be the id of the recipe to retrieve
@@ -32,13 +40,19 @@ public class Model {
      * For DELETE requests, uid should be the id of the recipe to delete and recipe
      * should be null
      */
-    public String performRequest(String method, String uid, Recipe recipe, String userId) {
+    public String performRecipeRequest(String method, String recipeId, Recipe recipe) {
+        // Check if userId is null, if so, return an error
+        if (userId == null) {
+            return "Error: Must login before performing requests";
+        }
         try {
-            String urlString = "http://localhost:8100/";
-            if (uid != null) {
-                urlString += ("?=" + userId);
+            // Builds a URL string in the format http://localhost:8100/recipes?userId=123&recipeId=456
+            String recipeRequestURL = urlString + "/recipes?userId=" + userId;
+            if (recipeId != null) {
+                recipeRequestURL += "&recipeId=" + recipeId;
             }
-            URL url = new URI(urlString).toURL();
+
+            URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
@@ -50,6 +64,70 @@ public class Model {
                 try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
                     out.write(jsonRecipe);
                 }
+            }
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                return response.toString();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Error: " + ex.getMessage();
+        }
+    }
+
+    // make a request to login a user, must be called before other requests besides register
+    public String performLoginRequest(String username, String password) {
+        try {
+            String urlString = "http://localhost:8100/login";
+            URL url = new URI(urlString).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+
+            String jsonUser = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+
+            try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
+                out.write(jsonUser);
+            }
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                // Set the Model's userId to the one returned by the server if the login was successful
+                if (!response.toString().contains("Error")) {
+                    this.userId = response.toString();
+                }
+
+                return response.toString();
+
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Error logging in: " + ex.getMessage();
+        }
+    }
+
+    // make a request to register a new user
+    public String performRegisterRequest(String username, String password) {
+        try {
+            String urlString = "http://localhost:8100/register";
+            URL url = new URI(urlString).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+
+            String jsonUser = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+
+            try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
+                out.write(jsonUser);
             }
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {

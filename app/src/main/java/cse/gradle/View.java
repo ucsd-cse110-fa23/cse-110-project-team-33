@@ -326,7 +326,7 @@ class AppFramePopUp extends BorderPane {
         this.setBottom(buttonsBox);
 
         saveButton.setOnAction(e -> {
-            Controller.saveRecipe(this, recipe, recipeList);
+            // Controller.saveRecipe(this, recipe, recipeList);
         });
 
         deleteButton.setOnAction(e -> {
@@ -358,7 +358,11 @@ class RecipeList extends BorderPane {
     private VBox vBox;
 
     private Button newRecipeButton;
+    private Button logoutButton;
     private HBox newRecipeButtonBox;
+    private HBox TitleBox;
+    private HBox logoutButtonBox;
+    private VBox topBox;
 
     public RecipeList(View appScenes) {
         this.appScenes = appScenes;
@@ -368,12 +372,28 @@ class RecipeList extends BorderPane {
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
+        vBox.setAlignment(Pos.TOP_CENTER);
         // vBox
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+
+        Label title = new Label("Recipes");
+        TitleBox = new HBox();
+        logoutButtonBox = new HBox();
+        topBox = new VBox();
+        title.setStyle("-fx-font-size: 24;");
+        logoutButton = new Button("Logout");
+        title.setAlignment(Pos.CENTER);
+        logoutButton.setAlignment(Pos.CENTER);
+        TitleBox.setAlignment(Pos.TOP_CENTER);
+        TitleBox.getChildren().add(title);
+        logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
+        logoutButtonBox.getChildren().add(logoutButton);
+        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+        this.setTop(topBox); 
 
         // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
@@ -387,6 +407,11 @@ class RecipeList extends BorderPane {
             this.appScenes.displayNewRecipeScene();
             System.out.println("New Recipe pressed");
         });
+
+        logoutButton.setOnAction(e -> {
+            this.appScenes.displayUserLoginConstructor();
+        });
+
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
         newRecipeButtonBox.getChildren().add(newRecipeButton);
@@ -402,12 +427,28 @@ class RecipeList extends BorderPane {
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
+        vBox.setAlignment(Pos.TOP_CENTER);
 
         for (int i = 0; i < recipes.size(); i++) {
             // For each recipe, add new button with title of recipe
             Recipe r = recipes.get(i);
             addButton(r);
         }
+
+        Label title = new Label("Recipes");
+        TitleBox = new HBox();
+        logoutButtonBox = new HBox();
+        topBox = new VBox();
+        title.setStyle("-fx-font-size: 24;");
+        logoutButton = new Button("Logout");
+        title.setAlignment(Pos.CENTER);
+        logoutButton.setAlignment(Pos.CENTER);
+        TitleBox.setAlignment(Pos.TOP_CENTER);
+        TitleBox.getChildren().add(title);
+        logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
+        logoutButtonBox.getChildren().add(logoutButton);
+        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+        this.setTop(topBox); 
 
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
@@ -425,6 +466,11 @@ class RecipeList extends BorderPane {
         newRecipeButton.setOnAction(e -> {
             this.appScenes.displayNewRecipeScene();
         });
+
+        logoutButton.setOnAction(e -> {
+            this.appScenes.displayUserLoginConstructor();
+        });
+
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
         newRecipeButtonBox.getChildren().add(newRecipeButton);
@@ -448,6 +494,7 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(b);
+        refresh();
     }
 
     // overloaded method for adding a button at a specific index
@@ -463,6 +510,7 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(index, b);
+        refresh();
     }
 
     public void removeButton(Recipe r) {
@@ -479,7 +527,12 @@ class RecipeList extends BorderPane {
     public void refresh() {
         for (int i = 0; i < recipes.size(); i++) {
             // this.recipes.set(i, this.recipes.get(i));
+            System.out.println("button text before: " + this.buttons.get(i));
+            System.out.println("recipe name before: " + recipes.get(i).getName());
+            recipes.get(i).setName(recipes.get(i).getName().replace("\n", "").replace("\r", ""));
             this.buttons.get(i).setText(recipes.get(i).getName());
+            System.out.println("button text after: " + this.buttons.get(i));
+            System.out.println("recipe name after: " + recipes.get(i).getName());
         }
 
     }
@@ -489,7 +542,7 @@ class RecipeList extends BorderPane {
     }
 }
 
-class UserCreateAccount extends BorderPane{
+class UserCreateAccount extends BorderPane {
     private TextField usernameField;
     private PasswordField passwordField;
     private Button CreateButton;
@@ -554,7 +607,7 @@ class UserCreateAccount extends BorderPane{
     }
 }
 
-class UserLogin extends BorderPane{
+class UserLogin extends BorderPane {
     private TextField usernameField;
     private PasswordField passwordField;
     private Button CreateButton;

@@ -3,6 +3,9 @@ package cse.gradle;
 import java.util.UUID;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -12,27 +15,13 @@ public class User {
     private String password;
     private List<Recipe> recipeList;
 
-    public User(String username, String password, List<Recipe> recipeList) {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.recipeList = recipeList;
+        this.recipeList = new ArrayList<Recipe>();
         this.userId = UUID.randomUUID();
     }
-
-    // toDocument method for saving to or querying database
-    public Document toDocument() {
-        /**
-         * TO DO (see commented out code for reference)
-         */
-        Document doc = new Document();
-        // doc.append("ingredients", ingredients);
-        // doc.append("instructions", instructions);
-        // doc.append("category", category);
-        // doc.append("name", name);
-        // doc.append("id", id.toString());
-        return doc;
-    }
-
+    
     // parse method for populating a recipe from a database document
     public static Recipe parseRecipeFromDocument(Document result) {
         Recipe recipe = new Recipe();
@@ -66,5 +55,15 @@ public class User {
 
     public String toString() {
         return "Username: " + username + "\nPassword: " + password + "\nUserID: " + userId.toString();
+    }
+
+    // toDocument method for saving to database
+    public Document toDocument() {
+        Document doc = new Document();
+        doc.append("username", username);
+        doc.append("password", password);
+        doc.append("userId", userId.toString());
+        doc.append("recipeList", recipeList);
+        return doc;
     }
 }

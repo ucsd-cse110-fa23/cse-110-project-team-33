@@ -23,7 +23,8 @@ public class App extends Application {
 
         // initialize relevant classes
         Model model = new Model();
-        String response = model.performRequest("GET", null, null);
+        Recipe rcp = null;
+        String response = model.performRequest("GET", null, rcp);
 
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<Recipe> arrayList = new ArrayList<Recipe>();
@@ -44,7 +45,7 @@ public class App extends Application {
         // Create scene of mentioned size with the border pane
         primaryStage.setScene(appScenes.getScene());
         // Make window non-resizable
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         // Show the app
         primaryStage.show();
 
