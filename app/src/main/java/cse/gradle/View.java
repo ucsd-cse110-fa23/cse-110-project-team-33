@@ -27,8 +27,9 @@ public class View {
     private RecipeList recipeListRoot;
     private AudioRecorder audioRecorder;
     private Stage stage;
+    private Controller controller;
 
-    public View(Stage stage) {
+    public View(Stage stage, Controller controller) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
         recipeListRoot = new RecipeList(this);
@@ -37,18 +38,28 @@ public class View {
         newRecipeSceneConstructor();
     }
 
-    public View(Stage stage, List<Recipe> arrayList) {
+    public View(Stage stage, List<Recipe> arrayList, Controller controller) {
         audioRecorder = new AudioRecorder();
         this.stage = stage;
+        this.controller = controller;
         recipeListRoot = new RecipeList(this, arrayList);
-        newRecipeListSceneConstructor();
+        // newRecipeListSceneConstructor();
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
     }
 
+    public Controller getController(){
+        return this.controller;
+    }
+
+    public void setRecipeListRoot(List<Recipe> arrayList){
+        this.recipeListRoot = new RecipeList(this, arrayList);
+        newRecipeListSceneConstructor();
+    }
+
     private void newRecipeListSceneConstructor(){
-        recipeListScene = new Scene(recipeListRoot, 500, 600);
+        this.recipeListScene = new Scene(recipeListRoot, 500, 600);
     }
 
     public void displayRecipeListScene() {
@@ -145,7 +156,7 @@ class NewRecipePane extends BorderPane {
         backButton.setPrefSize(100, 20);
         backButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
-        Controller.setListeners(this, appScenes, cancelScene);
+        appScenes.getController().setListeners(this, appScenes, cancelScene);
 
         newRecipeLabel = new Label("New Recipe");
         newRecipeLabel.setScaleX(1.5);
@@ -326,11 +337,11 @@ class AppFramePopUp extends BorderPane {
         this.setBottom(buttonsBox);
 
         saveButton.setOnAction(e -> {
-            // Controller.saveRecipe(this, recipe, recipeList);
+            recipeList.appScenes.getController().saveRecipe(this, recipeList.appScenes, recipe, recipeList);
         });
 
         deleteButton.setOnAction(e -> {
-            Controller.deleteRecipe(this, recipe, recipeList);
+            recipeList.appScenes.getController().deleteRecipe(this, recipeList.appScenes, recipe, recipeList);
         });
     }
 
@@ -352,7 +363,7 @@ class AppFramePopUp extends BorderPane {
 }
 
 class RecipeList extends BorderPane {
-    private View appScenes;
+    public View appScenes;
     private List<Recipe> recipes;
     private List<Button> buttons;
     private VBox vBox;
@@ -435,6 +446,9 @@ class RecipeList extends BorderPane {
             addButton(r);
         }
 
+        // Refresh the vbox after adding all the buttons
+        refresh();
+
         Label title = new Label("Recipes");
         TitleBox = new HBox();
         logoutButtonBox = new HBox();
@@ -494,7 +508,8 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(b);
-        refresh();
+        System.err.println("vbox size: " + vBox.getChildren().size());
+        // refresh();
     }
 
     // overloaded method for adding a button at a specific index
@@ -510,7 +525,7 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         vBox.getChildren().add(index, b);
-        refresh();
+        // refresh();
     }
 
     public void removeButton(Recipe r) {
@@ -525,6 +540,7 @@ class RecipeList extends BorderPane {
     }
 
     public void refresh() {
+        System.out.println(recipes.size());
         for (int i = 0; i < recipes.size(); i++) {
             // this.recipes.set(i, this.recipes.get(i));
             System.out.println("button text before: " + this.buttons.get(i));
@@ -577,7 +593,7 @@ class UserCreateAccount extends BorderPane {
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(CreateButton, BackButton);
 
-        Controller.setListeners(this, appScenes);
+        appScenes.getController().setListeners(this, appScenes);
         vbox.getChildren().addAll(usernameField, passwordField);
 
         VBox vbox2 = new VBox();
@@ -642,7 +658,7 @@ class UserLogin extends BorderPane {
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(CreateButton, LoginButton);
 
-        Controller.setListeners(this, appScenes);
+        appScenes.getController().setListeners(this, appScenes);
         vbox.getChildren().addAll(usernameField, passwordField);
 
         VBox vbox2 = new VBox();

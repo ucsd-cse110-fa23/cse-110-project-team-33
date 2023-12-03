@@ -1,5 +1,7 @@
 package cse.gradle;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -8,39 +10,68 @@ import javafx.stage.Stage;
 
 public class Controller {
 
-    public static void createUser(String username, String password) {
-        Model model = new Model();
-        String postResponse = model.registerUser(username, password);
+    private Model model;
+
+    public Controller(Model model) {
+        this.model = model;
+    }
+
+    public void createUser(String username, String password) {
+        String postResponse = model.performRegisterRequest(username, password);
+    }
+
+    public void loginUser(String username, String password) {
+        String postResponse = model.performLoginRequest(username, password);
+        System.out.println("login response: " + postResponse);
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
-    public static void saveRecipe(AppFramePopUp popUp, UUID userId, Recipe recipe) {
-        recipe.setName(popUp.getNameField().getText());
-        recipe.setCategory(popUp.getCategoryField().getText());
-        recipe.setIngredients(popUp.getIngredientsField().getText());
-        recipe.setInstructions(popUp.getInstructionsField().getText());
+    public void saveRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
 
-        Model model = new Model();
-        String postResponse = model.performRequest("PUT", userId.toString(), recipe);
+            recipe.setName(popUp.getNameField().getText());
+            recipe.setCategory(popUp.getCategoryField().getText());
+            recipe.setIngredients(popUp.getIngredientsField().getText());
+            recipe.setInstructions(popUp.getInstructionsField().getText());
+
+            System.out.println("NEW RECIPE: " + recipe.toString());
+
+            // Update the recipe in the database
+            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);  
+            System.out.println("save recipe put response: " + putResponse);
+
+            if (putResponse.contains("No recipe found")) {
+                // If the recipe was not found, create a new recipe in the database
+                String postResponse = model.performRecipeRequest("POST", null, recipe);
+                System.out.println("save recipe post response: " + postResponse);
+            }
+
+            // Update recipeList to reflect the state of the database
+            String getAllResponse = model.performRecipeRequest("GET", null, null);
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
+            appScenes.setRecipeListRoot(recipeArrayList);
+            appScenes.displayRecipeListScene();
+
     }
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
-    public static void deleteRecipe(AppFramePopUp popUp, Recipe recipe, RecipeList rList) {
+    public void deleteRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
         // saveRecipe(popUp, recipe, rList);
-        Model model = new Model();
         Recipe rcp = null;
-        String getResponse = model.performRequest("DELETE", recipe.getId().toString(), rcp);
-        if (!getResponse.contains("No recipe found for id ")) {
-            model.performRequest("DELETE", recipe.getId().toString(), rcp);
-            rList.removeButton(recipe);
-            rList.refresh();
-            Stage current = (Stage) popUp.getScene().getWindow();
-            current.close();
-        }
+        String getResponse = model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
+
+        // Update recipeList to reflect the state of the database
+        getResponse = model.performRecipeRequest("GET", null, null);
+        List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
+        appScenes.setRecipeListRoot(recipeArrayList);
+        appScenes.displayRecipeListScene();
+        
+        Stage current = (Stage) popUp.getScene().getWindow();
+        current.close();
+
     }
 
     // Sets the listensers for all the buttons within the recipe creation window
-    static void setListeners(NewRecipePane recipePane, View appScenes, Scene cancelScene) {
+    void setListeners(NewRecipePane recipePane, View appScenes, Scene cancelScene) {
 
         recipePane.getRecordMealTypeButton().setOnAction(e -> {
             if (!recipePane.getRecordingInProgress()) {
@@ -79,22 +110,27 @@ public class Controller {
             appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
             appScenes.getRecipeListRoot().addButton(0, newRecipe);
             appScenes.getRecipeListRoot().refresh();
-            appScenes.displayScene(cancelScene);
+            appScenes.displayRecipeListScene();
         });
 
         // Display cancelScene when backButton is pushed
         recipePane.getBackButton().setOnAction(e -> {
-            appScenes.displayScene(cancelScene);
+            appScenes.displayRecipeListScene();
         });
     }
 
-    // Sets the listensers for all the buttons within the recipe creation window
-    static void setListeners(UserCreateAccount createPane, View appScenes) {
+    // Sets the listensers for all the buttons within the account creation window
+    void setListeners(UserCreateAccount createPane, View appScenes) {
 
         createPane.getCreateButton().setOnAction(e -> {
             String username = createPane.getUsernameField().getText().toString();
             String password = createPane.getPasswordField().getText().toString();
             createUser(username, password);
+
+            // Get all recipes from the database and display
+            String response = model.performRecipeRequest("GET", null, null);
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
+            appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
         });    
 
@@ -104,15 +140,24 @@ public class Controller {
         });
     }
 
-    // Sets the listensers for all the buttons within the recipe creation window
-    static void setListeners(UserLogin userPane, View appScenes) {
+    // Sets the listensers for all the buttons within the account login window
+    void setListeners(UserLogin userPane, View appScenes) {
 
         userPane.getCreateButton().setOnAction(e -> {
             appScenes.displayUserAccountSceneConstructor();
         });    
 
-        // Display cancelScene when backButton is pushed
+        // When the login button is pressed, make a request to the server to login the user
+        // then make a get all recipes request and display the recipe list scene
         userPane.getLoginButton().setOnAction(e -> {
+            String username = userPane.getUsernameField().getText().toString();
+            String password = userPane.getPasswordField().getText().toString();
+            loginUser(username, password);
+
+            // Get all recipes from the database and display
+            String response = model.performRecipeRequest("GET", null, null);
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
+            appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
         });
     }

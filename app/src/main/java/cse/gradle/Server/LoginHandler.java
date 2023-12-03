@@ -14,23 +14,23 @@ import java.util.*;
 
 import org.bson.Document;
 
-public class RegisterHandler implements HttpHandler {
+public class LoginHandler implements HttpHandler {
+    // Handles a POST request for user login
 
     MongoDB usersDB;
 
-    public RegisterHandler(MongoDB mongoDB) {
+    public LoginHandler(MongoDB mongoDB) {
         this.usersDB = mongoDB;
         usersDB.connect();
     }
 
-    // Handles a POST request for a new user registration
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
         try {
             if (method.equals("POST")) {
-                response = handlePost(httpExchange);
+                response = handleGet(httpExchange);
             } else {
                 throw new Exception("Unsupported HTTP method: " + method);
             }
@@ -56,50 +56,56 @@ public class RegisterHandler implements HttpHandler {
     }
 
     // TODO: Write a test for this method
-    // Handles a POST request for a new user registration
+    // Handles a GET request for a new user login
     // Accepted JSON Format: {"username": "username", "password": "password"}
-    private String handlePost(HttpExchange httpExchange) throws IOException {
-        String response = "Invalid POST request";
+    private String handleGet(HttpExchange httpExchange) throws IOException {
+
+        String response = "Invalid GET request";
+
         try {
+
             InputStream inStream = httpExchange.getRequestBody();
             Scanner scanner = new Scanner(inStream);
-            StringBuilder postData = new StringBuilder();
+            StringBuilder getData = new StringBuilder();
 
             while (scanner.hasNextLine()) {
-                postData.append(scanner.nextLine());
+                getData.append(scanner.nextLine());
             }
 
             scanner.close();
             inStream.close();
 
-            System.out.println("Received JSON data: " + postData);
+            System.out.println("Received JSON data: " + getData);
 
             // Parse the JSON request body into a JsonNode tree
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(postData.toString());
+            JsonNode root = mapper.readTree(getData.toString());
 
             // Get the username and password from the request body
             String username = root.get("username").asText();
             String password = root.get("password").asText();
 
-            if (usersDB.findOne("username", username) != null) {
-                response += "Error: Username " + username + " already exists";
+            // Check if username password pair is in the database
+            Document user = usersDB.findOne("username", username);
+            if (user != null) {
+                // If the user exists, check if the password is correct
+                if (user.get("password").equals(password)) {
+                    // If the password is correct, return the user's id 
+                    return user.get("userId").toString();
+                } else {
+                    // If the password is incorrect, return an error message
+                    response += "Incorrect password for user " + username;
+                    throw new Exception(response);
+                }
+            } else {
+                // If the user does not exist, return an error message
+                response += "User " + username + " does not exist";
                 throw new Exception(response);
             }
-
-            // Create a new User object using the username and password and insert it into the database
-            // Intially, the user will have no recipes and the constructor creates a UUID for the user
-            User user = new User(username, password);
-            usersDB.insertOne(user.toDocument());
-
-            // return the userId of the newly created user
-            response = user.getUserId().toString();
-
         } catch (Exception e) {
             // If an exception is thrown, return an error message
             e.printStackTrace();
         }
-
         return response;
     } 
 
