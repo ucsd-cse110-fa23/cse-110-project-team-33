@@ -31,6 +31,10 @@ public class Model {
         this.urlString = urlString;
     }
 
+    public String getShareLink (String recipeId) {
+        return urlString + "/share?userId=" + userId + "&recipeId=" + recipeId;
+    }
+
     /*
      * Performs an HTTP request to the server
      * For GET requests, uid should be the id of the recipe to retrieve
