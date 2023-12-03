@@ -52,7 +52,7 @@ public class Model {
                 recipeRequestURL += recipeId;
             }
 
-            System.out.println("Sending request to " + recipeRequestURL);
+            System.out.println("Sending " + method + " request to " + recipeRequestURL);
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

@@ -22,7 +22,6 @@ public class Controller {
 
     public void loginUser(String username, String password) {
         String postResponse = model.performLoginRequest(username, password);
-        System.out.println("login response: " + postResponse);
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
@@ -33,16 +32,12 @@ public class Controller {
             recipe.setIngredients(popUp.getIngredientsField().getText());
             recipe.setInstructions(popUp.getInstructionsField().getText());
 
-            System.out.println("NEW RECIPE: " + recipe.toString());
-
             // Update the recipe in the database
             String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);  
-            System.out.println("save recipe put response: " + putResponse);
 
             if (putResponse.contains("No recipe found")) {
                 // If the recipe was not found, create a new recipe in the database
                 String postResponse = model.performRecipeRequest("POST", null, recipe);
-                System.out.println("save recipe post response: " + postResponse);
             }
 
             // Update recipeList to reflect the state of the database
