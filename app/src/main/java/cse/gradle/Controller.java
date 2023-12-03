@@ -16,12 +16,19 @@ public class Controller {
         this.model = model;
     }
 
-    public void createUser(String username, String password) {
+    public void createUser(String username, String password, View appScenes) {
         String postResponse = model.performRegisterRequest(username, password);
+        if(postResponse.equals("Server Down")){
+                appScenes.displayServerDownConstructor();
+        }
     }
 
-    public void loginUser(String username, String password) {
+    public void loginUser(String username, String password, View appScenes) {
         String postResponse = model.performLoginRequest(username, password);
+        if(postResponse.equals("Server Down")){
+                appScenes.displayServerDownConstructor();
+                return;
+        }
         System.out.println("login response: " + postResponse);
     }
 
@@ -142,7 +149,7 @@ public class Controller {
         createPane.getCreateButton().setOnAction(e -> {
             String username = createPane.getUsernameField().getText().toString();
             String password = createPane.getPasswordField().getText().toString();
-            createUser(username, password);
+            createUser(username, password, appScenes);
 
             // Get all recipes from the database and display
             String response = model.performRecipeRequest("GET", null, null);
@@ -169,7 +176,7 @@ public class Controller {
         userPane.getLoginButton().setOnAction(e -> {
             String username = userPane.getUsernameField().getText().toString();
             String password = userPane.getPasswordField().getText().toString();
-            loginUser(username, password);
+            loginUser(username, password, appScenes);
 
             // Get all recipes from the database and display
             String response = model.performRecipeRequest("GET", null, null);
