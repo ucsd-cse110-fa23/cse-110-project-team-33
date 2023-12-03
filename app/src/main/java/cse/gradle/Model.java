@@ -138,6 +138,10 @@ public class Model {
                 while ((line = in.readLine()) != null) {
                     response.append(line);
                 }
+                // Set the Model's userId to the one returned by the server if the registration was successful
+                if (!response.toString().contains("Error")) {
+                    this.userId = response.toString();
+                }
                 return response.toString();
             }
         } catch (Exception ex) {

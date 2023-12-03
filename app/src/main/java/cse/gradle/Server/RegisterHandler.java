@@ -83,7 +83,7 @@ public class RegisterHandler implements HttpHandler {
             String password = root.get("password").asText();
 
             if (usersDB.findOne("username", username) != null) {
-                response += "Username " + username + " already exists";
+                response += "Error: Username " + username + " already exists";
                 throw new Exception(response);
             }
 
@@ -92,7 +92,8 @@ public class RegisterHandler implements HttpHandler {
             User user = new User(username, password);
             usersDB.insertOne(user.toDocument());
 
-            response = "User " + username + " successfully registered";
+            // return the userId of the newly created user
+            response = user.getUserId().toString();
 
         } catch (Exception e) {
             // If an exception is thrown, return an error message

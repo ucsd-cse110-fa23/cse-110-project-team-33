@@ -114,7 +114,7 @@ public class RecipeHandler implements HttpHandler {
 
             // Break if no recipe list was found
             if (recipeList == null) {
-                response += "No recipe list found for user " + userId;
+                response = "No recipe list found for user " + userId;
                 return response;
             }
 
@@ -129,7 +129,7 @@ public class RecipeHandler implements HttpHandler {
 
             // Break if no recipe was found
             if (recipe == null) {
-                response += "No recipe found for id " + recipeId;
+                response = "No recipe found for id " + recipeId;
                 return response;
             }
 

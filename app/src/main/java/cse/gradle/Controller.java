@@ -35,18 +35,14 @@ public class Controller {
 
             System.out.println("NEW RECIPE: " + recipe.toString());
 
-            // Check if the recipe already exists in the database
-            String getResponse = model.performRecipeRequest("GET", recipe.getId().toString(), null);
-            if (getResponse.equals("No recipe found for id + " + recipe.getId().toString())) {
-                // Save the recipe to the database
+            // Update the recipe in the database
+            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);  
+            System.out.println("save recipe put response: " + putResponse);
+
+            if (putResponse.contains("No recipe found")) {
+                // If the recipe was not found, create a new recipe in the database
                 String postResponse = model.performRecipeRequest("POST", null, recipe);
-
                 System.out.println("save recipe post response: " + postResponse);
-            } else {
-                // Update the recipe in the database
-                String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);
-
-                System.out.println("save recipe put response: " + putResponse);
             }
 
             // Update recipeList to reflect the state of the database
@@ -130,7 +126,11 @@ public class Controller {
             String username = createPane.getUsernameField().getText().toString();
             String password = createPane.getPasswordField().getText().toString();
             createUser(username, password);
-            // Start user with empty recipe list
+
+            // Get all recipes from the database and display
+            String response = model.performRecipeRequest("GET", null, null);
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
+            appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
         });    
 
