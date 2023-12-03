@@ -21,6 +21,17 @@ public class User {
         this.recipeList = new ArrayList<Recipe>();
         this.userId = UUID.randomUUID();
     }
+    
+    // parse method for populating a recipe from a database document
+    public static Recipe parseRecipeFromDocument(Document result) {
+        Recipe recipe = new Recipe();
+        recipe.setIngredients(result.getString("ingredients"));
+        recipe.setInstructions(result.getString("instructions"));
+        recipe.setCategory(result.getString("category"));
+        recipe.setName(result.getString("name"));
+        recipe.setId(UUID.fromString(result.getString("id")));
+        return recipe;
+    }
 
     public String getUsername() {
         return username;
