@@ -56,6 +56,11 @@ public class Model {
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            if(conn.getResponseCode() != HttpURLConnection.HTTP_OK){
+                return "Server Down";
+            }
+
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
 
@@ -88,6 +93,11 @@ public class Model {
             String urlString = "http://localhost:8100/login";
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            if(conn.getResponseCode() != HttpURLConnection.HTTP_OK){
+                return "Server Down";
+            }
+
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
 
@@ -123,6 +133,11 @@ public class Model {
             String urlString = "http://localhost:8100/register";
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            if(conn.getResponseCode() != HttpURLConnection.HTTP_OK){
+                return "Server Down";
+            }
+
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
 
@@ -224,6 +239,7 @@ public class Model {
         errorReader.close();
         String errorResult = errorResponse.toString();
         System.out.println("Error Result: " + errorResult);
+
     }
 
     public static String useWhisper(String filePathString) throws IOException, URISyntaxException {

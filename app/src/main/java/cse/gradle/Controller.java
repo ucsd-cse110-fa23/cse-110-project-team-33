@@ -36,7 +36,11 @@ public class Controller {
             System.out.println("NEW RECIPE: " + recipe.toString());
 
             // Update the recipe in the database
-            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);  
+            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe); 
+            if(putResponse.equals("Server Down")){
+                appScenes.displayServerDownConstructor();
+                return;
+            } 
             System.out.println("save recipe put response: " + putResponse);
 
             if (putResponse.contains("No recipe found")) {
@@ -47,6 +51,10 @@ public class Controller {
 
             // Update recipeList to reflect the state of the database
             String getAllResponse = model.performRecipeRequest("GET", null, null);
+            if(getAllResponse.equals("Server Down")){
+                appScenes.displayServerDownConstructor();
+                return;
+            }
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
             appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
@@ -58,9 +66,18 @@ public class Controller {
         // saveRecipe(popUp, recipe, rList);
         Recipe rcp = null;
         String getResponse = model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
+        if(getResponse.equals("Server Down")){
+            appScenes.displayServerDownConstructor();
+            return;
+        }
 
         // Update recipeList to reflect the state of the database
         getResponse = model.performRecipeRequest("GET", null, null);
+        if(getResponse.equals("Server Down")){
+            appScenes.displayServerDownConstructor();
+            return;
+        }
+
         List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
         appScenes.setRecipeListRoot(recipeArrayList);
         appScenes.displayRecipeListScene();
