@@ -18,14 +18,14 @@ public class Controller {
 
     public void createUser(String username, String password, View appScenes) {
         String postResponse = model.performRegisterRequest(username, password);
-        if(postResponse.equals("Error: Connection refused: connect")){
+        if(postResponse.equals("Error: Server down")){
                 appScenes.displayServerDownConstructor();
         }
     }
 
     public void loginUser(String username, String password, View appScenes) {
         String postResponse = model.performLoginRequest(username, password);
-        if(postResponse.equals("Error logging in: Connection refused: connect")){
+        if(postResponse.equals("Error: Server down")){
                 appScenes.displayServerDownConstructor();
                 return;
         }
@@ -44,7 +44,7 @@ public class Controller {
 
             // Update the recipe in the database
             String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe); 
-            if(putResponse.equals("Error: Connection refused: connect")){
+            if(putResponse.equals("Error: Server down")){
                 appScenes.displayServerDownConstructor();
                 return;
             } 
@@ -58,7 +58,7 @@ public class Controller {
 
             // Update recipeList to reflect the state of the database
             String getAllResponse = model.performRecipeRequest("GET", null, null);
-            if(getAllResponse.equals("Error: Connection refused: connect")){
+            if(getAllResponse.equals("Error: Server down")){
                 appScenes.displayServerDownConstructor();
                 return;
             }
@@ -73,14 +73,14 @@ public class Controller {
         // saveRecipe(popUp, recipe, rList);
         Recipe rcp = null;
         String getResponse = model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
-        if(getResponse.equals("Error: Connection refused: connect")){
+        if(getResponse.equals("Error: Server down")){
             appScenes.displayServerDownConstructor();
             return;
         }
 
         // Update recipeList to reflect the state of the database
         getResponse = model.performRecipeRequest("GET", null, null);
-        if(getResponse.equals("Error: Connection refused: connect")){
+        if(getResponse.equals("Error: Server down")){
             appScenes.displayServerDownConstructor();
             return;
         }

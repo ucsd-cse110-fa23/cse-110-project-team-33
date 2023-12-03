@@ -78,6 +78,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }
@@ -113,6 +116,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error logging in: " + ex.getMessage();
         }
     }
@@ -146,6 +152,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }

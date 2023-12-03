@@ -27,13 +27,13 @@ class Feature13Tests extends HTTPServerTests{
         // Check for login error
         Model model = new MockModel();
         String response = model.performLoginRequest("test_user", "password");
-        String error = "Error logging in: Connection refused: connect";
+        String error = "Error: Server down";
         assertEquals(error, response);
 
         // Check for generic request error
         Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
         response = model.performRecipeRequest("POST", null, originalRecipe);
-        error = "Error: Connection refused: connect";
+        error = "Error: Server down";
         assertEquals(error, response);
     }
 }
