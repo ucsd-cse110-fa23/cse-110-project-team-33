@@ -15,6 +15,9 @@ import java.net.http.HttpResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cse.gradle.Server.APIs.ChatGPTApi;
+import cse.gradle.Server.APIs.ChatGPTApiClient;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -281,48 +284,18 @@ public class Model {
     }
 
     // ChatGPT stuff
-    private static final String API_ENDPOINT_GPT = "https://api.openai.com/v1/completions";
-    private static final String API_KEY = "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";
-    private static final String MODEL_GPT = "text-davinci-003";
+    public static String[] performRecipeGenerationRequest(String mealType, String ingredients) {
+        
+        String[] response = new String[4];
 
-    public static String useChatGPT(int maxTokenCount, String promptString)
-            throws IOException, InterruptedException, URISyntaxException {
+        try {
+            ChatGPTApiClient chatGPTApi = new ChatGPTApiClient();
+            response = chatGPTApi.generateResponse(mealType, ingredients);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        // Set request parameters
-        int maxTokens = maxTokenCount;
-        String prompt = promptString;
-
-        // Create a request body which you will pass into request object
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("model", MODEL_GPT);
-        requestBody.put("prompt", prompt);
-        requestBody.put("max_tokens", maxTokens);
-        requestBody.put("temperature", 1.0);
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        HttpRequest request = HttpRequest
-                .newBuilder()
-                .uri(URI.create(API_ENDPOINT_GPT))
-                .header("Content-Type", "application/json")
-                .header("Authorization", String.format("Bearer %s", API_KEY))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
-                .build();
-
-        HttpResponse<String> response = client.send(
-                request,
-                HttpResponse.BodyHandlers.ofString());
-
-        String responseBody = response.body();
-
-        JSONObject responseJSON = new JSONObject(responseBody);
-
-        JSONArray choices = responseJSON.getJSONArray("choices");
-        String generatedText = choices.getJSONObject(0).getString("text");
-
-        System.out.println(generatedText);
-        return generatedText;
-
+        return response;
     }
 
 }
