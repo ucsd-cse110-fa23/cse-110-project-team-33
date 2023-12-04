@@ -32,7 +32,7 @@ class Feature13Tests extends HTTPServerTests{
 
         // Check for generic request error
         Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
-        response = model.performRecipeRequest("POST", null, originalRecipe);
+        response = model.postRecipe(originalRecipe);
         error = "Error: Server down";
         assertEquals(error, response);
     }
