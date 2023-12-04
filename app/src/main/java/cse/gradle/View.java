@@ -115,7 +115,6 @@ public class View {
 
     public Scene getScene() {
         return mainLoginScene;
-        //return newRecipeScene;
     }
 
     public RecipeList getRecipeListRoot() {
