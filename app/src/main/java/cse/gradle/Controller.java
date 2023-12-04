@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -183,6 +184,16 @@ public class Controller {
 
         recipeList.getLogoutButton().setOnAction(e -> {
             appScenes.displayUserLoginConstructor();
+        });
+
+        recipeList.getMealTypeChoiceBox().getSelectionModel().selectedIndexProperty().addListener(
+            (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
+                // store selected mealtype
+                recipeList.getFilterButton().setOnAction(e -> {
+                    String chosenMeal = (recipeList.getMealTypes()[new_val.intValue()]);
+                    
+                });
+
         });
     }
 }

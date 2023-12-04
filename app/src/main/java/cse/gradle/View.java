@@ -101,13 +101,6 @@ public class View {
         displayScene(mainLoginScene);
     }
 
-    public void filterByMealType(String mealType) {
-        System.out.println("filterByMealType() TO DO");
-        // need to get only meals matching mealType
-        // call to controller?
-        
-    }
-
     public void displayScene(Scene s) {
         stage.setScene(s);
     }
@@ -407,6 +400,7 @@ class RecipeList extends BorderPane {
     private Button logoutButton;
     private Button filterButton;
     private ChoiceBox mealTypeChoice;
+    private String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
     private HBox newRecipeButtonBox;
     private HBox TitleBox;
     private HBox logoutButtonBox;
@@ -435,7 +429,7 @@ class RecipeList extends BorderPane {
         topBox = new VBox();
         title.setStyle("-fx-font-size: 24;");
         logoutButton = new Button("Logout");
-        String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
+        // String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
         mealTypeChoice = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
         title.setAlignment(Pos.CENTER);
         logoutButton.setAlignment(Pos.CENTER);
@@ -496,7 +490,6 @@ class RecipeList extends BorderPane {
         title.setStyle("-fx-font-size: 24;");
         logoutButton = new Button("Logout");
         filterButton = new Button("Filter");
-        String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
         Label choiceBoxLabel = new Label(" by: ");
         choiceBoxLabel.setStyle("-fx-font-size: 15;");
         choiceBoxLabel.setAlignment(Pos.CENTER);
@@ -523,22 +516,6 @@ class RecipeList extends BorderPane {
         newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
         appScenes.getController().setListeners(this, appScenes);
-        // newRecipeButton.setOnAction(e -> {
-        //     this.appScenes.displayNewRecipeScene();
-        // });
-
-        // logoutButton.setOnAction(e -> {
-        //     this.appScenes.displayUserLoginConstructor();
-        // });
-        
-        mealTypeChoice.getSelectionModel().selectedIndexProperty().addListener(
-            (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
-                // store selected mealtype
-                filterButton.setOnAction(e -> {
-                    this.appScenes.filterByMealType(mealTypes[new_val.intValue()]);
-                });
-
-        });
 
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
@@ -618,6 +595,18 @@ class RecipeList extends BorderPane {
 
     public Button getLogoutButton() {
         return logoutButton;
+    }
+
+    public ChoiceBox getMealTypeChoiceBox() {
+        return mealTypeChoice;
+    }
+
+    public Button getFilterButton() {
+        return filterButton;
+    }
+
+    public String[] getMealTypes() {
+        return mealTypes;
     }
 }
 
