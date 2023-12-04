@@ -47,11 +47,7 @@ public class Controller {
 
             String sortOption = rList.getSortDropDown().getValue();
 
-            // Update recipeList to reflect the state of the database
-            String getAllResponse = model.getRecipeList(sortOption);
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
-            appScenes.updateRecipeListView(recipeArrayList);
-            appScenes.displayRecipeListScene();
+            getRecipeArrayList(appScenes, sortOption);
 
     }
 
@@ -65,10 +61,7 @@ public class Controller {
         // Update recipeList to reflect the state of the database // TODO: Refactor into a method so we can DRY
         String sortOption = rList.getSortDropDown().getValue();
 
-        getResponse = model.getRecipeList(sortOption);
-        List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
-        appScenes.updateRecipeListView(recipeArrayList);
-        appScenes.displayRecipeListScene();
+        syncRecipeListWithModel(appScenes, sortOption);
         
         Stage current = (Stage) popUp.getScene().getWindow();
         current.close();
@@ -119,10 +112,7 @@ public class Controller {
             // Update recipeList to reflect the state of the database 
             // TODO: Refactor into a method so we can DRY
             String sortOption = appScenes.getRecipeListRoot().getSortDropDown().getValue();
-            String getResponse = model.getRecipeList(sortOption);
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
-            appScenes.updateRecipeListView(recipeArrayList);
-            appScenes.displayRecipeListScene();
+            getRecipeArrayList(appScenes, sortOption);
         });
 
         // Display cancelScene when backButton is pushed
@@ -141,10 +131,7 @@ public class Controller {
 
             // Get all recipes from the database and display
             // When create account, start with default sorted list
-            String response = model.getRecipeList(Constants.defaultSortOption); 
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
-            appScenes.updateRecipeListView(recipeArrayList);
-            appScenes.displayRecipeListScene();
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
         });    
 
         // Display cancelScene when backButton is pushed
@@ -169,10 +156,7 @@ public class Controller {
 
             // Get all recipes from the database and display
             // When logging into account, start with default sorted list
-            String response = model.getRecipeList(Constants.defaultSortOption);
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
-            appScenes.updateRecipeListView(recipeArrayList);
-            appScenes.displayRecipeListScene();
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
         });
     }
 
@@ -191,12 +175,16 @@ public class Controller {
 
         recipeList.getSortDropDown().setOnAction(event -> {
             String sortOption = recipeList.getSortDropDown().getValue();
-            String getAllResponse = model.getRecipeList(sortOption);
-
-            // Get all recipes from the database and display
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
-            appScenes.updateRecipeListView(recipeArrayList);
-            appScenes.displayRecipeListScene();
+            syncRecipeListWithModel(appScenes, sortOption);
         });
+    }
+
+    private void syncRecipeListWithModel(View appScenes, String sortOption) {
+        String getAllResponse = model.getRecipeList(sortOption);
+
+        // Get all recipes from the database and display
+        List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
+        appScenes.updateRecipeListView(recipeArrayList);
+        appScenes.displayRecipeListScene();
     }
 }
