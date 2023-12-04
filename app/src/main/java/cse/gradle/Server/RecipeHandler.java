@@ -166,29 +166,35 @@ public class RecipeHandler implements HttpHandler {
             return response;
         }
 
-        List<Document> recipeList = user.getList("recipeList", Document.class);
+        List<Document> recipeDocumentList = user.getList("recipeList", Document.class);
 
         // Break if no recipe list was found
-        if (recipeList == null) {
+        if (recipeDocumentList == null) {
             response += "No recipe list found for user " + userId;
             return response;
         }
 
         // Convert the recipe list to a List<Recipe>
-        List<Recipe> recipes = Recipe.parseRecipeListFromString(new JSONArray(recipeList).toString());
+        List<Recipe> recipeList = Recipe.parseRecipeListFromString(new JSONArray(recipeDocumentList).toString());
   
         // TODO: If no sort option was provided, return the recipes in newest-oldest order by default
         // Sort the recipes if a sort option was provided
         if (!sortOption.equals("")) {
             if (sortOption.equals("a-z")) {
-                Recipe.sortByName(recipes, true);
+                Recipe.sortByName(recipeList, false);
             } else if (sortOption.equals("z-a")) {
-                Recipe.sortByName(recipes, false);
+                Recipe.sortByName(recipeList, true);
             }
         }
 
+        // Convert recipeList back into a document list
+        recipeDocumentList = new ArrayList<Document>();
 
-        JSONArray jsonArray = new JSONArray(recipeList);
+        for (Recipe recipe : recipeList) {
+            recipeDocumentList.add(recipe.toDocument());
+        }
+
+        JSONArray jsonArray = new JSONArray(recipeDocumentList);
 
         return jsonArray.toString();
     }

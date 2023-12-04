@@ -36,17 +36,17 @@ public class Controller {
             System.out.println("NEW RECIPE: " + recipe.toString());
 
             // Update the recipe in the database
-            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);  
+            String putResponse = model.putRecipe(recipe.getId().toString(), recipe);  
             System.out.println("save recipe put response: " + putResponse);
 
             if (putResponse.contains("No recipe found")) {
                 // If the recipe was not found, create a new recipe in the database
-                String postResponse = model.performRecipeRequest("POST", null, recipe);
+                String postResponse = model.postRecipe(recipe);
                 System.out.println("save recipe post response: " + postResponse);
             }
 
             // Update recipeList to reflect the state of the database
-            String getAllResponse = model.performRecipeRequest("GET", null, null);
+            String getAllResponse = model.getRecipeList();
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
             appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
@@ -57,10 +57,10 @@ public class Controller {
     public void deleteRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
         // saveRecipe(popUp, recipe, rList);
         Recipe rcp = null;
-        String getResponse = model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
+        String getResponse = model.deleteRecipe(recipe.getId().toString());
 
         // Update recipeList to reflect the state of the database
-        getResponse = model.performRecipeRequest("GET", null, null);
+        getResponse = model.getRecipeList();
         List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
         appScenes.setRecipeListRoot(recipeArrayList);
         appScenes.displayRecipeListScene();
@@ -128,7 +128,7 @@ public class Controller {
             createUser(username, password);
 
             // Get all recipes from the database and display
-            String response = model.performRecipeRequest("GET", null, null);
+            String response = model.getRecipeList();
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
             appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
@@ -155,7 +155,7 @@ public class Controller {
             loginUser(username, password);
 
             // Get all recipes from the database and display
-            String response = model.performRecipeRequest("GET", null, null);
+            String response = model.getRecipeList();
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
             appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
