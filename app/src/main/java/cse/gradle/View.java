@@ -3,18 +3,25 @@ package cse.gradle;
 import javafx.scene.Scene;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -92,6 +99,10 @@ public class View {
 
     public void displayUserLoginConstructor(){
         displayScene(mainLoginScene);
+    }
+
+    public void filterByMealType(String mealType) {
+        System.out.println("filterByMealType() TO DO");
     }
 
     public void displayScene(Scene s) {
@@ -391,6 +402,8 @@ class RecipeList extends BorderPane {
 
     private Button newRecipeButton;
     private Button logoutButton;
+    private Button filterButton;
+    private ChoiceBox mealTypeChoice;
     private HBox newRecipeButtonBox;
     private HBox TitleBox;
     private HBox logoutButtonBox;
@@ -418,14 +431,16 @@ class RecipeList extends BorderPane {
         topBox = new VBox();
         title.setStyle("-fx-font-size: 24;");
         logoutButton = new Button("Logout");
+        String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
+        mealTypeChoice = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
         title.setAlignment(Pos.CENTER);
         logoutButton.setAlignment(Pos.CENTER);
         TitleBox.setAlignment(Pos.TOP_CENTER);
         TitleBox.getChildren().add(title);
         logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
-        logoutButtonBox.getChildren().add(logoutButton);
+        logoutButtonBox.getChildren().addAll(mealTypeChoice, logoutButton);
         topBox.getChildren().addAll(TitleBox, logoutButtonBox);
-        this.setTop(topBox); 
+        this.setTop(topBox);
 
         // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
@@ -476,12 +491,19 @@ class RecipeList extends BorderPane {
         topBox = new VBox();
         title.setStyle("-fx-font-size: 24;");
         logoutButton = new Button("Logout");
+        filterButton = new Button("Filter");
+        String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
+        Label choiceBoxLabel = new Label(" by: ");
+        choiceBoxLabel.setStyle("-fx-font-size: 15;");
+        choiceBoxLabel.setAlignment(Pos.CENTER);
+        mealTypeChoice = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
         title.setAlignment(Pos.CENTER);
         logoutButton.setAlignment(Pos.CENTER);
+        filterButton.setAlignment(Pos.CENTER);
         TitleBox.setAlignment(Pos.TOP_CENTER);
         TitleBox.getChildren().add(title);
         logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
-        logoutButtonBox.getChildren().add(logoutButton);
+        logoutButtonBox.getChildren().addAll(filterButton, choiceBoxLabel, mealTypeChoice, logoutButton);
         topBox.getChildren().addAll(TitleBox, logoutButtonBox);
         this.setTop(topBox); 
 
@@ -505,6 +527,18 @@ class RecipeList extends BorderPane {
         logoutButton.setOnAction(e -> {
             this.appScenes.displayUserLoginConstructor();
         });
+        // 
+        mealTypeChoice.getSelectionModel().selectedIndexProperty().addListener(
+            (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
+                // store selected mealtype
+                filterButton.setOnAction(e -> {
+                    this.appScenes.filterByMealType(mealTypes[new_val.intValue()]);
+                });
+
+        });
+        // filterButton.setOnAction(e -> {
+        //     this.appScenes.filterByMealType();
+        // });
 
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
