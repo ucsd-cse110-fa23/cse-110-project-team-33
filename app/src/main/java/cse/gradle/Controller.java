@@ -201,8 +201,8 @@ public class Controller {
         });
     }
 
-    void handleRegenerateButton(AppFramePopUp popUp, View appScenes, RecipeList rList){
-        Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
+    void handleRegenerateButton(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList){
+        Recipe newRecipe = new RecipeGenerator().reGenerateRecipe(recipe);
         popUp.getNameField().setText(newRecipe.getName());
         popUp.getCategoryField().setText(newRecipe.getCategory());
         popUp.getIngredientsField().setText(newRecipe.getIngredients());

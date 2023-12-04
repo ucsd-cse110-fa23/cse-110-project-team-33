@@ -372,7 +372,7 @@ class AppFramePopUp extends BorderPane {
         });
 
         regenerateButton.setOnAction(e -> {
-            recipeList.appScenes.getController().handleRegenerateButton(this, recipeList.appScenes, recipeList);
+            recipeList.appScenes.getController().handleRegenerateButton(this, recipeList.appScenes, recipe, recipeList);
         });
     }
 
