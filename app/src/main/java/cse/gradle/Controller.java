@@ -47,7 +47,7 @@ public class Controller {
 
             String sortOption = rList.getSortDropDown().getValue();
 
-            getRecipeArrayList(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption);
 
     }
 
@@ -112,7 +112,7 @@ public class Controller {
             // Update recipeList to reflect the state of the database 
             // TODO: Refactor into a method so we can DRY
             String sortOption = appScenes.getRecipeListRoot().getSortDropDown().getValue();
-            getRecipeArrayList(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption);
         });
 
         // Display cancelScene when backButton is pushed
