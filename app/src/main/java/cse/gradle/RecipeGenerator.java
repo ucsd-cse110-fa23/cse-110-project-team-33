@@ -16,13 +16,13 @@ public class RecipeGenerator {
         String ingredientsTranscript = "ingredients was never transcribed";
 
         try {
-            mealtypeTranscript = Model.useWhisper(mealTypePath);
+            mealtypeTranscript = Model.performAudioTranscriptionRequest(mealTypePath);
         } catch(Exception e){
             e.printStackTrace();
         }
                  
         try {
-            ingredientsTranscript = Model.useWhisper(ingredientsPath);
+            ingredientsTranscript = Model.performAudioTranscriptionRequest(ingredientsPath);
         } catch(Exception e){
             e.printStackTrace();
         }

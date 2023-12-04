@@ -106,6 +106,7 @@ public class Controller {
         });
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
+            // TODO: replace with using Model
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
             appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
             appScenes.getRecipeListRoot().addButton(0, newRecipe);
