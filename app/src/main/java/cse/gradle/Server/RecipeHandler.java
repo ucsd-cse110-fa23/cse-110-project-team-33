@@ -38,16 +38,26 @@ public class RecipeHandler implements HttpHandler {
         String method = httpExchange.getRequestMethod();
         try {
 
-            // Get user id from request, first query is user id, second is recipe id (if
-            // applicable)
-            // Example: http://localhost:8100/recipe?userId=123&recipeId=456
+            // Get user id from request, first query is user id, second is recipe id (if applicable) or sort method (if applicable)
+            // Example: http://localhost:8100/recipes?userId=1&recipeId=1 
+            // Example: http://localhost:8100/recipes?userId=1&sort="a-z"
+            // Example: http://localhost:8100/recipes?userId=1
             
             URI uri = httpExchange.getRequestURI();
             System.out.println("URI: " + uri);
             String query = uri.getRawQuery();
             System.out.println("Query: " + query);
             String userId = query.substring(query.indexOf("=") + 1, query.indexOf("&"));
-            String recipeId = query.substring(query.lastIndexOf("=") + 1);
+
+            String recipeId = "";
+            if (query.contains("recipeId")) {
+                recipeId = query.substring(query.indexOf("recipeId=") + "recipeId=".length());
+            }
+
+            String sortOption = "";
+            if (query.contains("sort")) {
+                sortOption = query.substring(query.indexOf("sort=") + "sort=".length());
+            }   
 
              // If there is no user id, return an error
              if (userId.equals("")) {
@@ -56,7 +66,7 @@ public class RecipeHandler implements HttpHandler {
 
             if (method.equals("GET")) {
                 if (recipeId.equals("")) {
-                    response = handleGetAll(httpExchange, userId);
+                    response = handleGetAll(httpExchange, userId, sortOption);
                 } else {
                     response = handleGet(httpExchange, userId, recipeId);
                 }
@@ -141,9 +151,10 @@ public class RecipeHandler implements HttpHandler {
     }
 
     /*
-     * Handles GET requests by returning the recipe associated with the id
+     * Handles GET requests with no id by returning all recipes
+     * Optional sort options: "a-z", "z-a", "newest-oldest", "oldest-newest"
      */
-    private String handleGetAll(HttpExchange httpExchange, String userId) throws IOException {
+    private String handleGetAll(HttpExchange httpExchange, String userId, String sortOption) throws IOException {
         String response = "Invalid GET request";
         
         // Search for the current user's recipe list
@@ -162,6 +173,20 @@ public class RecipeHandler implements HttpHandler {
             response += "No recipe list found for user " + userId;
             return response;
         }
+
+        // Convert the recipe list to a List<Recipe>
+        List<Recipe> recipes = Recipe.parseRecipeListFromString(new JSONArray(recipeList).toString());
+  
+        // TODO: If no sort option was provided, return the recipes in newest-oldest order by default
+        // Sort the recipes if a sort option was provided
+        if (!sortOption.equals("")) {
+            if (sortOption.equals("a-z")) {
+                Recipe.sortByName(recipes, true);
+            } else if (sortOption.equals("z-a")) {
+                Recipe.sortByName(recipes, false);
+            }
+        }
+
 
         JSONArray jsonArray = new JSONArray(recipeList);
 
