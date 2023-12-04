@@ -228,6 +228,10 @@ class AppFramePopUp extends BorderPane {
     private TextField ingredientsField;
     private TextArea instructionsField;
 
+    private HBox toolBar;
+    private Button shareButton;
+
+
     // empty constructor
     // initialize pop up window here
     public AppFramePopUp(RecipeList rList) {
@@ -243,6 +247,7 @@ class AppFramePopUp extends BorderPane {
         this.recipe = recipe;
         this.recipeList = rList;
 
+        createToolBar();
         createFrame();
     }
 
@@ -263,7 +268,7 @@ class AppFramePopUp extends BorderPane {
         nameField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
 
         Label nameLabel = new Label();
-        nameLabel.setText("Recipe name: "); // create index label
+        nameLabel.setText("Recipe name: "); // create index label 
         nameLabel.setPrefSize(300, 20); // set size of Index label
         nameLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
         nameLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
@@ -342,6 +347,22 @@ class AppFramePopUp extends BorderPane {
 
         deleteButton.setOnAction(e -> {
             recipeList.appScenes.getController().deleteRecipe(this, recipeList.appScenes, recipe, recipeList);
+        });
+    }
+
+    private void createToolBar() {
+        toolBar = new HBox();
+        toolBar.setPadding(new Insets(10));
+        toolBar.setSpacing(10);
+        toolBar.setAlignment(Pos.TOP_RIGHT);
+
+        shareButton = new Button("Share");
+
+        toolBar.getChildren().add(shareButton);
+        this.setTop(toolBar);
+
+        shareButton.setOnAction(e -> {
+            recipeList.appScenes.getController().shareRecipe(recipe);
         });
     }
 

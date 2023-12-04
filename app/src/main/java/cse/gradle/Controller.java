@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javafx.scene.Scene;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.stage.Stage;
 
 public class Controller {
@@ -22,7 +24,22 @@ public class Controller {
 
     public void loginUser(String username, String password) {
         String postResponse = model.performLoginRequest(username, password);
-        System.out.println("login response: " + postResponse);
+    }
+
+
+    // Handles the share button being pressed by the user
+    public void shareRecipe(Recipe recipe) {
+
+        // Get the share link from the model 
+        String shareLink = model.getShareLink(recipe.getId().toString());
+
+        // Copy the share link to the user's clipboard
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(shareLink);
+        clipboard.setContent(content);
+
+        System.out.println("Share link copied to clipboard: " + shareLink);
     }
 
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
@@ -33,16 +50,12 @@ public class Controller {
             recipe.setIngredients(popUp.getIngredientsField().getText());
             recipe.setInstructions(popUp.getInstructionsField().getText());
 
-            System.out.println("NEW RECIPE: " + recipe.toString());
-
             // Update the recipe in the database
             String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);  
-            System.out.println("save recipe put response: " + putResponse);
 
             if (putResponse.contains("No recipe found")) {
                 // If the recipe was not found, create a new recipe in the database
                 String postResponse = model.performRecipeRequest("POST", null, recipe);
-                System.out.println("save recipe post response: " + postResponse);
             }
 
             // Update recipeList to reflect the state of the database

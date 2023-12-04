@@ -31,6 +31,10 @@ public class Model {
         this.urlString = urlString;
     }
 
+    public String getShareLink (String recipeId) {
+        return urlString + "/share?userId=" + userId + "&recipeId=" + recipeId;
+    }
+
     /*
      * Performs an HTTP request to the server
      * For GET requests, uid should be the id of the recipe to retrieve
@@ -52,7 +56,7 @@ public class Model {
                 recipeRequestURL += recipeId;
             }
 
-            System.out.println("Sending request to " + recipeRequestURL);
+            System.out.println("Sending " + method + " request to " + recipeRequestURL);
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
