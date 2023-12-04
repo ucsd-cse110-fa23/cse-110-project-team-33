@@ -3,6 +3,9 @@ package cse.gradle;
 import javafx.scene.Scene;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mongodb.ServerAddress;
+
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -24,6 +27,7 @@ public class View {
     private Scene ingredientsInputScene;
     private Scene userAcccountScene;
     private Scene mainLoginScene;
+    private Scene ServerDownScene;
     private RecipeList recipeListRoot;
     private AudioRecorder audioRecorder;
     private Stage stage;
@@ -36,6 +40,7 @@ public class View {
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+        ServerDownConstructor();
     }
 
     public View(Stage stage, List<Recipe> arrayList, Controller controller) {
@@ -47,6 +52,7 @@ public class View {
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+        ServerDownConstructor();
     }
 
     public Controller getController(){
@@ -85,13 +91,22 @@ public class View {
         displayScene(userAcccountScene);
     }
 
-     public void UserLoginConstructor(){
+    public void UserLoginConstructor(){
         UserLogin userLoginAccount = new UserLogin(this);
         mainLoginScene = new Scene(userLoginAccount, 500, 600);
     }
 
     public void displayUserLoginConstructor(){
         displayScene(mainLoginScene);
+    }
+
+    public void ServerDownConstructor(){
+        ServerDown server = new ServerDown(this);
+        ServerDownScene = new Scene(server, 500, 600);
+    }
+
+    public void displayServerDownConstructor(){
+        displayScene(ServerDownScene);
     }
 
     public void displayScene(Scene s) {
@@ -707,4 +722,21 @@ class UserLogin extends BorderPane {
     public Button getLoginButton(){
         return LoginButton;
     }
+}
+
+class ServerDown extends BorderPane {
+    public ServerDown(View appScenes){
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+
+        Label title = new Label("SERVER DOWN!");
+        title.setStyle("-fx-font-size: 20;");
+
+        Label subTitle = new Label("Please Try Again Later");
+        subTitle.setStyle("-fx-font-size: 14;"); 
+
+        vbox.getChildren().addAll(title, subTitle);
+        this.setCenter(vbox);
+    }
+
 }

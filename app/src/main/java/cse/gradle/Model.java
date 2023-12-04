@@ -82,6 +82,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }
@@ -117,6 +120,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error logging in: " + ex.getMessage();
         }
     }
@@ -150,6 +156,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }
@@ -228,6 +237,7 @@ public class Model {
         errorReader.close();
         String errorResult = errorResponse.toString();
         System.out.println("Error Result: " + errorResult);
+
     }
 
     public static String useWhisper(String filePathString) throws IOException, URISyntaxException {

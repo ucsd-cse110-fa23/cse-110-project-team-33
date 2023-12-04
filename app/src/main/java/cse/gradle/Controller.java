@@ -18,12 +18,20 @@ public class Controller {
         this.model = model;
     }
 
-    public void createUser(String username, String password) {
+    public void createUser(String username, String password, View appScenes) {
         String postResponse = model.performRegisterRequest(username, password);
+        if(postResponse.equals("Error: Server down")){
+                appScenes.displayServerDownConstructor();
+        }
     }
 
-    public void loginUser(String username, String password) {
+    public void loginUser(String username, String password, View appScenes) {
         String postResponse = model.performLoginRequest(username, password);
+        if(postResponse.equals("Error: Server down")){
+                appScenes.displayServerDownConstructor();
+                return;
+        }
+        System.out.println("login response: " + postResponse);
     }
 
 
@@ -51,7 +59,12 @@ public class Controller {
             recipe.setInstructions(popUp.getInstructionsField().getText());
 
             // Update the recipe in the database
-            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe);  
+            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe); 
+            if(putResponse.equals("Error: Server down")){
+                appScenes.displayServerDownConstructor();
+                return;
+            } 
+            System.out.println("save recipe put response: " + putResponse);
 
             if (putResponse.contains("No recipe found")) {
                 // If the recipe was not found, create a new recipe in the database
@@ -60,6 +73,10 @@ public class Controller {
 
             // Update recipeList to reflect the state of the database
             String getAllResponse = model.performRecipeRequest("GET", null, null);
+            if(getAllResponse.equals("Error: Server down")){
+                appScenes.displayServerDownConstructor();
+                return;
+            }
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
             appScenes.setRecipeListRoot(recipeArrayList);
             appScenes.displayRecipeListScene();
@@ -71,9 +88,18 @@ public class Controller {
         // saveRecipe(popUp, recipe, rList);
         Recipe rcp = null;
         String getResponse = model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
+        if(getResponse.equals("Error: Server down")){
+            appScenes.displayServerDownConstructor();
+            return;
+        }
 
         // Update recipeList to reflect the state of the database
         getResponse = model.performRecipeRequest("GET", null, null);
+        if(getResponse.equals("Error: Server down")){
+            appScenes.displayServerDownConstructor();
+            return;
+        }
+
         List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
         appScenes.setRecipeListRoot(recipeArrayList);
         appScenes.displayRecipeListScene();
@@ -138,7 +164,7 @@ public class Controller {
         createPane.getCreateButton().setOnAction(e -> {
             String username = createPane.getUsernameField().getText().toString();
             String password = createPane.getPasswordField().getText().toString();
-            createUser(username, password);
+            createUser(username, password, appScenes);
 
             // Get all recipes from the database and display
             String response = model.performRecipeRequest("GET", null, null);
@@ -165,7 +191,7 @@ public class Controller {
         userPane.getLoginButton().setOnAction(e -> {
             String username = userPane.getUsernameField().getText().toString();
             String password = userPane.getPasswordField().getText().toString();
-            loginUser(username, password);
+            loginUser(username, password, appScenes);
 
             // Get all recipes from the database and display
             String response = model.performRecipeRequest("GET", null, null);
