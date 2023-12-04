@@ -478,7 +478,7 @@ class RecipeList extends BorderPane {
         scrollPane.setFitToWidth(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
-        Label title = new Label("Recipes");
+        title = new Label("Recipes");
         TitleBox = new HBox();
         logoutButtonBox = new HBox();
         topBox = new VBox();
@@ -540,8 +540,7 @@ class RecipeList extends BorderPane {
 
         Label title = new Label("Recipes");
         title.setStyle("-fx-font-size: 24;");
-        logoutButton = new Button("Logout");
-        
+
         filterButton = new Button("Filter");
         Label choiceBoxLabel = new Label(" by: ");
         choiceBoxLabel.setStyle("-fx-font-size: 15;");
@@ -559,7 +558,8 @@ class RecipeList extends BorderPane {
 
         logoutButtonBox = new HBox();
         logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
-        logoutButtonBox.getChildren().add(logoutButton);
+        logoutButtonBox.getChildren().addAll(filterButton, choiceBoxLabel, mealTypeChoice, logoutButton);
+        // logoutButtonBox.getChildren().add(logoutButton);
 
         // Create a ComboBox with sorting options
         sortDropDown = new ComboBox<>();
@@ -583,9 +583,9 @@ class RecipeList extends BorderPane {
         topBox = new VBox();
         topBox.getChildren().addAll(TitleBox, toolBar);
         this.setTop(topBox);
-        logoutButtonBox.getChildren().addAll(filterButton, choiceBoxLabel, mealTypeChoice, logoutButton);
-        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
-        this.setTop(topBox); 
+
+        // topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+        // this.setTop(topBox); 
 
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
@@ -627,17 +627,6 @@ class RecipeList extends BorderPane {
 
     public RecipeList(List<Recipe> list) {
         recipes = list;
-    }
-
-    // getters for button and dropdown
-    public Button getNewRecipeButton() {
-        return newRecipeButton;
-    }
-    public Button getLogoutButton() {
-        return logoutButton;
-    }
-    public ComboBox<String> getSortDropDown() {
-        return sortDropDown;
     }
 
     // adds button to the end of button array
@@ -720,6 +709,10 @@ class RecipeList extends BorderPane {
 
     public String[] getMealTypes() {
         return mealTypes;
+    }
+
+    public ComboBox<String> getSortDropDown() {
+        return sortDropDown;
     }
 }
 
