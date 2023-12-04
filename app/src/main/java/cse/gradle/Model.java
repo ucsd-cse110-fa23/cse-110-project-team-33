@@ -143,16 +143,28 @@ public class Model {
         }
     }
 
-    public static String performAudioTranscriptionRequest(String filePath) throws IOException, URISyntaxException {
-        String response = "";
+    // TODO: Move this logic to execute on server (in GenerateRecipeHandler's handlePost())
+    // IN FUTURE IMPLEMENTATION, this method:
+    // SENDS meal type and ingredients audio files in a single request, 
+    // RECEIVES String transcript for each audio file
+    public static String[] performAudioTranscriptionRequest(String mealTypeFilePath, String ingredientsFilePath)
+            throws IOException, URISyntaxException {
+                
+        String[] response = new String[2];
 
         WhisperApiClient whisperApi = new WhisperApiClient();
-        response = whisperApi.generateResponse(filePath);
+        response[0] = whisperApi.generateResponse(mealTypeFilePath);
+        response[1] = whisperApi.generateResponse(ingredientsFilePath);
 
         return response;
     }
 
+    // TODO: Move this logic to execute on server (in generateRecipeHandler's handlePost())
+    // IN FUTURE IMPLEMENTATION, this method:
+    // SENDS 2 String audio transcriptions (meal type and ingredients),
+    // RECEIVES JSONified recipe
     public static String[] performRecipeGenerationRequest(String mealType, String ingredients) {
+        
         String[] response = new String[4];
 
         try {
@@ -164,5 +176,8 @@ public class Model {
 
         return response;
     }
+    // public static String performRecipeGenerationRequest(String audioFilePath) {
+        
+    // }
 
 }
