@@ -45,10 +45,12 @@ public class Controller {
                 System.out.println("save recipe post response: " + postResponse);
             }
 
+            String sortOption = rList.getSortDropDown().getValue();
+
             // Update recipeList to reflect the state of the database
-            String getAllResponse = model.getRecipeList();
+            String getAllResponse = model.getRecipeList(sortOption);
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
-            appScenes.setRecipeListRoot(recipeArrayList);
+            appScenes.updateRecipeListView(recipeArrayList);
             appScenes.displayRecipeListScene();
 
     }
@@ -59,10 +61,13 @@ public class Controller {
         Recipe rcp = null;
         String getResponse = model.deleteRecipe(recipe.getId().toString());
 
-        // Update recipeList to reflect the state of the database
-        getResponse = model.getRecipeList();
+
+        // Update recipeList to reflect the state of the database // TODO: Refactor into a method so we can DRY
+        String sortOption = rList.getSortDropDown().getValue();
+
+        getResponse = model.getRecipeList(sortOption);
         List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
-        appScenes.setRecipeListRoot(recipeArrayList);
+        appScenes.updateRecipeListView(recipeArrayList);
         appScenes.displayRecipeListScene();
         
         Stage current = (Stage) popUp.getScene().getWindow();
@@ -107,9 +112,16 @@ public class Controller {
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
-            appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
-            appScenes.getRecipeListRoot().addButton(0, newRecipe);
-            appScenes.getRecipeListRoot().refresh();
+
+            // Save the new recipe to the database
+            String postResponse = model.postRecipe(newRecipe);
+
+            // Update recipeList to reflect the state of the database 
+            // TODO: Refactor into a method so we can DRY
+            String sortOption = appScenes.getRecipeListRoot().getSortDropDown().getValue();
+            String getResponse = model.getRecipeList(sortOption);
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
+            appScenes.updateRecipeListView(recipeArrayList);
             appScenes.displayRecipeListScene();
         });
 
@@ -128,9 +140,10 @@ public class Controller {
             createUser(username, password);
 
             // Get all recipes from the database and display
-            String response = model.getRecipeList();
+            // When create account, start with default sorted list
+            String response = model.getRecipeList(Constants.defaultSortOption); 
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
-            appScenes.setRecipeListRoot(recipeArrayList);
+            appScenes.updateRecipeListView(recipeArrayList);
             appScenes.displayRecipeListScene();
         });    
 
@@ -155,9 +168,34 @@ public class Controller {
             loginUser(username, password);
 
             // Get all recipes from the database and display
-            String response = model.getRecipeList();
+            // When logging into account, start with default sorted list
+            String response = model.getRecipeList(Constants.defaultSortOption);
             List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
-            appScenes.setRecipeListRoot(recipeArrayList);
+            appScenes.updateRecipeListView(recipeArrayList);
+            appScenes.displayRecipeListScene();
+        });
+    }
+
+    void setListeners(RecipeList recipeList, View appScenes) {
+        // button
+        recipeList.getNewRecipeButton().setOnAction(e -> {
+            appScenes.displayNewRecipeScene();
+        });
+
+        recipeList.getLogoutButton().setOnAction(e -> {
+            model.userId = null; // erase the userId
+            // set the dropdown back to default sort option
+            recipeList.getSortDropDown().setValue(Constants.defaultSortOption);
+            appScenes.displayUserLoginConstructor();
+        });
+
+        recipeList.getSortDropDown().setOnAction(event -> {
+            String sortOption = recipeList.getSortDropDown().getValue();
+            String getAllResponse = model.getRecipeList(sortOption);
+
+            // Get all recipes from the database and display
+            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
+            appScenes.updateRecipeListView(recipeArrayList);
             appScenes.displayRecipeListScene();
         });
     }

@@ -148,6 +148,17 @@ public class Recipe {
         }
     }
 
+    /*
+     * This method removes all newlines 
+     * from the ingredients, category, and name
+     * and trims the white space around each field
+     */
+    public static void clean(Recipe recipe) {
+        recipe.setIngredients(recipe.getIngredients().replaceAll("\\r|\\n", "").trim());
+        recipe.setCategory(recipe.getCategory().replaceAll("\\r|\\n", "").trim());
+        recipe.setName(recipe.getName().replaceAll("\\r|\\n", "").trim()); 
+    }
+
     // static parse method for populating a recipe from a JSON string
     public static Recipe parseRecipeFromString(String json) {
         try {
@@ -162,11 +173,14 @@ public class Recipe {
             String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
             UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
 
+
             // Create a recipe object
             Recipe recipe = new Recipe(ingredients, instructions, category, name);
             // set id
             recipe.setId(id);
 
+            Recipe.clean(recipe);
+            
             return recipe;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -190,6 +204,10 @@ public class Recipe {
         }
         else {
             recipes.sort((r1, r2) -> r1.getName().compareToIgnoreCase(r2.getName()));
+        }
+        // print recipe names for debugging
+        for (Recipe recipe : recipes) {
+            System.out.println(recipe.getName());
         }
     }
 }
