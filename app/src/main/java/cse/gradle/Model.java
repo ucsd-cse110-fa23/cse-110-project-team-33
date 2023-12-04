@@ -24,6 +24,10 @@ public class Model {
         this.urlString = urlString;
     }
 
+    public String getShareLink (String recipeId) {
+        return urlString + "/share?userId=" + userId + "&recipeId=" + recipeId;
+    }
+
     /*
      * Performs an HTTP request to the server
      * For GET requests, uid should be the id of the recipe to retrieve
@@ -33,7 +37,7 @@ public class Model {
      * For DELETE requests, uid should be the id of the recipe to delete and recipe
      * should be null
      */
-    public String performRecipeRequest(String method, String recipeId, Recipe recipe) {
+    private String performRecipeRequest(String method, String recipeId, Recipe recipe) {
         // Check if userId is null, if so, return an error
         if (userId == null) {
             return "Error: Must login before performing requests";
@@ -44,8 +48,6 @@ public class Model {
             if (recipeId != null) {
                 recipeRequestURL += recipeId;
             }
-
-            System.out.println("Sending request to " + recipeRequestURL);
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -71,9 +73,65 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }
+
+    // Calls the performRecipeRequest method with the GET method 
+    public String getRecipeList(String sortOption) {
+        try {
+            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&sort=a-z
+            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption;
+
+            URL url = new URI(recipeRequestURL).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoOutput(true);
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                return response.toString();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Error: " + ex.getMessage();
+        }
+    }
+
+    // Overloaded getRecipeList method that defaults to no sort option
+    // TODO: Replace with newest to oldest sort option when implemented
+    public String getRecipeList() {
+        return getRecipeList("");
+    }
+
+    // Calls the performRecipeRequest method with and an id for the recipe we want
+    public String getRecipe(String recipeId) {
+        return performRecipeRequest("GET", recipeId, null);
+    }
+
+    // Calls the performRecipeRequest method with the POST method and a recipe to add
+    public String postRecipe(Recipe recipe) {
+        return performRecipeRequest("POST", null, recipe);
+    }
+
+    // Calls the performRecipeRequest method with the PUT method and a recipe to update
+    public String putRecipe(String recipeId, Recipe recipe) {
+        return performRecipeRequest("PUT", recipeId, recipe);
+    }
+
+    // Calls the performRecipeRequest method with the DELETE method and an id for the recipe to delete
+    public String deleteRecipe(String recipeId) {
+        return performRecipeRequest("DELETE", recipeId, null);
+    }
+
+
 
     // make a request to login a user, must be called before other requests besides register
     public String performLoginRequest(String username, String password) {
@@ -106,6 +164,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error logging in: " + ex.getMessage();
         }
     }
@@ -139,6 +200,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }

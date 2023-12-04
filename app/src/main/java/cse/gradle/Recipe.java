@@ -17,54 +17,6 @@ public class Recipe {
     private String name;
     private UUID id;
 
-    // static parse method for populating a List<Recipe> from a JSON string
-    public static List<Recipe> parseRecipeListFromString(String json) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ArrayList<Recipe> recipeArrayList = (ArrayList<Recipe>)objectMapper.readValue(json, new TypeReference<List<Recipe>>() {});
-
-            return recipeArrayList;
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // static parse method for populating a recipe from a JSON string
-    public static Recipe parseRecipeFromString(String json) {
-        try {
-            // Parse JSON using Jackson
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(json);
-
-            // Extract individual fields from the JSON
-            String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
-            String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
-            String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
-            String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
-            UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
-
-            // Create a recipe object
-            Recipe recipe = new Recipe(ingredients, instructions, category, name);
-            // set id
-            recipe.setId(id);
-
-            return recipe;
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // static equals method for comparing two recipes
-    public static boolean equals(Recipe r1, Recipe r2) {
-        return r1.getIngredients().equals(r2.getIngredients()) &&
-               r1.getInstructions().equals(r2.getInstructions()) &&
-               r1.getCategory().equals(r2.getCategory()) &&
-               r1.getName().equals(r2.getName()) &&
-               r1.getId().equals(r2.getId());
-    }
-
     // empty constructor
     public Recipe() {
         this.ingredients = "";
@@ -181,5 +133,81 @@ public class Recipe {
         }
       
         return recipe;
+    }
+
+    // static parse method for populating a List<Recipe> from a JSON string
+    public static List<Recipe> parseRecipeListFromString(String json) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ArrayList<Recipe> recipeArrayList = (ArrayList<Recipe>)objectMapper.readValue(json, new TypeReference<List<Recipe>>() {});
+
+            return recipeArrayList;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /*
+     * This method removes all newlines 
+     * from the ingredients, category, and name
+     * and trims the white space around each field
+     */
+    public static void clean(Recipe recipe) {
+        recipe.setIngredients(recipe.getIngredients().replaceAll("\\r|\\n", "").trim());
+        recipe.setCategory(recipe.getCategory().replaceAll("\\r|\\n", "").trim());
+        recipe.setName(recipe.getName().replaceAll("\\r|\\n", "").trim()); 
+    }
+
+    // static parse method for populating a recipe from a JSON string
+    public static Recipe parseRecipeFromString(String json) {
+        try {
+            // Parse JSON using Jackson
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(json);
+
+            // Extract individual fields from the JSON
+            String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
+            String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
+            String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
+            String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
+            UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
+
+
+            // Create a recipe object
+            Recipe recipe = new Recipe(ingredients, instructions, category, name);
+            // set id
+            recipe.setId(id);
+
+            Recipe.clean(recipe);
+            
+            return recipe;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // static equals method for comparing two recipes
+    public static boolean equals(Recipe r1, Recipe r2) {
+        return r1.getIngredients().equals(r2.getIngredients()) &&
+               r1.getInstructions().equals(r2.getInstructions()) &&
+               r1.getCategory().equals(r2.getCategory()) &&
+               r1.getName().equals(r2.getName()) &&
+               r1.getId().equals(r2.getId());
+    }
+
+    // static method for sorting a list of recipes alphabetically by name (case insensitive)
+    public static void sortByName(List<Recipe> recipes, boolean ascending) {
+        if (ascending) {
+            recipes.sort((r1, r2) -> r2.getName().compareToIgnoreCase(r1.getName()));
+        }
+        else {
+            recipes.sort((r1, r2) -> r1.getName().compareToIgnoreCase(r2.getName()));
+        }
+        // print recipe names for debugging
+        for (Recipe recipe : recipes) {
+            System.out.println(recipe.getName());
+        }
     }
 }

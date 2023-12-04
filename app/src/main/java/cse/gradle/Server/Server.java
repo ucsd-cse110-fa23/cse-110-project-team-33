@@ -34,6 +34,7 @@ public class Server {
         server.createContext("/recipe", new RecipeHandler(usersDb));
         server.createContext("/login", new LoginHandler(usersDb));
         server.createContext("/register", new RegisterHandler(usersDb));
+        server.createContext("/share", new ShareHandler(usersDb));
         // TODO: add generateRecipeHandler endpoint
         // server.createContext("/generate", new GenerateRecipeHandler(usersDb));
 

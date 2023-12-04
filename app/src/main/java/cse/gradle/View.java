@@ -3,17 +3,24 @@ package cse.gradle;
 import javafx.scene.Scene;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mongodb.ServerAddress;
+
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,6 +31,7 @@ public class View {
     private Scene ingredientsInputScene;
     private Scene userAcccountScene;
     private Scene mainLoginScene;
+    private Scene ServerDownScene;
     private RecipeList recipeListRoot;
     private AudioRecorder audioRecorder;
     private Stage stage;
@@ -36,6 +44,7 @@ public class View {
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+        ServerDownConstructor();
     }
 
     public View(Stage stage, List<Recipe> arrayList, Controller controller) {
@@ -43,19 +52,19 @@ public class View {
         this.stage = stage;
         this.controller = controller;
         recipeListRoot = new RecipeList(this, arrayList);
-        // newRecipeListSceneConstructor();
+        newRecipeListSceneConstructor();
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+        ServerDownConstructor();
     }
 
     public Controller getController(){
         return this.controller;
     }
 
-    public void setRecipeListRoot(List<Recipe> arrayList){
-        this.recipeListRoot = new RecipeList(this, arrayList);
-        newRecipeListSceneConstructor();
+    public void updateRecipeListView(List<Recipe> arrayList){
+        this.recipeListRoot.updateRecipeList(arrayList);
     }
 
     private void newRecipeListSceneConstructor(){
@@ -85,13 +94,22 @@ public class View {
         displayScene(userAcccountScene);
     }
 
-     public void UserLoginConstructor(){
+    public void UserLoginConstructor(){
         UserLogin userLoginAccount = new UserLogin(this);
         mainLoginScene = new Scene(userLoginAccount, 500, 600);
     }
 
     public void displayUserLoginConstructor(){
         displayScene(mainLoginScene);
+    }
+
+    public void ServerDownConstructor(){
+        ServerDown server = new ServerDown(this);
+        ServerDownScene = new Scene(server, 500, 600);
+    }
+
+    public void displayServerDownConstructor(){
+        displayScene(ServerDownScene);
     }
 
     public void displayScene(Scene s) {
@@ -228,6 +246,10 @@ class AppFramePopUp extends BorderPane {
     private TextField ingredientsField;
     private TextArea instructionsField;
 
+    private HBox toolBar;
+    private Button shareButton;
+
+
     // empty constructor
     // initialize pop up window here
     public AppFramePopUp(RecipeList rList) {
@@ -243,6 +265,7 @@ class AppFramePopUp extends BorderPane {
         this.recipe = recipe;
         this.recipeList = rList;
 
+        createToolBar();
         createFrame();
     }
 
@@ -263,7 +286,7 @@ class AppFramePopUp extends BorderPane {
         nameField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
 
         Label nameLabel = new Label();
-        nameLabel.setText("Recipe name: "); // create index label
+        nameLabel.setText("Recipe name: "); // create index label 
         nameLabel.setPrefSize(300, 20); // set size of Index label
         nameLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
         nameLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
@@ -345,6 +368,22 @@ class AppFramePopUp extends BorderPane {
         });
     }
 
+    private void createToolBar() {
+        toolBar = new HBox();
+        toolBar.setPadding(new Insets(10));
+        toolBar.setSpacing(10);
+        toolBar.setAlignment(Pos.TOP_RIGHT);
+
+        shareButton = new Button("Share");
+
+        toolBar.getChildren().add(shareButton);
+        this.setTop(toolBar);
+
+        shareButton.setOnAction(e -> {
+            recipeList.appScenes.getController().shareRecipe(recipe);
+        });
+    }
+
     public TextField getNameField() {
         return nameField;
     }
@@ -370,6 +409,7 @@ class RecipeList extends BorderPane {
 
     private Button newRecipeButton;
     private Button logoutButton;
+    private ComboBox<String> sortDropDown; // drop down menu for sorting recipes
     private HBox newRecipeButtonBox;
     private HBox TitleBox;
     private HBox logoutButtonBox;
@@ -384,27 +424,50 @@ class RecipeList extends BorderPane {
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
         vBox.setAlignment(Pos.TOP_CENTER);
-        // vBox
+
+        Label title = new Label("Recipes");
+        title.setStyle("-fx-font-size: 24;");
+        title.setAlignment(Pos.CENTER);
+
+        logoutButton = new Button("Logout");
+        logoutButton.setAlignment(Pos.CENTER);
+
+        TitleBox = new HBox();
+        TitleBox.setAlignment(Pos.TOP_CENTER);
+        TitleBox.getChildren().add(title);
+
+        logoutButtonBox = new HBox();
+        logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
+        logoutButtonBox.getChildren().add(logoutButton);
+
+        // Create a ComboBox with sorting options
+        sortDropDown = new ComboBox<>();
+        // Add options from Constants.sortOptions
+        sortDropDown.getItems().addAll(Constants.sortOptions);
+
+        Label sortLabel = new Label("Sort by:");
+        sortLabel.setAlignment(Pos.CENTER_LEFT);
+        sortLabel.setPadding(new Insets(0, 10, 0, 0));
+
+        HBox sortBox = new HBox();
+        sortBox.setAlignment(Pos.CENTER_LEFT);
+        sortBox.getChildren().addAll(sortLabel, sortDropDown);
+
+        // ToolBar to hold the sortBox and logoutButtonBox
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        ToolBar toolBar = new ToolBar(sortBox, spacer, logoutButtonBox);
+        toolBar.setPadding(new Insets(5, 10, 5, 10));
+
+        topBox = new VBox();
+        topBox.getChildren().addAll(TitleBox, toolBar);
+        this.setTop(topBox);
+
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-
-        Label title = new Label("Recipes");
-        TitleBox = new HBox();
-        logoutButtonBox = new HBox();
-        topBox = new VBox();
-        title.setStyle("-fx-font-size: 24;");
-        logoutButton = new Button("Logout");
-        title.setAlignment(Pos.CENTER);
-        logoutButton.setAlignment(Pos.CENTER);
-        TitleBox.setAlignment(Pos.TOP_CENTER);
-        TitleBox.getChildren().add(title);
-        logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
-        logoutButtonBox.getChildren().add(logoutButton);
-        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
-        this.setTop(topBox); 
 
         // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
@@ -450,19 +513,42 @@ class RecipeList extends BorderPane {
         refresh();
 
         Label title = new Label("Recipes");
-        TitleBox = new HBox();
-        logoutButtonBox = new HBox();
-        topBox = new VBox();
         title.setStyle("-fx-font-size: 24;");
-        logoutButton = new Button("Logout");
         title.setAlignment(Pos.CENTER);
+
+        logoutButton = new Button("Logout");
         logoutButton.setAlignment(Pos.CENTER);
+
+        TitleBox = new HBox();
         TitleBox.setAlignment(Pos.TOP_CENTER);
         TitleBox.getChildren().add(title);
+
+        logoutButtonBox = new HBox();
         logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
         logoutButtonBox.getChildren().add(logoutButton);
-        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
-        this.setTop(topBox); 
+
+        // Create a ComboBox with sorting options
+        sortDropDown = new ComboBox<>();
+        sortDropDown.getItems().addAll(Constants.sortOptions);
+        sortDropDown.setValue(Constants.defaultSortOption); // TODO: Change to "newest-oldest" when implemented
+
+        Label sortLabel = new Label("Sort by:");
+        sortLabel.setAlignment(Pos.CENTER_LEFT);
+        sortLabel.setPadding(new Insets(0, 10, 0, 0));
+
+        HBox sortBox = new HBox();
+        sortBox.setAlignment(Pos.CENTER_LEFT);
+        sortBox.getChildren().addAll(sortLabel, sortDropDown);
+
+        // ToolBar to hold the sortBox and logoutButtonBox
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        ToolBar toolBar = new ToolBar(sortBox, spacer, logoutButtonBox);
+        toolBar.setPadding(new Insets(5, 10, 5, 10));
+
+        topBox = new VBox();
+        topBox.getChildren().addAll(TitleBox, toolBar);
+        this.setTop(topBox);
 
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
@@ -474,25 +560,47 @@ class RecipeList extends BorderPane {
         newRecipeButton = new Button("New Recipe");
         newRecipeButton.setPrefSize(100, 20);
         newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets
-                                                                                                                    // style
-                                                                                                                    // of
-                                                                                                                    // button
-        newRecipeButton.setOnAction(e -> {
-            this.appScenes.displayNewRecipeScene();
-        });
-
-        logoutButton.setOnAction(e -> {
-            this.appScenes.displayUserLoginConstructor();
-        });
 
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
         newRecipeButtonBox.getChildren().add(newRecipeButton);
         this.setBottom(newRecipeButtonBox);
+
+        // set listeners
+        this.appScenes.getController().setListeners(this, appScenes);
+    }
+
+    public void updateRecipeList(List<Recipe> rList) {
+        this.recipes = rList;
+
+        // prune recipe names
+        for (int i = 0; i < recipes.size(); i++) {
+            recipes.get(i).setName(recipes.get(i).getName().replace("\n", "").replace("\r", ""));
+        }
+
+        // Remove all buttons from vBox
+        vBox.getChildren().removeAll(buttons);
+
+        for (int i = 0; i < recipes.size(); i++) {
+            // For each recipe, add new button with title of recipe
+            Recipe r = recipes.get(i);
+            addButton(r);
+        }
     }
 
     public RecipeList(List<Recipe> list) {
         recipes = list;
+    }
+
+    // getters for button and dropdown
+    public Button getNewRecipeButton() {
+        return newRecipeButton;
+    }
+    public Button getLogoutButton() {
+        return logoutButton;
+    }
+    public ComboBox<String> getSortDropDown() {
+        return sortDropDown;
     }
 
     // adds button to the end of button array
@@ -686,4 +794,21 @@ class UserLogin extends BorderPane {
     public Button getLoginButton(){
         return LoginButton;
     }
+}
+
+class ServerDown extends BorderPane {
+    public ServerDown(View appScenes){
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+
+        Label title = new Label("SERVER DOWN!");
+        title.setStyle("-fx-font-size: 20;");
+
+        Label subTitle = new Label("Please Try Again Later");
+        subTitle.setStyle("-fx-font-size: 14;"); 
+
+        vbox.getChildren().addAll(title, subTitle);
+        this.setCenter(vbox);
+    }
+
 }
