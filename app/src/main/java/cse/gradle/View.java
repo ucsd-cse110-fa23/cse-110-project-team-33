@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mongodb.ServerAddress;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
@@ -15,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
@@ -22,6 +25,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -410,11 +415,15 @@ class RecipeList extends BorderPane {
     private Button newRecipeButton;
     private Button logoutButton;
     private ComboBox<String> sortDropDown; // drop down menu for sorting recipes
+    private Button filterButton;
+    private ChoiceBox mealTypeChoice;
+    private String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
     private HBox newRecipeButtonBox;
     private HBox TitleBox;
     private HBox logoutButtonBox;
     private VBox topBox;
 
+    // I don't think we use this constructor anymore
     public RecipeList(View appScenes) {
         this.appScenes = appScenes;
 
@@ -469,6 +478,23 @@ class RecipeList extends BorderPane {
         scrollPane.setFitToWidth(true);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
+        Label title = new Label("Recipes");
+        TitleBox = new HBox();
+        logoutButtonBox = new HBox();
+        topBox = new VBox();
+        title.setStyle("-fx-font-size: 24;");
+        logoutButton = new Button("Logout");
+        // String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
+        mealTypeChoice = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
+        title.setAlignment(Pos.CENTER);
+        logoutButton.setAlignment(Pos.CENTER);
+        TitleBox.setAlignment(Pos.TOP_CENTER);
+        TitleBox.getChildren().add(title);
+        logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
+        logoutButtonBox.getChildren().addAll(mealTypeChoice, logoutButton);
+        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+        this.setTop(topBox);
+
         // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
         newRecipeButton.setPrefSize(100, 20);
@@ -514,12 +540,20 @@ class RecipeList extends BorderPane {
 
         Label title = new Label("Recipes");
         title.setStyle("-fx-font-size: 24;");
+        logoutButton = new Button("Logout");
+        
+        filterButton = new Button("Filter");
+        Label choiceBoxLabel = new Label(" by: ");
+        choiceBoxLabel.setStyle("-fx-font-size: 15;");
+        choiceBoxLabel.setAlignment(Pos.CENTER);
+        mealTypeChoice = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
         title.setAlignment(Pos.CENTER);
 
         logoutButton = new Button("Logout");
         logoutButton.setAlignment(Pos.CENTER);
 
         TitleBox = new HBox();
+        filterButton.setAlignment(Pos.CENTER);
         TitleBox.setAlignment(Pos.TOP_CENTER);
         TitleBox.getChildren().add(title);
 
@@ -549,6 +583,9 @@ class RecipeList extends BorderPane {
         topBox = new VBox();
         topBox.getChildren().addAll(TitleBox, toolBar);
         this.setTop(topBox);
+        logoutButtonBox.getChildren().addAll(filterButton, choiceBoxLabel, mealTypeChoice, logoutButton);
+        topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+        this.setTop(topBox); 
 
         ScrollPane scrollPane = new ScrollPane(vBox);
         this.setCenter(scrollPane);
@@ -663,6 +700,26 @@ class RecipeList extends BorderPane {
 
     public List<Recipe> getRecipes() {
         return recipes;
+    }
+
+    public Button getNewRecipeButton() {
+        return newRecipeButton;
+    }
+
+    public Button getLogoutButton() {
+        return logoutButton;
+    }
+
+    public ChoiceBox getMealTypeChoiceBox() {
+        return mealTypeChoice;
+    }
+
+    public Button getFilterButton() {
+        return filterButton;
+    }
+
+    public String[] getMealTypes() {
+        return mealTypes;
     }
 }
 
