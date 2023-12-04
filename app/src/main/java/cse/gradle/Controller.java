@@ -200,4 +200,13 @@ public class Controller {
             appScenes.displayRecipeListScene();
         });
     }
+
+    void handleRegenerateButton(AppFramePopUp popUp, View appScenes, RecipeList rList){
+        Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
+        popUp.getNameField().setText(newRecipe.getName());
+        popUp.getCategoryField().setText(newRecipe.getCategory());
+        popUp.getIngredientsField().setText(newRecipe.getIngredients());
+        popUp.getInstructionsField().setText(newRecipe.getInstructions());
+        rList.refresh();
+    }
 }

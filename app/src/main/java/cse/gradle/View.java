@@ -115,6 +115,7 @@ public class View {
 
     public Scene getScene() {
         return mainLoginScene;
+        //return newRecipeScene;
     }
 
     public RecipeList getRecipeListRoot() {
@@ -245,6 +246,7 @@ class AppFramePopUp extends BorderPane {
 
     private HBox toolBar;
     private Button shareButton;
+    private Button regenerateButton;
 
 
     // empty constructor
@@ -350,8 +352,13 @@ class AppFramePopUp extends BorderPane {
         deleteButton.setStyle(
                 "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
 
+        regenerateButton = new Button("Regenerate Recipe");
+        regenerateButton.setStyle(
+                "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
+
         buttonsBox.getChildren().add(saveButton);
         buttonsBox.getChildren().add(deleteButton);
+        buttonsBox.getChildren().add(regenerateButton);
         buttonsBox.setAlignment(Pos.CENTER);
 
         this.setBottom(buttonsBox);
@@ -362,6 +369,10 @@ class AppFramePopUp extends BorderPane {
 
         deleteButton.setOnAction(e -> {
             recipeList.appScenes.getController().deleteRecipe(this, recipeList.appScenes, recipe, recipeList);
+        });
+
+        regenerateButton.setOnAction(e -> {
+            recipeList.appScenes.getController().handleRegenerateButton(this, recipeList.appScenes, recipeList);
         });
     }
 
@@ -395,6 +406,10 @@ class AppFramePopUp extends BorderPane {
 
     public TextArea getInstructionsField() {
         return instructionsField;
+    }
+
+    public Button getRegenerateButton(){
+        return regenerateButton;
     }
 }
 
