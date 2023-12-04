@@ -174,4 +174,15 @@ public class Controller {
             appScenes.displayRecipeListScene();
         });
     }
+
+    // Set listeners for all buttons in the RecipeList window 
+    void setListeners(RecipeList recipeList, View appScenes) {
+        recipeList.getNewRecipeButton().setOnAction(e -> {
+            appScenes.displayNewRecipeScene();
+        });
+
+        recipeList.getLogoutButton().setOnAction(e -> {
+            appScenes.displayUserLoginConstructor();
+        });
+    }
 }

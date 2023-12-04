@@ -103,6 +103,9 @@ public class View {
 
     public void filterByMealType(String mealType) {
         System.out.println("filterByMealType() TO DO");
+        // need to get only meals matching mealType
+        // call to controller?
+        
     }
 
     public void displayScene(Scene s) {
@@ -409,6 +412,7 @@ class RecipeList extends BorderPane {
     private HBox logoutButtonBox;
     private VBox topBox;
 
+    // I don't think we use this constructor anymore
     public RecipeList(View appScenes) {
         this.appScenes = appScenes;
 
@@ -516,18 +520,17 @@ class RecipeList extends BorderPane {
         // make "New Recipe" button
         newRecipeButton = new Button("New Recipe");
         newRecipeButton.setPrefSize(100, 20);
-        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets
-                                                                                                                    // style
-                                                                                                                    // of
-                                                                                                                    // button
-        newRecipeButton.setOnAction(e -> {
-            this.appScenes.displayNewRecipeScene();
-        });
+        newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
-        logoutButton.setOnAction(e -> {
-            this.appScenes.displayUserLoginConstructor();
-        });
-        // 
+        appScenes.getController().setListeners(this, appScenes);
+        // newRecipeButton.setOnAction(e -> {
+        //     this.appScenes.displayNewRecipeScene();
+        // });
+
+        // logoutButton.setOnAction(e -> {
+        //     this.appScenes.displayUserLoginConstructor();
+        // });
+        
         mealTypeChoice.getSelectionModel().selectedIndexProperty().addListener(
             (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
                 // store selected mealtype
@@ -536,9 +539,6 @@ class RecipeList extends BorderPane {
                 });
 
         });
-        // filterButton.setOnAction(e -> {
-        //     this.appScenes.filterByMealType();
-        // });
 
         newRecipeButtonBox = new HBox();
         newRecipeButtonBox.setAlignment(Pos.CENTER);
@@ -610,6 +610,14 @@ class RecipeList extends BorderPane {
 
     public List<Recipe> getRecipes() {
         return recipes;
+    }
+
+    public Button getNewRecipeButton() {
+        return newRecipeButton;
+    }
+
+    public Button getLogoutButton() {
+        return logoutButton;
     }
 }
 
