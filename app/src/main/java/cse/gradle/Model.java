@@ -31,6 +31,10 @@ public class Model {
         this.urlString = urlString;
     }
 
+    public String getShareLink (String recipeId) {
+        return urlString + "/share?userId=" + userId + "&recipeId=" + recipeId;
+    }
+
     /*
      * Performs an HTTP request to the server
      * For GET requests, uid should be the id of the recipe to retrieve
@@ -76,6 +80,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }
@@ -164,6 +171,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error logging in: " + ex.getMessage();
         }
     }
@@ -197,6 +207,9 @@ public class Model {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
             return "Error: " + ex.getMessage();
         }
     }
@@ -275,6 +288,7 @@ public class Model {
         errorReader.close();
         String errorResult = errorResponse.toString();
         System.out.println("Error Result: " + errorResult);
+
     }
 
     public static String useWhisper(String filePathString) throws IOException, URISyntaxException {

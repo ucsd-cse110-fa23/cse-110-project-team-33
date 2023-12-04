@@ -3,6 +3,9 @@ package cse.gradle;
 import javafx.scene.Scene;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mongodb.ServerAddress;
+
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -28,6 +31,7 @@ public class View {
     private Scene ingredientsInputScene;
     private Scene userAcccountScene;
     private Scene mainLoginScene;
+    private Scene ServerDownScene;
     private RecipeList recipeListRoot;
     private AudioRecorder audioRecorder;
     private Stage stage;
@@ -40,6 +44,7 @@ public class View {
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+        ServerDownConstructor();
     }
 
     public View(Stage stage, List<Recipe> arrayList, Controller controller) {
@@ -51,6 +56,7 @@ public class View {
         UserLoginConstructor();
         UserAccountSceneConstructor();
         newRecipeSceneConstructor();
+        ServerDownConstructor();
     }
 
     public Controller getController(){
@@ -88,13 +94,22 @@ public class View {
         displayScene(userAcccountScene);
     }
 
-     public void UserLoginConstructor(){
+    public void UserLoginConstructor(){
         UserLogin userLoginAccount = new UserLogin(this);
         mainLoginScene = new Scene(userLoginAccount, 500, 600);
     }
 
     public void displayUserLoginConstructor(){
         displayScene(mainLoginScene);
+    }
+
+    public void ServerDownConstructor(){
+        ServerDown server = new ServerDown(this);
+        ServerDownScene = new Scene(server, 500, 600);
+    }
+
+    public void displayServerDownConstructor(){
+        displayScene(ServerDownScene);
     }
 
     public void displayScene(Scene s) {
@@ -231,6 +246,10 @@ class AppFramePopUp extends BorderPane {
     private TextField ingredientsField;
     private TextArea instructionsField;
 
+    private HBox toolBar;
+    private Button shareButton;
+
+
     // empty constructor
     // initialize pop up window here
     public AppFramePopUp(RecipeList rList) {
@@ -246,6 +265,7 @@ class AppFramePopUp extends BorderPane {
         this.recipe = recipe;
         this.recipeList = rList;
 
+        createToolBar();
         createFrame();
     }
 
@@ -266,7 +286,7 @@ class AppFramePopUp extends BorderPane {
         nameField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
 
         Label nameLabel = new Label();
-        nameLabel.setText("Recipe name: "); // create index label
+        nameLabel.setText("Recipe name: "); // create index label 
         nameLabel.setPrefSize(300, 20); // set size of Index label
         nameLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
         nameLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
@@ -345,6 +365,22 @@ class AppFramePopUp extends BorderPane {
 
         deleteButton.setOnAction(e -> {
             recipeList.appScenes.getController().deleteRecipe(this, recipeList.appScenes, recipe, recipeList);
+        });
+    }
+
+    private void createToolBar() {
+        toolBar = new HBox();
+        toolBar.setPadding(new Insets(10));
+        toolBar.setSpacing(10);
+        toolBar.setAlignment(Pos.TOP_RIGHT);
+
+        shareButton = new Button("Share");
+
+        toolBar.getChildren().add(shareButton);
+        this.setTop(toolBar);
+
+        shareButton.setOnAction(e -> {
+            recipeList.appScenes.getController().shareRecipe(recipe);
         });
     }
 
@@ -758,4 +794,21 @@ class UserLogin extends BorderPane {
     public Button getLoginButton(){
         return LoginButton;
     }
+}
+
+class ServerDown extends BorderPane {
+    public ServerDown(View appScenes){
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+
+        Label title = new Label("SERVER DOWN!");
+        title.setStyle("-fx-font-size: 20;");
+
+        Label subTitle = new Label("Please Try Again Later");
+        subTitle.setStyle("-fx-font-size: 14;"); 
+
+        vbox.getChildren().addAll(title, subTitle);
+        this.setCenter(vbox);
+    }
+
 }
