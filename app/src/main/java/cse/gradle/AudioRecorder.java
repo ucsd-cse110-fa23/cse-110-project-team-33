@@ -9,8 +9,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 
-import javafx.scene.control.Label;
-
 public class AudioRecorder {
     private boolean currentlyRecording;
     private AudioFormat audioFormat;

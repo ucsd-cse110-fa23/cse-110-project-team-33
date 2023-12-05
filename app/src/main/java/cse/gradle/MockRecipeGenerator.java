@@ -1,7 +1,5 @@
 package cse.gradle;
 
-import java.util.concurrent.TimeUnit;
-
 public class MockRecipeGenerator extends RecipeGenerator {
     public Recipe generateNewRecipe(String mealTypeString, String ingredientsString, 
                                     String instructionsString, String titleString) {

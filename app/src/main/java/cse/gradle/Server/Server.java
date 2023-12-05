@@ -2,20 +2,14 @@ package cse.gradle.Server;
 
 import com.sun.net.httpserver.*;
 
-import cse.gradle.Recipe;
-
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.*;
 
 public class Server {
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_HOSTNAME = "localhost";
     public static HttpServer server;
-
 
     public static void startServer() throws IOException {
         // create a thread pool to handle requests
@@ -24,10 +18,10 @@ public class Server {
         // Create a server
         server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT), 0);
 
-
-        // Create a MongoDB object that accesses the users colleciton in the user_db database
+        // Create a MongoDB object that accesses the users colleciton in
+        // the user_db database
         MongoDB usersDb = new MongoDB(
-            "mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority",
+                "mongodb+srv://trevor:cse110@dev-azure-desktop.4j6hron.mongodb.net/?retryWrites=true&w=majority",
                 "user_db", "users");
 
         // Register the handlers
@@ -35,8 +29,7 @@ public class Server {
         server.createContext("/login", new LoginHandler(usersDb));
         server.createContext("/register", new RegisterHandler(usersDb));
         server.createContext("/share", new ShareHandler(usersDb));
-        // TODO: add generateRecipeHandler endpoint
-        // server.createContext("/generate", new GenerateRecipeHandler(usersDb));
+        server.createContext("/generate", new GenerateRecipeHandler(usersDb));
 
         // Set the server's executor object to be threadPoolExecutor
         server.setExecutor(threadPoolExecutor);

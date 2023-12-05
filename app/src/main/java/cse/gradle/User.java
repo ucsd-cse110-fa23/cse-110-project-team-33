@@ -3,7 +3,6 @@ package cse.gradle;
 import java.util.UUID;
 
 import org.bson.Document;
-import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 
@@ -21,7 +20,7 @@ public class User {
         this.recipeList = new ArrayList<Recipe>();
         this.userId = UUID.randomUUID();
     }
-    
+
     // parse method for populating a recipe from a database document
     public static Recipe parseRecipeFromDocument(Document result) {
         Recipe recipe = new Recipe();
