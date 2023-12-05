@@ -3,3 +3,4 @@ app/build
 .vscode/
 app/ingredients.wav
 app/mealType.wav
+app/bin
