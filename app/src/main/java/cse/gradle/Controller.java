@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -53,59 +54,60 @@ public class Controller {
     // Handles the saving of a recipe in the database caused by the UI save button being pressed
     public void saveRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
 
+        try {
             recipe.setName(popUp.getNameField().getText());
             recipe.setCategory(popUp.getCategoryField().getText());
             recipe.setIngredients(popUp.getIngredientsField().getText());
             recipe.setInstructions(popUp.getInstructionsField().getText());
 
             // Update the recipe in the database
-            String putResponse = model.performRecipeRequest("PUT", recipe.getId().toString(), recipe); 
-            if(putResponse.equals("Error: Server down")){
-                appScenes.displayServerDownConstructor();
-                return;
-            } 
-            System.out.println("save recipe put response: " + putResponse);
+            String response = model.putRecipe(recipe.getId().toString(), recipe);  
+            System.out.println("save recipe put response: " + response);
 
-            if (putResponse.contains("No recipe found")) {
+            if (response.contains("No recipe found")) {
                 // If the recipe was not found, create a new recipe in the database
-                String postResponse = model.performRecipeRequest("POST", null, recipe);
+                response = model.postRecipe(recipe);
+                System.out.println("save recipe post response: " + response);
             }
 
-            // Update recipeList to reflect the state of the database
-            String getAllResponse = model.performRecipeRequest("GET", null, null);
-            if(getAllResponse.equals("Error: Server down")){
-                appScenes.displayServerDownConstructor();
-                return;
+            // Make sure the server isn't down
+            if(response.equals("Error: Server down")){
+                throw new Exception(response);
             }
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
-            appScenes.setRecipeListRoot(recipeArrayList);
-            appScenes.displayRecipeListScene();
+
+            String filterOption = rList.getMealTypeDropDown().getValue();
+            String sortOption = rList.getSortDropDown().getValue();
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
+        } catch (Exception e) {
+            if (e.getMessage().equals("Error: Server down"))
+                appScenes.displayServerDownConstructor();
+        }
 
     }
 
     // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
     public void deleteRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
-        // saveRecipe(popUp, recipe, rList);
-        Recipe rcp = null;
-        String getResponse = model.performRecipeRequest("DELETE", recipe.getId().toString(), rcp);
-        if(getResponse.equals("Error: Server down")){
-            appScenes.displayServerDownConstructor();
-            return;
-        }
+        try {
+            // saveRecipe(popUp, recipe, rList);
+            Recipe rcp = null;
+            String response = model.deleteRecipe(recipe.getId().toString());
 
-        // Update recipeList to reflect the state of the database
-        getResponse = model.performRecipeRequest("GET", null, null);
-        if(getResponse.equals("Error: Server down")){
-            appScenes.displayServerDownConstructor();
-            return;
-        }
 
-        List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getResponse);
-        appScenes.setRecipeListRoot(recipeArrayList);
-        appScenes.displayRecipeListScene();
-        
-        Stage current = (Stage) popUp.getScene().getWindow();
-        current.close();
+            if(response.equals("Error: Server down")){
+                appScenes.displayServerDownConstructor();
+                return;
+            }
+            
+            String filterOption = rList.getMealTypeDropDown().getValue();
+            String sortOption = rList.getSortDropDown().getValue();
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
+            
+            Stage current = (Stage) popUp.getScene().getWindow();
+            current.close();
+        } catch (Exception e) {
+            if (e.getMessage().equals("Error: Server down"))
+                appScenes.displayServerDownConstructor();
+        }
 
     }
 
@@ -145,11 +147,17 @@ public class Controller {
         });
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
+            // TODO: replace with using Model
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
-            appScenes.getRecipeListRoot().getRecipes().add(0, newRecipe);
-            appScenes.getRecipeListRoot().addButton(0, newRecipe);
-            appScenes.getRecipeListRoot().refresh();
-            appScenes.displayRecipeListScene();
+
+            // Save the new recipe to the database
+            String postResponse = model.postRecipe(newRecipe);
+
+            // Update recipeList to reflect the state of the database 
+            // TODO: Refactor into a method so we can DRY
+            String filterOption = appScenes.getRecipeListRoot().getMealTypeDropDown().getValue();
+            String sortOption = appScenes.getRecipeListRoot().getSortDropDown().getValue();
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
 
         // Display cancelScene when backButton is pushed
@@ -167,10 +175,8 @@ public class Controller {
             createUser(username, password, appScenes);
 
             // Get all recipes from the database and display
-            String response = model.performRecipeRequest("GET", null, null);
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
-            appScenes.setRecipeListRoot(recipeArrayList);
-            appScenes.displayRecipeListScene();
+            // When create account, start with default sorted list
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
         });    
 
         // Display cancelScene when backButton is pushed
@@ -194,11 +200,59 @@ public class Controller {
             loginUser(username, password, appScenes);
 
             // Get all recipes from the database and display
-            String response = model.performRecipeRequest("GET", null, null);
-            List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(response);
-            appScenes.setRecipeListRoot(recipeArrayList);
-            appScenes.displayRecipeListScene();
+            // When logging into account, start with default sorted list
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
         });
+    }
+
+    void setListeners(RecipeList recipeList, View appScenes) {
+        // button
+        recipeList.getNewRecipeButton().setOnAction(e -> {
+            appScenes.displayNewRecipeScene();
+        });
+
+        recipeList.getLogoutButton().setOnAction(e -> {
+            model.userId = null; // erase the userId
+            // set the dropdown back to default sort option
+            recipeList.getSortDropDown().setValue(Constants.defaultSortOption);
+            appScenes.displayUserLoginConstructor();
+        });
+
+        recipeList.getSortDropDown().setOnAction(event -> {
+            String filterOption = recipeList.getMealTypeDropDown().getValue();
+            String sortOption = recipeList.getSortDropDown().getValue();
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
+        });
+        
+        recipeList.getMealTypeDropDown().setOnAction(event -> {
+            String filterOption = recipeList.getMealTypeDropDown().getValue();
+            String sortOption = recipeList.getSortDropDown().getValue();
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
+        });
+        
+        // recipeList.getMealTypeChoiceBox().getSelectionModel().selectedIndexProperty().addListener(
+        //     (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
+        //         // store selected mealtype
+        //         recipeList.getFilterButton().setOnAction(e -> {
+        //             String chosenMeal = (recipeList.getMealTypes()[new_val.intValue()]);
+                    
+        //         });
+
+        // });
+    }
+
+    private void syncRecipeListWithModel(View appScenes, String sortOption, String filterOption) {
+        String getAllResponse = model.getRecipeList(sortOption, filterOption);
+
+        // Make sure the server isn't down
+        if(getAllResponse.equals("Error: Server down")){
+            appScenes.displayServerDownConstructor();
+        }
+
+        // Get all recipes from the database and display
+        List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
+        appScenes.updateRecipeListView(recipeArrayList);
+        appScenes.displayRecipeListScene();
     }
 
     // TODO: Replace this method with an API call to the HTTP server using Model
