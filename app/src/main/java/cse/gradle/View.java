@@ -409,7 +409,8 @@ class AppFramePopUp extends BorderPane {
 class RecipeList extends BorderPane {
     public View appScenes;
     private List<Recipe> recipes;
-    private List<Button> buttons;
+    //private List<Button> buttons;
+    private List<HBox> buttons;
     private VBox vBox;
 
     private Button newRecipeButton;
@@ -427,7 +428,8 @@ class RecipeList extends BorderPane {
         this.appScenes = appScenes;
 
         recipes = new ArrayList<Recipe>();
-        buttons = new ArrayList<Button>();
+        //buttons = new ArrayList<Button>();
+        buttons = new ArrayList<HBox>();
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
@@ -522,7 +524,8 @@ class RecipeList extends BorderPane {
 
         recipes = new ArrayList<Recipe>(rList);
 
-        buttons = new ArrayList<Button>();
+        //buttons = new ArrayList<Button>();
+        buttons = new ArrayList<HBox>();
         vBox = new VBox();
         vBox.setPrefSize(500, 20);
         vBox.setSpacing(2);
@@ -643,15 +646,20 @@ class RecipeList extends BorderPane {
     public void addButton(Recipe r) {
         Button b = new Button(r.getName());
         System.out.println("new recipe name: " + r.getName());
-        buttons.add(b);
-        b.setPrefSize(500, 20);
+        Label mealTypeLabel = new Label("[" + r.getCategory() + "]");
+        //mealTypeLabel.setPadding(new Insets(0, 0, 0, 20)); // Adjust padding as needed
+        HBox buttonWithMealType = new HBox(b, mealTypeLabel);
+        //buttons.add(b);
+        b.setPrefSize(400, 20);
         b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
                                                                                                       // button
         b.setOnAction(e -> {
             DisplayRecipe.display(new AppFramePopUp(this, r));
         });
         // add button to vBox
-        vBox.getChildren().add(b);
+        //vBox.getChildren().add(b);
+        buttons.add(buttonWithMealType);
+        vBox.getChildren().add(buttonWithMealType);
         System.err.println("vbox size: " + vBox.getChildren().size());
         // refresh();
     }
@@ -660,41 +668,63 @@ class RecipeList extends BorderPane {
     public void addButton(int index, Recipe r) {
         Button b = new Button(r.getName());
         System.out.println("new recipe name: " + r.getName());
-        buttons.add(index, b);
-        b.setPrefSize(500, 20);
+        Label mealTypeLabel = new Label("[" + r.getCategory() + "]");
+        //mealTypeLabel.setPadding(new Insets(0, 0, 0, 20)); // Adjust padding as needed
+        HBox buttonWithMealType = new HBox(b, mealTypeLabel);
+        //buttons.add(index, b);
+        b.setPrefSize(400, 20);
         b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
                                                                                                       // button
         b.setOnAction(e -> {
             DisplayRecipe.display(new AppFramePopUp(this, r));
         });
         // add button to vBox
-        vBox.getChildren().add(index, b);
+        //vBox.getChildren().add(index, b);
+        buttons.add(buttonWithMealType);
+        vBox.getChildren().add(index, buttonWithMealType);
         // refresh();
     }
 
     public void removeButton(Recipe r) {
         this.refresh();
-        for (Button button : buttons) {
+        //for (Button button : buttons) {
+        for (HBox buttonBox : buttons) {
+            Button button = (Button) buttonBox.getChildren().get(0);
             if (button.getText().equals(r.getName())) {
                 vBox.getChildren().remove(button);
-                buttons.remove(button);
+                buttons.remove(buttonBox);
                 break;
             }
         }
+        /*
+         * Button button = (Button) buttonBox.getChildren().get(0); // Assuming the button is the first child
+        if (button.getText().equals(r.getName())) {
+            vBox.getChildren().remove(buttonBox);
+            buttons.remove(buttonBox);
+            break;
+        }
+         */
     }
 
     public void refresh() {
         System.out.println(recipes.size());
         for (int i = 0; i < recipes.size(); i++) {
             // this.recipes.set(i, this.recipes.get(i));
-            System.out.println("button text before: " + this.buttons.get(i));
+            HBox buttonBox = buttons.get(i);
+            Button button = (Button) buttonBox.getChildren().get(0);
+            System.out.println("button text before: " + buttons.get(i));
             System.out.println("recipe name before: " + recipes.get(i).getName());
             recipes.get(i).setName(recipes.get(i).getName().replace("\n", "").replace("\r", ""));
-            this.buttons.get(i).setText(recipes.get(i).getName());
+            //this.buttons.get(i).setText(recipes.get(i).getName());
+            button.setText(recipes.get(i).getName());
             System.out.println("button text after: " + this.buttons.get(i));
             System.out.println("recipe name after: " + recipes.get(i).getName());
-        }
-
+        }   
+        /*
+         * HBox buttonBox = buttons.get(i);
+        Button button = (Button) buttonBox.getChildren().get(0); // Assuming the button is the first child
+        button.setText(recipes.get(i).getName());
+         */
     }
 
     public List<Recipe> getRecipes() {
