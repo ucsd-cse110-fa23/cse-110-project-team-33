@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Date;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -64,6 +65,19 @@ public class Model {
             if (method.equals("POST") || method.equals("PUT")) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 String jsonRecipe = objectMapper.writeValueAsString(recipe);
+
+                int startIndex = jsonRecipe.indexOf("\"date\"", 0);
+                startIndex += 7;
+                int endIndex = jsonRecipe.indexOf(",", startIndex);
+                String dateString = jsonRecipe.substring(startIndex, endIndex);
+
+                Date tempDate = new Date();
+                tempDate.setTime(Long.parseLong(dateString));
+
+                jsonRecipe = jsonRecipe.replaceFirst(dateString, "\"" + tempDate.toString() + "\"");
+
+                System.out.println("tempDate: " + tempDate.toString());
+                System.out.println("jsonRecipe: " + jsonRecipe);
 
                 try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
                     out.write(jsonRecipe);
