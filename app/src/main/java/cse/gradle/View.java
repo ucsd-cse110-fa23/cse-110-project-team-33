@@ -80,6 +80,13 @@ public class View {
         displayScene(recipeListScene);
     }
 
+    public void displayIncorrectPassword(){
+        UserLogin userLoginAccount = new UserLogin(this);
+        userLoginAccount.displayIncorrectPassword();
+        mainLoginScene = new Scene(userLoginAccount, 500, 600);
+        displayScene(mainLoginScene);
+    }
+
     private void newRecipeSceneConstructor() {
         NewRecipePane newRecipePane = new NewRecipePane(this, recipeListScene, ingredientsInputScene,
                 "Record your preferred meal type, and then record your available ingredients and click generate.");
@@ -132,6 +139,7 @@ public class View {
     public AudioRecorder getAudioRecorder() {
         return audioRecorder;
     }
+
 }
 
 class NewRecipePane extends BorderPane {
@@ -792,9 +800,12 @@ class UserLogin extends BorderPane {
     private PasswordField passwordField;
     private Button CreateButton;
     private Button LoginButton;
+    private VBox vbox;
+    private VBox vbox2;
+    private HBox hbox;
 
     public UserLogin(View appScenes){
-        VBox vbox = new VBox();
+        vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
 
         Label title = new Label("Login");
@@ -818,20 +829,30 @@ class UserLogin extends BorderPane {
         LoginButton.setPrefSize(200, 20);
         LoginButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
-        HBox hbox = new HBox();
+        hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(CreateButton, LoginButton);
 
         appScenes.getController().setListeners(this, appScenes);
         vbox.getChildren().addAll(usernameField, passwordField);
 
-        VBox vbox2 = new VBox();
+        vbox2 = new VBox();
         vbox2.setAlignment(Pos.TOP_CENTER);
         vbox2.getChildren().addAll(title);
         
         this.setCenter(vbox);
         this.setBottom(hbox);
         this.setTop(vbox2);
+    }
+
+    public void displayIncorrectPassword(){
+        Label incorrectPassword = new Label("Incorrect Password");
+        incorrectPassword.setStyle("-fx-font-size: 14;");
+
+        // add label to hbox
+        vbox.getChildren().add(incorrectPassword);
+        // add hbox to bottom of borderpane
+        this.setCenter(vbox);
     }
 
 

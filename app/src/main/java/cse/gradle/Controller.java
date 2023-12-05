@@ -26,13 +26,16 @@ public class Controller {
         }
     }
 
-    public void loginUser(String username, String password, View appScenes) {
+    public boolean loginUser(String username, String password, View appScenes) {
         String postResponse = model.performLoginRequest(username, password);
         if(postResponse.equals("Error: Server down")){
                 appScenes.displayServerDownConstructor();
-                return;
+                return false;
+        } else if (postResponse.contains("Incorrect password")) {
+            appScenes.displayIncorrectPassword();
+                return false;
         }
-        System.out.println("login response: " + postResponse);
+        return true;
     }
 
 
@@ -197,11 +200,13 @@ public class Controller {
         userPane.getLoginButton().setOnAction(e -> {
             String username = userPane.getUsernameField().getText().toString();
             String password = userPane.getPasswordField().getText().toString();
-            loginUser(username, password, appScenes);
+            boolean loginResult = loginUser(username, password, appScenes);
 
             // Get all recipes from the database and display
             // When logging into account, start with default sorted list
-            syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+            if (loginResult) {
+                syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+            }
         });
     }
 
