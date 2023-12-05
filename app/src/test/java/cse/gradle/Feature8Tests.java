@@ -73,17 +73,17 @@ public class Feature8Tests extends HTTPServerTests{
     void getAllTest() throws JsonMappingException, JsonProcessingException {
         Recipe recipe1 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
         Recipe recipe2 = new Recipe("cheese", "boil the cheese", "breakfast", "boiled cheese");
-        ArrayList<Recipe> rList = new ArrayList<Recipe>();
+        ArrayList<Recipe> rList = new ArrayList<Recipe>();      // original list of recipes                 
         rList.add(recipe1);
         rList.add(recipe2);
 
         Model model = new MockModel();
         for (int i = 0; i < rList.size(); i++) {
-            model.postRecipe(rList.get(i));
+            model.postRecipe(rList.get(i));                     // posting list of recipes 
         }
 
         String response = model.getRecipeList();
-        List<Recipe> rList2 = Recipe.parseRecipeListFromString(response); 
+        List<Recipe> rList2 = Recipe.parseRecipeListFromString(response);   // fetching recipes from database
 
         for (int i = 0; i < rList2.size(); i++) {
             System.out.println("rList.get(i) " + rList.get(i));

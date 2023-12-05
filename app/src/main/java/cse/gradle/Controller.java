@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -73,9 +74,10 @@ public class Controller {
             if(response.equals("Error: Server down")){
                 throw new Exception(response);
             }
-            
+
+            String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
         } catch (Exception e) {
             if (e.getMessage().equals("Error: Server down"))
                 appScenes.displayServerDownConstructor();
@@ -95,9 +97,10 @@ public class Controller {
                 appScenes.displayServerDownConstructor();
                 return;
             }
-
+            
+            String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
             
             Stage current = (Stage) popUp.getScene().getWindow();
             current.close();
@@ -152,8 +155,9 @@ public class Controller {
 
             // Update recipeList to reflect the state of the database 
             // TODO: Refactor into a method so we can DRY
+            String filterOption = appScenes.getRecipeListRoot().getMealTypeDropDown().getValue();
             String sortOption = appScenes.getRecipeListRoot().getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
 
         // Display cancelScene when backButton is pushed
@@ -172,7 +176,7 @@ public class Controller {
 
             // Get all recipes from the database and display
             // When create account, start with default sorted list
-            syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
         });    
 
         // Display cancelScene when backButton is pushed
@@ -197,7 +201,7 @@ public class Controller {
 
             // Get all recipes from the database and display
             // When logging into account, start with default sorted list
-            syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
         });
     }
 
@@ -215,13 +219,30 @@ public class Controller {
         });
 
         recipeList.getSortDropDown().setOnAction(event -> {
+            String filterOption = recipeList.getMealTypeDropDown().getValue();
             String sortOption = recipeList.getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
+        
+        recipeList.getMealTypeDropDown().setOnAction(event -> {
+            String filterOption = recipeList.getMealTypeDropDown().getValue();
+            String sortOption = recipeList.getSortDropDown().getValue();
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
+        });
+        
+        // recipeList.getMealTypeChoiceBox().getSelectionModel().selectedIndexProperty().addListener(
+        //     (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
+        //         // store selected mealtype
+        //         recipeList.getFilterButton().setOnAction(e -> {
+        //             String chosenMeal = (recipeList.getMealTypes()[new_val.intValue()]);
+                    
+        //         });
+
+        // });
     }
 
-    private void syncRecipeListWithModel(View appScenes, String sortOption) {
-        String getAllResponse = model.getRecipeList(sortOption);
+    private void syncRecipeListWithModel(View appScenes, String sortOption, String filterOption) {
+        String getAllResponse = model.getRecipeList(sortOption, filterOption);
 
         // Make sure the server isn't down
         if(getAllResponse.equals("Error: Server down")){

@@ -210,4 +210,10 @@ public class Recipe {
             System.out.println(recipe.getName());
         }
     }
+
+    // static method for filtering a list of recipes by a meal type (Breakfast, Lunch, Dinner)
+    public static void filterByMealType(List<Recipe> recipeList, String mealType) {
+        System.out.println("filter is: " + mealType);
+        recipeList.removeIf(recipe -> (!recipe.getCategory().toLowerCase().contains(mealType.toLowerCase())));
+    }
 }
