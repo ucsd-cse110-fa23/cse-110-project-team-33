@@ -7,6 +7,10 @@
 package cse.gradle;
 
 import org.junit.jupiter.api.Test;
+
+import cse.gradle.*;
+import cse.gradle.View.RecipeList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;

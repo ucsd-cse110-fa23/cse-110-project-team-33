@@ -1,5 +1,6 @@
 package cse.gradle;
 
+import cse.gradle.View.AppFramePopUp;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

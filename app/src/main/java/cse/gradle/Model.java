@@ -1,12 +1,5 @@
 package cse.gradle;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -20,18 +13,20 @@ import java.net.URISyntaxException;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import org.json.*;
 
-public class Model {
+public class Model implements ModelSubject {
     protected String userId;
     protected String urlString;
+    protected ArrayList<ModelObserver> obsList = new ArrayList<ModelObserver>();
 
     public Model(String urlString) {
         this.userId = null;
         this.urlString = urlString;
     }
 
-    public String getShareLink (String recipeId) {
+    public String getShareLink(String recipeId) {
         return urlString + "/share?userId=" + userId + "&recipeId=" + recipeId;
     }
 
@@ -50,7 +45,8 @@ public class Model {
             return "Error: Must login before performing requests";
         }
         try {
-            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&recipeId=456
+            // Builds a URL string in the format
+            // http://localhost:8100/recipe?userId=123&recipeId=456
             String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&recipeId=";
             if (recipeId != null) {
                 recipeRequestURL += recipeId;
@@ -87,10 +83,11 @@ public class Model {
         }
     }
 
-    // Calls the performRecipeRequest method with the GET method 
+    // Calls the performRecipeRequest method with the GET method
     public String getRecipeList(String sortOption) {
         try {
-            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&sort=a-z
+            // Builds a URL string in the format
+            // http://localhost:8100/recipe?userId=123&sort=a-z
             String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption;
 
             URL url = new URI(recipeRequestURL).toURL();
@@ -123,24 +120,26 @@ public class Model {
         return performRecipeRequest("GET", recipeId, null);
     }
 
-    // Calls the performRecipeRequest method with the POST method and a recipe to add
+    // Calls the performRecipeRequest method with the POST method and a recipe to
+    // add
     public String postRecipe(Recipe recipe) {
         return performRecipeRequest("POST", null, recipe);
     }
 
-    // Calls the performRecipeRequest method with the PUT method and a recipe to update
+    // Calls the performRecipeRequest method with the PUT method and a recipe to
+    // update
     public String putRecipe(String recipeId, Recipe recipe) {
         return performRecipeRequest("PUT", recipeId, recipe);
     }
 
-    // Calls the performRecipeRequest method with the DELETE method and an id for the recipe to delete
+    // Calls the performRecipeRequest method with the DELETE method and an id for
+    // the recipe to delete
     public String deleteRecipe(String recipeId) {
         return performRecipeRequest("DELETE", recipeId, null);
     }
 
-
-
-    // make a request to login a user, must be called before other requests besides register
+    // make a request to login a user, must be called before other requests besides
+    // register
     public String performLoginRequest(String username, String password) {
         try {
             String urlString = "http://localhost:8100/login";
@@ -161,7 +160,8 @@ public class Model {
                 while ((line = in.readLine()) != null) {
                     response.append(line);
                 }
-                // Set the Model's userId to the one returned by the server if the login was successful
+                // Set the Model's userId to the one returned by the server if the login was
+                // successful
                 if (!response.toString().contains("Error")) {
                     this.userId = response.toString();
                 }
@@ -175,6 +175,24 @@ public class Model {
                 return "Error: Server down";
             }
             return "Error logging in: " + ex.getMessage();
+        }
+    }
+
+    // Overloaded method for automatic login
+    public String performLoginRequest(File loginFile) {
+        try {
+            BufferedReader reader = new BufferedReader(
+                    new FileReader(loginFile));
+            String username = reader.readLine();
+            String password = reader.readLine();
+            //System.out.println("\n" + username + "\n");
+
+            reader.close();
+
+            return performLoginRequest(username, password);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
         }
     }
 
@@ -199,7 +217,8 @@ public class Model {
                 while ((line = in.readLine()) != null) {
                     response.append(line);
                 }
-                // Set the Model's userId to the one returned by the server if the registration was successful
+                // Set the Model's userId to the one returned by the server if the registration
+                // was successful
                 if (!response.toString().contains("Error")) {
                     this.userId = response.toString();
                 }
@@ -388,6 +407,11 @@ public class Model {
         System.out.println(generatedText);
         return generatedText;
 
+    }
+
+    @Override
+    public void register(ModelObserver obs) {
+        obsList.add(obs);
     }
 
 }
