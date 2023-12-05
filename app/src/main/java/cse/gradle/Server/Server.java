@@ -36,7 +36,7 @@ public class Server {
         server.createContext("/register", new RegisterHandler(usersDb));
         server.createContext("/share", new ShareHandler(usersDb));
         // TODO: add generateRecipeHandler endpoint
-        // server.createContext("/generate", new GenerateRecipeHandler(usersDb));
+        server.createContext("/generate", new GenerateRecipeHandler(usersDb));
 
         // Set the server's executor object to be threadPoolExecutor
         server.setExecutor(threadPoolExecutor);

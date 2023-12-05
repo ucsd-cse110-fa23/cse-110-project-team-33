@@ -20,6 +20,7 @@ public class WhisperApiClient implements WhisperApi {
     private static final String TOKEN = "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";
     private static final String MODEL = "whisper-1";
 
+    // TODO: take in audio file and output transcription
     public String generateResponse(String filePath) throws IOException, URISyntaxException {
 
         String response = "";

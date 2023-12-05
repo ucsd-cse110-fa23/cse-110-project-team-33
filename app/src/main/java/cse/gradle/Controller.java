@@ -146,6 +146,11 @@ public class Controller {
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
             // TODO: replace with using Model
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
+            try {
+                Recipe testRecipe = model.performRecipeGenerationRequest();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
 
             // Save the new recipe to the database
             String postResponse = model.postRecipe(newRecipe);

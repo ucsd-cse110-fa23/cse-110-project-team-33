@@ -1,13 +1,19 @@
 package cse.gradle;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Files;
 
 import cse.gradle.Server.APIs.ChatGPTApiClient;
 import cse.gradle.Server.APIs.WhisperApiClient;
@@ -211,14 +217,14 @@ public class Model {
     // IN FUTURE IMPLEMENTATION, this method:
     // SENDS meal type and ingredients audio files in a single request, 
     // RECEIVES String transcript for each audio file
-    public static String[] performAudioTranscriptionRequest(String mealTypeFilePath, String ingredientsFilePath)
+    public static String[] performAudioTranscriptionRequest(String mealTypeFile, String ingredientsFile)
             throws IOException, URISyntaxException {
                 
         String[] response = new String[2];
 
         WhisperApiClient whisperApi = new WhisperApiClient();
-        response[0] = whisperApi.generateResponse(mealTypeFilePath);
-        response[1] = whisperApi.generateResponse(ingredientsFilePath);
+        response[0] = whisperApi.generateResponse(mealTypeFile);
+        response[1] = whisperApi.generateResponse(ingredientsFile);
 
         return response;
     }
@@ -240,8 +246,40 @@ public class Model {
 
         return response;
     }
-    // public static String performRecipeGenerationRequest(String audioFilePath) {
+
+    public Recipe performRecipeGenerationRequest() throws MalformedURLException, IOException {
+        final int mid = 1;
+        final String POST_URL = "http://localhost:8100/generate";
+        final File uploadFile = new File("mealType.wav");
+
+        String boundary = Long.toHexString(System.currentTimeMillis()); 
+        String CRLF = "\r\n";
+        String charset = "UTF-8";
+        URLConnection connection = new URL(POST_URL).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
         
-    // }
+        try (
+            OutputStream output = connection.getOutputStream();
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
+        ) {
+            writer.append("--" + boundary).append(CRLF);
+            writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + uploadFile.getName() + "\"").append(CRLF);
+            writer.append("Content-Length: " + uploadFile.length()).append(CRLF);
+            writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(uploadFile.getName())).append(CRLF);
+            writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+            writer.append(CRLF).flush();
+            Files.copy(uploadFile, output);
+            output.flush();
+
+            int responseCode = ((HttpURLConnection) connection).getResponseCode();
+            System.out.println("Response code: [" + responseCode + "]");
+        }
+        
+        
+
+        Recipe generatedRecipe = new Recipe();
+        return generatedRecipe;
+    }
 
 }
