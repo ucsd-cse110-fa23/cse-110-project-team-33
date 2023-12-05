@@ -214,6 +214,12 @@ public class RecipeHandler implements HttpHandler {
             } else if (sortOption.equals("z-a")) {
                 Recipe.sortByName(recipeList, true);
             }
+            else if(sortOption.equals("newest-oldest")){
+                Recipe.sortByDate(recipeList, true);
+            }
+            else if(sortOption.equals("oldest-newest")){
+                Recipe.sortByDate(recipeList, false);
+            }
         }
 
 
