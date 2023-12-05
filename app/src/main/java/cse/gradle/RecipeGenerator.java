@@ -1,62 +1,39 @@
 package cse.gradle;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 
 public class RecipeGenerator {
-    private String mealTypePath;
-    private String ingredientsPath;
+    
+    // relative paths may not work
+    private final String MEAL_TYPE_PATH = "mealType.wav";
+    private final String INGREDIENTS_PATH = "ingredients.wav";
+
+    private String[] response;
 
     public RecipeGenerator() {
-        // relative paths may not work
-        mealTypePath = "mealType.wav";
-        ingredientsPath = "ingredients.wav";
+
     }
 
     public Recipe generateNewRecipe() {
-        String mealtypeTranscript = "";
-        String ingredientsTranscript = "";
-        String ingredientsString = "";
-        String titleString = "";
-        String instructionsString = "";
-        String mealTypeString = "";
-
-        try {
-            mealtypeTranscript = Model.useWhisper(mealTypePath);
-        } catch(Exception e){
-            System.out.println(e);
-        }
-                 
-        try {
-            ingredientsTranscript = Model.useWhisper(ingredientsPath);
-        } catch(Exception e){
-            System.out.println(e);
-        }
+        String mealTypeTranscript = "meal type was never transcribed";
+        String ingredientsTranscript = "ingredients was never transcribed";
         
         try {
-            System.out.println("Title:");
-            titleString = Model.useChatGPT(100, ("Give a 3 to 5 word name for a " + mealTypeString + " recipe using the following ingredients: " + ingredientsTranscript + ". Output nothing but the recipe name."));
-            System.out.println("Instructions:");
-            instructionsString = Model.useChatGPT(100, ("Give only instructions to make a recipe for a " + mealTypeString + " meal using only the following ingredients: " + ingredientsTranscript + ". Base it on this recipe name: " + titleString + ". Make this concise and within 100 words"));
-            //TimeUnit.SECONDS.sleep(12);
-
-            
-        } catch(Exception e) {
-            System.out.println(e);
-            System.out.println("mealtype: " + mealtypeTranscript);
-            System.out.println("ingredients: " + ingredientsTranscript);
-            System.out.println("instructions: " + instructionsString);
-            System.out.println("title: " + titleString);
-            Recipe returnRecipe = new Recipe(ingredientsTranscript, instructionsString, mealtypeTranscript, titleString);
-            
-            return returnRecipe;
+            // Call performAudioTranscriptionRequest once for both audio files
+            String[] transcriptions = Model.performAudioTranscriptionRequest(MEAL_TYPE_PATH, INGREDIENTS_PATH);
+            mealTypeTranscript = transcriptions[0];
+            ingredientsTranscript = transcriptions[1];
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        System.out.println("mealtype: " + mealtypeTranscript);
-        System.out.println("ingredients: " + ingredientsString);
-        System.out.println("instructions: " + instructionsString);
-        System.out.println("title: " + titleString);
-        Recipe returnRecipe = new Recipe(ingredientsTranscript, instructionsString, mealtypeTranscript, titleString);
+        
+        response = Model.performRecipeGenerationRequest(mealTypeTranscript, ingredientsTranscript);
+        
+        System.out.println("Title:\n" + response[0]);
+        System.out.println("Meal Type:\n" + response[1]);
+        System.out.println("Ingredients:\n" + response[2]);
+        System.out.println("Instructions:\n" + response[3]);
+        Recipe returnRecipe = new Recipe(response[2], response[3], response[1], response[0]);
         
         return returnRecipe;
     }
+
 }

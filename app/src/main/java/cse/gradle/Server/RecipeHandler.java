@@ -47,7 +47,7 @@ public class RecipeHandler implements HttpHandler {
             System.out.println("URI: " + uri);
             String query = uri.getRawQuery();
             System.out.println("Query: " + query);
-            String userId = query.substring(query.indexOf("=") + 1, query.indexOf("&"));
+            String userId = query.substring(query.indexOf("=") + 1, query.indexOf("&"));    // correct substring indeces?
 
             String recipeId = "";
             if (query.contains("recipeId")) {
@@ -56,8 +56,14 @@ public class RecipeHandler implements HttpHandler {
 
             String sortOption = "";
             if (query.contains("sort")) {
-                sortOption = query.substring(query.indexOf("sort=") + "sort=".length());
-            }   
+                sortOption = query.substring(query.indexOf("sort=") + "sort=".length(), query.indexOf("&filter="));
+            }
+            // substring from first char after "sort=" to last char before "filter="
+            
+            String filterOption = "";
+            if (query.contains("filter")) {
+                filterOption = query.substring(query.indexOf("filter=") + "filter=".length());
+            }  
 
              // If there is no user id, return an error
              if (userId.equals("")) {
@@ -66,7 +72,7 @@ public class RecipeHandler implements HttpHandler {
 
             if (method.equals("GET")) {
                 if (recipeId.equals("")) {
-                    response = handleGetAll(httpExchange, userId, sortOption);
+                    response = handleGetAll(httpExchange, userId, sortOption, filterOption);
                 } else {
                     response = handleGet(httpExchange, userId, recipeId);
                 }
@@ -153,8 +159,12 @@ public class RecipeHandler implements HttpHandler {
     /*
      * Handles GET requests with no id by returning all recipes
      * Optional sort options: "a-z", "z-a", "newest-oldest", "oldest-newest"
+     * Optional filter options: "Breakfast", "Dinner", "Lunch", "All", ""
      */
-    private String handleGetAll(HttpExchange httpExchange, String userId, String sortOption) throws IOException {
+    private String handleGetAll(HttpExchange httpExchange, String userId, String sortOption, String filterOption) throws IOException {
+        System.out.println("sort: " + sortOption);
+        System.out.println("filter: " + filterOption);
+        
         String response = "Invalid GET request";
         
         // Search for the current user's recipe list
@@ -176,7 +186,26 @@ public class RecipeHandler implements HttpHandler {
 
         // Convert the recipe list to a List<Recipe>
         List<Recipe> recipeList = Recipe.parseRecipeListFromString(new JSONArray(recipeDocumentList).toString());
-  
+        System.out.println("recipeList: " + recipeList.toString());
+
+        // Filter recipes if a meal type filter is provided
+        switch (filterOption) {
+            case "Breakfast": {
+                Recipe.filterByMealType(recipeList, "Breakfast"); 
+                break;
+            }
+            case "Lunch": {
+                Recipe.filterByMealType(recipeList, "Lunch");
+                break;
+            }
+            case "Dinner": {
+                Recipe.filterByMealType(recipeList, "Dinner");
+                break;
+            }
+            case "All": { break; }
+            default: { break; }
+        }
+        
         // TODO: If no sort option was provided, return the recipes in newest-oldest order by default
         // Sort the recipes if a sort option was provided
         if (!sortOption.equals("")) {
@@ -192,6 +221,8 @@ public class RecipeHandler implements HttpHandler {
                 Recipe.sortByDate(recipeList, false);
             }
         }
+
+
 
         // Convert recipeList back into a document list
         recipeDocumentList = new ArrayList<Document>();
