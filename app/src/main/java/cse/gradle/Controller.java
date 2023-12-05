@@ -147,8 +147,8 @@ public class Controller {
             // TODO: replace with using Model
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
             try {
-                model.performRecipeGenerationRequest("mealType.wav");
-                model.performRecipeGenerationRequest("ingredients.wav");
+                model.performFileWriteRequest("mealType.wav");
+                model.performFileWriteRequest("ingredients.wav");
             } catch (Exception exception) {
                 exception.printStackTrace();
             }

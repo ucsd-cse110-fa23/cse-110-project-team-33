@@ -246,16 +246,18 @@ public class Model {
 
         return response;
     }
-
-    public Recipe performRecipeGenerationRequest(String audioFile) throws MalformedURLException, IOException {
+    
+    public String performFileWriteRequest(String audioFile) throws MalformedURLException, IOException {
         final int mid = 1;
-        final String POST_URL = "http://localhost:8100/generate?audioFile=" + audioFile;
+        final String PUT_URL = "http://localhost:8100/generate?audioFile=" + audioFile;
         final File uploadFile = new File(audioFile);
 
         String boundary = Long.toHexString(System.currentTimeMillis()); 
         String CRLF = "\r\n";
         String charset = "UTF-8";
-        URLConnection connection = new URL(POST_URL).openConnection();
+        URL url = new URL(PUT_URL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("PUT");
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
         
@@ -272,14 +274,20 @@ public class Model {
             Files.copy(uploadFile, output);
             output.flush();
 
-            int responseCode = ((HttpURLConnection) connection).getResponseCode();
-            System.out.println("Response code: [" + responseCode + "]");
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                return response.toString();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return "Error: " + ex.getMessage();
+            }
         }
-        
-         
-
-        Recipe generatedRecipe = new Recipe();
-        return generatedRecipe;
     }
 
+    // TO DO: implement performRecipeRequest method to request the server 
+    // public String performRecipeGenerateRequest()
 }

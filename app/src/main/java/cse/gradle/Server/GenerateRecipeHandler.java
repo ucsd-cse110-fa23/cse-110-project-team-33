@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.HttpURLConnection;
@@ -39,6 +40,117 @@ public class GenerateRecipeHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
+        String response = "Request Received";
+        String method = httpExchange.getRequestMethod();
+        try {
+            if (method.equals("PUT")) {
+                response = handlePut(httpExchange);
+            } else if (method.equals("POST")) {
+                response = handlePost(httpExchange);
+            } else {
+                throw new Exception("Unsupported HTTP method: " + method);
+            }
+
+            // Set the response character encoding to UTF-8
+            httpExchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
+
+            // Convert the response string to bytes with UTF-8 encoding
+            byte[] responseBytes = response.getBytes("UTF-8");
+
+            // Send the response
+            httpExchange.sendResponseHeaders(200, responseBytes.length);
+            try (OutputStream os = httpExchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            httpExchange.sendResponseHeaders(500, response.length());
+            try (OutputStream os = httpExchange.getResponseBody()) {
+                os.write(response.getBytes());
+            }
+        }
+        
+        // String CRLF = "\r\n";
+        // int fileSize = 0;
+
+        // URI uri = httpExchange.getRequestURI();
+        // System.out.println("URI: " + uri);
+        // String query = uri.getRawQuery();
+        // System.out.println("Query: " + query);
+        // String audioFile = query.substring(query.indexOf("=") + 1);
+        // System.out.println("audioFile parsed from URL: " + audioFile);
+        
+        // String FILE_TO_RECEIVED = "src/main/java/cse/gradle/Server/" + audioFile;
+        // File file = new File(FILE_TO_RECEIVED);
+        // System.out.println("created: " + FILE_TO_RECEIVED + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        // if (!file.exists()) {
+        //     file.createNewFile();
+        // }
+        
+        // InputStream input = httpExchange.getRequestBody();
+        // String nextLine = "";
+        // do {
+        //     nextLine = readLine(input, CRLF);
+        //     if (nextLine.startsWith("Content-Length:")) {
+        //         fileSize = 
+        //             Integer.parseInt(
+        //                 nextLine.replaceAll(" ", "").substring(
+        //                     "Content-Length:".length()
+        //                 )
+        //             );
+        //     }
+        //     System.out.println(nextLine);
+        // } while (!nextLine.equals(""));
+        
+        // byte[] midFileByteArray = new byte[fileSize];
+        // int readOffset = 0;
+        // while (readOffset < fileSize) {
+        //     int bytesRead = input.read(midFileByteArray, readOffset, fileSize);
+        //     readOffset += bytesRead;
+        // }
+        
+        // BufferedOutputStream bos = 
+        //     new BufferedOutputStream(new FileOutputStream(FILE_TO_RECEIVED));
+        
+        // bos.write(midFileByteArray, 0, fileSize);
+        // bos.flush();
+        // bos.close();
+        
+        // httpExchange.sendResponseHeaders(200, 0);
+    }
+
+    // handle POST request to generate a recipe
+    private String handlePost(HttpExchange httpExchange) throws IOException, URISyntaxException {
+            // get mealType and ingredients from whisper
+        String mealType = "";
+        String ingredients = "";
+        String mealTypeFilePath = "app/src/main/java/cse/gradle/Server/mealType.wav";
+        String ingredientsFilePath = "app/src/main/java/cse/gradle/Server/ingredients.wav";
+
+        String[] transcriptions = new String[2];
+
+        WhisperApiClient whisperApi = new WhisperApiClient();
+        transcriptions[0] = whisperApi.generateResponse(mealTypeFilePath);
+        transcriptions[1] = whisperApi.generateResponse(ingredientsFilePath);
+
+        // use transcriptions to generate recipe
+        String[] response = new String[4];
+
+        try {
+            ChatGPTApiClient chatGPTApi = new ChatGPTApiClient();
+            response = chatGPTApi.generateResponse(mealType, ingredients);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // JSONify recipe
+        Recipe newRecipe = new Recipe(response[2], response[3], response[1], response[0]);
+        String jsonRecipe = newRecipe.toDocument().toJson();
+        
+        return jsonRecipe;
+    }
+
+    private String handlePut(HttpExchange httpExchange) throws IOException {
         String CRLF = "\r\n";
         int fileSize = 0;
 
@@ -86,9 +198,10 @@ public class GenerateRecipeHandler implements HttpHandler {
         bos.close();
         
         httpExchange.sendResponseHeaders(200, 0);
+        return null;
     }
 
-    // helper method for handle()
+    // helper method for handlePut()
     private static String readLine(InputStream is, String lineSeparator) 
         throws IOException {
 
