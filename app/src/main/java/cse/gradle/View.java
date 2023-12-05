@@ -55,6 +55,10 @@ public class View implements ViewSubject {
         this.stage = stage;
     }
 
+    public View(List<Recipe> arrayList) {
+        this.listOfRecipes = arrayList;
+    }
+
     public void updateRecipeListView(List<Recipe> arrayList) {
         this.recipeListRoot.updateRecipeList(arrayList);
     }
@@ -118,6 +122,10 @@ public class View implements ViewSubject {
 
     public AudioRecorder getAudioRecorder() {
         return audioRecorder;
+    }
+
+    public List<Recipe> getListOfRecipes() {
+        return listOfRecipes;
     }
 
     @Override

@@ -28,7 +28,7 @@ class Feature2Tests {
         Recipe r = mock.generateNewRecipe("breakfast", "eggs, bacon", "cook for 10 minutes", "American breakfast");
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(r);
-        RecipeList rl = new RecipeList(list);
-        assertEquals("breakfast", rl.getRecipes().get(0).getCategory());
+        MockView view = new MockView(list);;
+        assertEquals("breakfast", view.getRecipeList().get(0).getCategory());
     }
 }
