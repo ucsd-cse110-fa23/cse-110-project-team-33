@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mongodb.ServerAddress;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
@@ -18,7 +16,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
@@ -26,8 +23,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -142,7 +137,7 @@ public class View implements ViewSubject {
     @Override
     public void register(ViewObserver obs) {
         obsList.add(obs);
-
+        
         // Reconstruct scenes every time a new observer is added
         recipeListRoot = new RecipeList(this, this.listOfRecipes);
         newRecipeListSceneConstructor();
@@ -736,7 +731,6 @@ public class View implements ViewSubject {
             for (ViewObserver obs : obsList) {
                 obs.setAccountWindowListeners(this, appScenes);
             }
-
             vbox.getChildren().addAll(usernameField, passwordField);
 
             VBox vbox2 = new VBox();
