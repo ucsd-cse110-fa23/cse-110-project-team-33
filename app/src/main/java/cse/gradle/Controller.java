@@ -36,7 +36,7 @@ public class Controller implements ModelObserver, ViewObserver {
     }
 
     public void loginUser(String username, String password, View appScenes, UserLogin loginPage) throws IOException {
-
+        // Checks if the automic login file exists; if it does, and username matches the one in file, do automatic login
         if ((new File("src/main/java/cse/gradle/local/login.txt")).exists()) {
             File loginFile = new File("src/main/java/cse/gradle/local/login.txt");
             BufferedReader reader = new BufferedReader(
@@ -51,43 +51,33 @@ public class Controller implements ModelObserver, ViewObserver {
                 System.out.println("login response: " + postResponse);
             } else {
                 reader.close();
-                String postResponse = model.performLoginRequest(username, password);
-                if ((loginPage.getAutoLoginButton().isSelected()) && (!postResponse.contains("Invalid"))) {
-                    try {
-                        FileWriter writer = new FileWriter("src/main/java/cse/gradle/local/login.txt");
-                        writer.write(username + "\n" + password);
-                        writer.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-                if (postResponse.equals("Error: Server down")) {
-                    appScenes.displayServerDownConstructor();
-                    return;
-                }
-                System.out.println("login response: " + postResponse);
+                loginUserWithButtonCheck(username, password, appScenes, loginPage);
             }
         } else {
-            String postResponse = model.performLoginRequest(username, password);
-            if ((loginPage.getAutoLoginButton().isSelected()) && (!postResponse.contains("Invalid"))) {
-                try {
-                    FileWriter writer = new FileWriter("src/main/java/cse/gradle/local/login.txt");
-                    writer.write(username + "\n" + password);
-                    writer.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            if (postResponse.equals("Error: Server down")) {
-                appScenes.displayServerDownConstructor();
-                return;
-            }
-            System.out.println("login response: " + postResponse);
-
+            loginUserWithButtonCheck(username, password, appScenes, loginPage);
         }
         // Get all recipes from the database and display
         // When logging into account, start with default sorted list
         syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
+    }
+
+    // Logs-in the user and writes to login.txt file if the automatic login checkbox is selected
+    public void loginUserWithButtonCheck(String username, String password, View appScenes, UserLogin loginPage) {
+        String postResponse = model.performLoginRequest(username, password);
+        if ((loginPage.getAutoLoginButton().isSelected()) && (!postResponse.contains("Invalid"))) {
+            try {
+                FileWriter writer = new FileWriter("src/main/java/cse/gradle/local/login.txt");
+                writer.write(username + "\n" + password);
+                writer.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if (postResponse.equals("Error: Server down")) {
+            appScenes.displayServerDownConstructor();
+            return;
+        }
+        System.out.println("login response: " + postResponse);
     }
 
     // Handles the share button being pressed by the user
