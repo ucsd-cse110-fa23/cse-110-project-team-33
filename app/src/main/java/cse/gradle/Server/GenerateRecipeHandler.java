@@ -38,6 +38,7 @@ public class GenerateRecipeHandler implements HttpHandler {
         usersDB.connect();
     }
 
+    // receive request from Model and execute handlePut or handlePost accordingly
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
@@ -72,7 +73,9 @@ public class GenerateRecipeHandler implements HttpHandler {
     }
 
     // TODO: test needed
-    // handle POST request to generate a recipe
+    // use the mealType.wav and ingredients.wav stored on the server, 
+    // make Whisper and ChatGPT api calls to generate the recipe, 
+    // convert the responses to a JSON recipe, and send the JSON recipe to Model.
     private String handlePost(HttpExchange httpExchange) throws IOException, URISyntaxException {
         // get mealType and ingredients from whisper
         String mealTypeFilePath = "src/main/java/cse/gradle/Server/mealType.wav";
@@ -100,6 +103,7 @@ public class GenerateRecipeHandler implements HttpHandler {
     }
 
     // TODO: test needed
+    // decode and store the audio file received from Model
     private String handlePut(HttpExchange httpExchange) throws IOException {
         String CRLF = "\r\n";
         int fileSize = 0;
