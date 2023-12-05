@@ -649,6 +649,7 @@ class RecipeList extends BorderPane {
         Label mealTypeLabel = new Label("[" + r.getCategory() + "]");
         //mealTypeLabel.setPadding(new Insets(0, 0, 0, 20)); // Adjust padding as needed
         HBox buttonWithMealType = new HBox(b, mealTypeLabel);
+        buttonWithMealType.setAlignment(Pos.CENTER);
         //buttons.add(b);
         b.setPrefSize(400, 20);
         b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
@@ -671,6 +672,7 @@ class RecipeList extends BorderPane {
         Label mealTypeLabel = new Label("[" + r.getCategory() + "]");
         //mealTypeLabel.setPadding(new Insets(0, 0, 0, 20)); // Adjust padding as needed
         HBox buttonWithMealType = new HBox(b, mealTypeLabel);
+        buttonWithMealType.setAlignment(Pos.CENTER);
         //buttons.add(index, b);
         b.setPrefSize(400, 20);
         b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
