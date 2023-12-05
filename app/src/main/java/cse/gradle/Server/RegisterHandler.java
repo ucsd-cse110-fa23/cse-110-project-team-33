@@ -84,8 +84,9 @@ public class RegisterHandler implements HttpHandler {
                 throw new Exception(response);
             }
 
-            // Create a new User object using the username and password and insert it into the database
-            // Intially, the user will have no recipes and the constructor creates a UUID for the user
+            // Create a new User object using the username and password and
+            // insert it into the database. Intially, the user will have no
+            // recipes and the constructor creates a UUID for the user
             User user = new User(username, password);
             usersDB.insertOne(user.toDocument());
 
@@ -98,7 +99,6 @@ public class RegisterHandler implements HttpHandler {
         }
 
         return response;
-    } 
-
+    }
 
 }

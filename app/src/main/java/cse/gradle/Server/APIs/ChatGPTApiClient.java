@@ -11,95 +11,102 @@ import org.json.JSONObject;
 
 public class ChatGPTApiClient implements ChatGPTApi {
 
-    private static final String API_ENDPOINT_GPT = "https://api.openai.com/v1/completions";
-    private static final String API_KEY = "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";
-    private static final String MODEL_GPT = "text-davinci-003";
+        private static final String API_ENDPOINT_GPT = "https://api.openai.com/v1/completions";
+        private static final String API_KEY = "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";
+        private static final String MODEL_GPT = "text-davinci-003";
 
-    private static final int MAX_TOKENS = 100;
+        private static final int MAX_TOKENS = 100;
 
-    public ChatGPTApiClient() {
-        
-    }
+        public ChatGPTApiClient() {
 
-    public String[] generateResponse(String mealType, String ingredients) 
-            throws IOException, InterruptedException, IllegalArgumentException {
+        }
 
-        String[] response = new String[4];
+        public String[] generateResponse(String mealType, String ingredients)
+                        throws IOException, InterruptedException, IllegalArgumentException {
 
-        String title = generateTitle(mealType, ingredients);
-        String instructions = generateInstructions(mealType, ingredients, title);
+                String[] response = new String[4];
 
-        response[0] = title;
-        response[1] = mealType;
-        response[2] = ingredients;
-        response[3] = instructions;
+                String title = generateTitle(mealType, ingredients);
+                String instructions = generateInstructions(mealType, ingredients, title);
 
-        return response;
-    }
+                response[0] = title;
+                response[1] = mealType;
+                response[2] = ingredients;
+                response[3] = instructions;
 
-    public String generateTitle(String mealType, String ingredients)
-            throws IOException, InterruptedException, IllegalArgumentException {
+                return response;
+        }
 
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("model", MODEL_GPT);
-        requestBody.put("prompt", "Give a 3 to 5 word name for a " + mealType + " recipe using the following ingredients: " + ingredients + ". Output nothing but the recipe name.");
-        requestBody.put("max_tokens", MAX_TOKENS);
-        requestBody.put("temperature", 1.0);
+        public String generateTitle(String mealType, String ingredients)
+                        throws IOException, InterruptedException, IllegalArgumentException {
 
-        HttpClient client = HttpClient.newHttpClient();
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("model", MODEL_GPT);
+                requestBody.put("prompt",
+                                "Give a 3 to 5 word name for a " + mealType
+                                                + " recipe using the following ingredients: " + ingredients
+                                                + ". Output nothing but the recipe name.");
+                requestBody.put("max_tokens", MAX_TOKENS);
+                requestBody.put("temperature", 1.0);
 
-        HttpRequest request = HttpRequest
-                .newBuilder()
-                .uri(URI.create(API_ENDPOINT_GPT))
-                .header("Content-Type", "application/json")
-                .header("Authorization", String.format("Bearer %s", API_KEY))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
-                .build();
+                HttpClient client = HttpClient.newHttpClient();
 
-        HttpResponse<String> response = client.send(
-                request,
-                HttpResponse.BodyHandlers.ofString());
+                HttpRequest request = HttpRequest
+                                .newBuilder()
+                                .uri(URI.create(API_ENDPOINT_GPT))
+                                .header("Content-Type", "application/json")
+                                .header("Authorization", String.format("Bearer %s", API_KEY))
+                                .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+                                .build();
 
-        String responseBody = response.body();
+                HttpResponse<String> response = client.send(
+                                request,
+                                HttpResponse.BodyHandlers.ofString());
 
-        JSONObject responseJSON = new JSONObject(responseBody);
+                String responseBody = response.body();
 
-        JSONArray choices = responseJSON.getJSONArray("choices");
-        String title = choices.getJSONObject(0).getString("text");
-        
-        return title;
-    }
+                JSONObject responseJSON = new JSONObject(responseBody);
 
-    public String generateInstructions(String mealType, String ingredients, String title)
-            throws IOException, InterruptedException, IllegalArgumentException {
-        
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("model", MODEL_GPT);
-        requestBody.put("prompt", "Give only instructions to make a recipe for a " + mealType + " meal using only the following ingredients: " + ingredients + ". Base it on this recipe name: " + title + ". Make this concise and within 100 words");
-        requestBody.put("max_tokens", MAX_TOKENS);
-        requestBody.put("temperature", 1.0);
+                JSONArray choices = responseJSON.getJSONArray("choices");
+                String title = choices.getJSONObject(0).getString("text");
 
-        HttpClient client = HttpClient.newHttpClient();
+                return title;
+        }
 
-        HttpRequest request = HttpRequest
-                .newBuilder()
-                .uri(URI.create(API_ENDPOINT_GPT))
-                .header("Content-Type", "application/json")
-                .header("Authorization", String.format("Bearer %s", API_KEY))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
-                .build();
+        public String generateInstructions(String mealType, String ingredients, String title)
+                        throws IOException, InterruptedException, IllegalArgumentException {
 
-        HttpResponse<String> response = client.send(
-                request,
-                HttpResponse.BodyHandlers.ofString());
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("model", MODEL_GPT);
+                requestBody.put("prompt",
+                                "Give only instructions to make a recipe for a " + mealType
+                                                + " meal using only the following ingredients: " + ingredients
+                                                + ". Base it on this recipe name: " + title
+                                                + ". Make this concise and within 100 words");
+                requestBody.put("max_tokens", MAX_TOKENS);
+                requestBody.put("temperature", 1.0);
 
-        String responseBody = response.body();
+                HttpClient client = HttpClient.newHttpClient();
 
-        JSONObject responseJSON = new JSONObject(responseBody);
+                HttpRequest request = HttpRequest
+                                .newBuilder()
+                                .uri(URI.create(API_ENDPOINT_GPT))
+                                .header("Content-Type", "application/json")
+                                .header("Authorization", String.format("Bearer %s", API_KEY))
+                                .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+                                .build();
 
-        JSONArray choices = responseJSON.getJSONArray("choices");
-        String instructions = choices.getJSONObject(0).getString("text");
+                HttpResponse<String> response = client.send(
+                                request,
+                                HttpResponse.BodyHandlers.ofString());
 
-        return instructions;
-    }
+                String responseBody = response.body();
+
+                JSONObject responseJSON = new JSONObject(responseBody);
+
+                JSONArray choices = responseJSON.getJSONArray("choices");
+                String instructions = choices.getJSONObject(0).getString("text");
+
+                return instructions;
+        }
 }

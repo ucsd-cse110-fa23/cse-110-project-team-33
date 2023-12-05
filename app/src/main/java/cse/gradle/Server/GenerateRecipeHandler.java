@@ -60,8 +60,8 @@ public class GenerateRecipeHandler implements HttpHandler {
     }
 
     // TODO: test needed
-    // use the mealType.wav and ingredients.wav stored on the server, 
-    // make Whisper and ChatGPT api calls to generate the recipe, 
+    // use the mealType.wav and ingredients.wav stored on the server,
+    // make Whisper and ChatGPT api calls to generate the recipe,
     // convert the responses to a JSON recipe, and send the JSON recipe to Model.
     private String handlePost(HttpExchange httpExchange) throws IOException, URISyntaxException {
         // get mealType and ingredients from whisper
@@ -85,7 +85,7 @@ public class GenerateRecipeHandler implements HttpHandler {
         // JSONify recipe
         Recipe newRecipe = new Recipe(response[2], response[3], response[1], response[0]);
         String jsonRecipe = newRecipe.toDocument().toJson();
-        
+
         return jsonRecipe;
     }
 
@@ -101,7 +101,7 @@ public class GenerateRecipeHandler implements HttpHandler {
         System.out.println("Query: " + query);
         String audioFile = query.substring(query.indexOf("=") + 1);
         System.out.println("audioFile parsed from URL: " + audioFile);
-        
+
         String FILE_TO_RECEIVED = "src/main/java/cse/gradle/Server/" + audioFile;
         File file = new File(FILE_TO_RECEIVED);
         System.out.println("audio file stored at: " + FILE_TO_RECEIVED);
@@ -114,26 +114,22 @@ public class GenerateRecipeHandler implements HttpHandler {
             do {
                 nextLine = readLine(input, CRLF);
                 if (nextLine.startsWith("Content-Length:")) {
-                    fileSize = 
-                        Integer.parseInt(
+                    fileSize = Integer.parseInt(
                             nextLine.replaceAll(" ", "").substring(
-                                "Content-Length:".length()
-                            )
-                        );
+                                    "Content-Length:".length()));
                 }
                 System.out.println(nextLine);
             } while (!nextLine.equals(""));
-            
+
             byte[] midFileByteArray = new byte[fileSize];
             int readOffset = 0;
             while (readOffset < fileSize) {
                 int bytesRead = input.read(midFileByteArray, readOffset, fileSize);
                 readOffset += bytesRead;
             }
-            
-            BufferedOutputStream bos = 
-                new BufferedOutputStream(new FileOutputStream(FILE_TO_RECEIVED));
-            
+
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(FILE_TO_RECEIVED));
+
             bos.write(midFileByteArray, 0, fileSize);
             bos.flush();
             bos.close();
@@ -145,37 +141,36 @@ public class GenerateRecipeHandler implements HttpHandler {
     }
 
     // helper method for handlePut()
-    private static String readLine(InputStream is, String lineSeparator) 
-        throws IOException {
+    private static String readLine(InputStream is, String lineSeparator)
+            throws IOException {
 
         int off = 0, i = 0;
         byte[] separator = lineSeparator.getBytes("UTF-8");
         byte[] lineBytes = new byte[1024];
-        
+
         while (is.available() > 0) {
             int nextByte = is.read();
             if (nextByte < -1) {
                 throw new IOException(
-                    "Reached end of stream while reading the current line!");
+                        "Reached end of stream while reading the current line!");
             }
-            
+
             lineBytes[i] = (byte) nextByte;
             if (lineBytes[i++] == separator[off++]) {
                 if (off == separator.length) {
                     return new String(
-                        lineBytes, 0, i-separator.length, "UTF-8");
+                            lineBytes, 0, i - separator.length, "UTF-8");
                 }
-            }
-            else {
+            } else {
                 off = 0;
             }
-            
+
             if (i == lineBytes.length) {
                 throw new IOException("Maximum line length exceeded: " + i);
             }
         }
-        
+
         throw new IOException(
-            "Reached end of stream while reading the current line!");       
+                "Reached end of stream while reading the current line!");
     }
 }

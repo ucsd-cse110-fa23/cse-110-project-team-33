@@ -64,7 +64,6 @@ public class LocalDatabase {
         }
     }
 
-
     public static Recipe removeNewLines(Recipe r) {
         r.setIngredients(r.getIngredients().replaceAll("\n", " "));
         r.setInstructions(r.getInstructions().replaceAll("\n", " "));
@@ -72,11 +71,11 @@ public class LocalDatabase {
         r.setName(r.getName().replaceAll("\n", " "));
         return r;
     }
-    
+
     public static void saveRecipeToLocal(Recipe recipe) {
         recipe = removeNewLines(recipe);
 
-        ArrayList<Recipe> newRecipes = (ArrayList<Recipe>)LocalDatabase.readLocal();
+        ArrayList<Recipe> newRecipes = (ArrayList<Recipe>) LocalDatabase.readLocal();
         newRecipes.add(0, recipe);
         LocalDatabase.saveListToLocal(newRecipes);
     }
@@ -85,7 +84,7 @@ public class LocalDatabase {
         try {
             // create array with every recipe except one to delete
             BufferedReader reader = new BufferedReader(
-                        new FileReader("src/main/java/cse/gradle/Server/recipes.csv"));
+                    new FileReader("src/main/java/cse/gradle/Server/recipes.csv"));
             String localRecipeString;
             ArrayList<String> newCSVFile = new ArrayList<String>();
             while ((localRecipeString = reader.readLine()) != null) {

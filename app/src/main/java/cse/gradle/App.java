@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 import cse.gradle.Server.Server;
 
 public class App extends Application {
-    
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         // start the server
@@ -23,7 +23,8 @@ public class App extends Application {
         // Create a controller object to mediate between the view and the model
         Controller controller = new Controller(model);
 
-        // Create a View object to handle the UI and pass it the controller for button listeners
+        // Create a View object to handle the UI and pass it the controller for button
+        // listeners
         View appScenes = new View(primaryStage, arrayList, controller);
 
         // Set the title of the app
