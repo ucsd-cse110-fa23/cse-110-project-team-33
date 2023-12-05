@@ -1,18 +1,11 @@
 package cse.gradle;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import cse.gradle.Server.Server;
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import cse.gradle.Database;
-import cse.gradle.Server.LocalDatabase;
+import cse.gradle.Server.Server;
 
 public class App extends Application {
     

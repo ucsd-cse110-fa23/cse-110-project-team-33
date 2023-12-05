@@ -1,11 +1,7 @@
 package cse.gradle;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -151,7 +147,6 @@ public class Controller {
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
             Recipe newRecipe = null;
-            // newRecipe = new RecipeGenerator().generateNewRecipe();
             try {
                 model.performFileWriteRequest("mealType.wav");
                 model.performFileWriteRequest("ingredients.wav");

@@ -9,7 +9,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -33,7 +32,7 @@ public class Model {
         this.urlString = urlString;
     }
 
-    public String getShareLink (String recipeId) {
+    public String getShareLink(String recipeId) {
         return urlString + "/share?userId=" + userId + "&recipeId=" + recipeId;
     }
 
@@ -52,7 +51,8 @@ public class Model {
             return "Error: Must login before performing requests";
         }
         try {
-            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&recipeId=456
+            // Builds a URL string in the format
+            // http://localhost:8100/recipe?userId=123&recipeId=456
             String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&recipeId=";
             if (recipeId != null) {
                 recipeRequestURL += recipeId;
@@ -102,12 +102,14 @@ public class Model {
         }
     }
 
-    // Calls the performRecipeRequest method with the GET method 
+    // Calls the performRecipeRequest method with the GET method
     public String getRecipeList(String sortOption, String filterOption) {
         try {
-            
-            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&sort=a-z&filter=Breakfast
-            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption + "&filter=" + filterOption;
+
+            // Builds a URL string in the format
+            // http://localhost:8100/recipe?userId=123&sort=a-z&filter=Breakfast
+            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption + "&filter="
+                    + filterOption;
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -139,24 +141,26 @@ public class Model {
         return performRecipeRequest("GET", recipeId, null);
     }
 
-    // Calls the performRecipeRequest method with the POST method and a recipe to add
+    // Calls the performRecipeRequest method with the POST method and a recipe to
+    // add
     public String postRecipe(Recipe recipe) {
         return performRecipeRequest("POST", null, recipe);
     }
 
-    // Calls the performRecipeRequest method with the PUT method and a recipe to update
+    // Calls the performRecipeRequest method with the PUT method and a recipe to
+    // update
     public String putRecipe(String recipeId, Recipe recipe) {
         return performRecipeRequest("PUT", recipeId, recipe);
     }
 
-    // Calls the performRecipeRequest method with the DELETE method and an id for the recipe to delete
+    // Calls the performRecipeRequest method with the DELETE method and an id for
+    // the recipe to delete
     public String deleteRecipe(String recipeId) {
         return performRecipeRequest("DELETE", recipeId, null);
     }
 
-
-
-    // make a request to login a user, must be called before other requests besides register
+    // make a request to login a user, must be called before other requests besides
+    // register
     public String performLoginRequest(String username, String password) {
         try {
             String urlString = "http://localhost:8100/login";
@@ -177,7 +181,8 @@ public class Model {
                 while ((line = in.readLine()) != null) {
                     response.append(line);
                 }
-                // Set the Model's userId to the one returned by the server if the login was successful
+                // Set the Model's userId to the one returned by the server if the login was
+                // successful
                 if (!response.toString().contains("Error")) {
                     this.userId = response.toString();
                 }
@@ -215,7 +220,8 @@ public class Model {
                 while ((line = in.readLine()) != null) {
                     response.append(line);
                 }
-                // Set the Model's userId to the one returned by the server if the registration was successful
+                // Set the Model's userId to the one returned by the server if the registration
+                // was successful
                 if (!response.toString().contains("Error")) {
                     this.userId = response.toString();
                 }
@@ -230,13 +236,14 @@ public class Model {
         }
     }
 
-    // TODO: Move this logic to execute on server (in GenerateRecipeHandler's handlePost())
+    // TODO: Move this logic to execute on server (in GenerateRecipeHandler's
+    // handlePost())
     // IN FUTURE IMPLEMENTATION, this method:
-    // SENDS meal type and ingredients audio files in a single request, 
+    // SENDS meal type and ingredients audio files in a single request,
     // RECEIVES String transcript for each audio file
     public static String[] performAudioTranscriptionRequest(String mealTypeFile, String ingredientsFile)
             throws IOException, URISyntaxException {
-                
+
         String[] response = new String[2];
 
         WhisperApiClient whisperApi = new WhisperApiClient();
@@ -246,12 +253,13 @@ public class Model {
         return response;
     }
 
-    // TODO: Move this logic to execute on server (in generateRecipeHandler's handlePost())
+    // TODO: Move this logic to execute on server (in generateRecipeHandler's
+    // handlePost())
     // IN FUTURE IMPLEMENTATION, this method:
     // SENDS 2 String audio transcriptions (meal type and ingredients),
     // RECEIVES JSONified recipe
     public static String[] performRecipeGenerationRequest(String mealType, String ingredients) {
-        
+
         String[] response = new String[4];
 
         try {
@@ -263,12 +271,12 @@ public class Model {
 
         return response;
     }
-    
+
     public String performFileWriteRequest(String audioFile) throws MalformedURLException, IOException {
         final String PUT_URL = "http://localhost:8100/generate?audioFile=" + audioFile;
         final File uploadFile = new File(audioFile);
 
-        String boundary = Long.toHexString(System.currentTimeMillis()); 
+        String boundary = Long.toHexString(System.currentTimeMillis());
         String CRLF = "\r\n";
         String charset = "UTF-8";
         URL url = new URL(PUT_URL);
@@ -276,13 +284,14 @@ public class Model {
         connection.setRequestMethod("PUT");
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-        
+
         try (
-            OutputStream output = connection.getOutputStream();
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-        ) {
+                OutputStream output = connection.getOutputStream();
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);) {
             writer.append("--" + boundary).append(CRLF);
-            writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + uploadFile.getName() + "\"").append(CRLF);
+            writer.append(
+                    "Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + uploadFile.getName() + "\"")
+                    .append(CRLF);
             writer.append("Content-Length: " + uploadFile.length()).append(CRLF);
             writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(uploadFile.getName())).append(CRLF);
             writer.append("Content-Transfer-Encoding: binary").append(CRLF);
@@ -304,8 +313,9 @@ public class Model {
         }
     }
 
-    // sets request method to POST -> reads in the JSON recipe received from the server ->
-    // parses JSON recipe into Recipe object and returns the Recipe to Controller
+    // sets request method to POST -> reads in the JSON recipe received from the
+    // server -> parses JSON recipe into Recipe object and returns the Recipe to
+    // Controller
     public Recipe performRecipeGenerateRequest() throws URISyntaxException, IOException {
         final String POST_URL = "http://localhost:8100/generate";
         URL url = new URI(POST_URL).toURL();
@@ -316,13 +326,13 @@ public class Model {
         String generatedRecipe = "";
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = in.readLine()) != null) {
-                    response.append(line);
-                }
-                generatedRecipe = response.toString();
-                System.out.println(generatedRecipe);
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            generatedRecipe = response.toString();
+            System.out.println(generatedRecipe);
         } catch (Exception exception) {
             exception.printStackTrace();
             if (exception.getMessage().contains("Connection refused")) {

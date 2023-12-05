@@ -6,26 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Scanner;
 
-import org.bson.Document;
-import org.json.JSONArray;
-
-import com.google.common.io.Files;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import cse.gradle.Recipe;
-import cse.gradle.RecipeGenerator;
 import cse.gradle.Server.APIs.ChatGPTApiClient;
 import cse.gradle.Server.APIs.WhisperApiClient;
 

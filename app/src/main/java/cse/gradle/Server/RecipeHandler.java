@@ -3,11 +3,6 @@ package cse.gradle.Server;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-
 import cse.gradle.Recipe;
 
 import java.io.*;
@@ -15,8 +10,6 @@ import java.net.URI;
 import java.util.*;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.checkerframework.checker.units.qual.m;
 import org.json.JSONArray;
 
 // remake to recipe handler which requires a user id as a part of the http request

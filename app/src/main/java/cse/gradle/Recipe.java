@@ -3,14 +3,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Date;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import org.bson.Document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
