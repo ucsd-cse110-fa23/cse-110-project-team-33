@@ -220,6 +220,7 @@ public class Controller {
             model.userId = null; // erase the userId
             // set the dropdown back to default sort option
             recipeList.getSortDropDown().setValue(Constants.defaultSortOption);
+            appScenes.UserLoginConstructor(); // recreate the login screen to clear the username and password fields
             appScenes.displayUserLoginConstructor();
         });
 
