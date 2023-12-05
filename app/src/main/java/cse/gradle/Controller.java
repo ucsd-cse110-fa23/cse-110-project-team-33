@@ -253,4 +253,16 @@ public class Controller {
         appScenes.updateRecipeListView(recipeArrayList);
         appScenes.displayRecipeListScene();
     }
+
+
+    // TODO: Replace this method with an API call to the HTTP server using Model
+    void handleRegenerateButton(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList){
+        Recipe newRecipe = new RecipeGenerator().regenerateRecipe(recipe);
+        popUp.getNameField().setText(newRecipe.getName());
+        popUp.getCategoryField().setText(newRecipe.getCategory());
+        popUp.getIngredientsField().setText(newRecipe.getIngredients());
+        popUp.getInstructionsField().setText(newRecipe.getInstructions());
+        rList.refresh();
+    }
 }
+
