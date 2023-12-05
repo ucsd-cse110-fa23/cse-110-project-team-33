@@ -144,17 +144,19 @@ public class Controller {
         });
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
-            // TODO: replace with using Model
-            Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
+            Recipe newRecipe = null;
+            // newRecipe = new RecipeGenerator().generateNewRecipe();
             try {
                 model.performFileWriteRequest("mealType.wav");
                 model.performFileWriteRequest("ingredients.wav");
+                newRecipe = model.performRecipeGenerateRequest();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
 
             // Save the new recipe to the database
             String postResponse = model.postRecipe(newRecipe);
+            System.out.println(postResponse);
 
             // Update recipeList to reflect the state of the database 
             // TODO: Refactor into a method so we can DRY

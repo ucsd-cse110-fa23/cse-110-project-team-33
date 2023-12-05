@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -248,7 +249,6 @@ public class Model {
     }
     
     public String performFileWriteRequest(String audioFile) throws MalformedURLException, IOException {
-        final int mid = 1;
         final String PUT_URL = "http://localhost:8100/generate?audioFile=" + audioFile;
         final File uploadFile = new File(audioFile);
 
@@ -288,6 +288,36 @@ public class Model {
         }
     }
 
-    // TO DO: implement performRecipeRequest method to request the server 
-    // public String performRecipeGenerateRequest()
+    // sets request method to POST -> reads in the JSON recipe received from the server ->
+    // parses JSON recipe into Recipe object and returns the Recipe to Controller
+    public Recipe performRecipeGenerateRequest() throws URISyntaxException, IOException {
+        final String POST_URL = "http://localhost:8100/generate";
+        URL url = new URI(POST_URL).toURL();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+
+        String generatedRecipe = "";
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                generatedRecipe = response.toString();
+                System.out.println(generatedRecipe);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            if (exception.getMessage().contains("Connection refused")) {
+                System.out.println("Error: Server down");
+            }
+            System.out.println("Error: " + exception.getMessage());
+        }
+
+        System.out.println("GENERATED JSON RECIPE: " + generatedRecipe);
+        System.out.println("PARSED RECIPE: " + Recipe.parseRecipeFromString(generatedRecipe));
+
+        return Recipe.parseRecipeFromString(generatedRecipe);
+    }
 }

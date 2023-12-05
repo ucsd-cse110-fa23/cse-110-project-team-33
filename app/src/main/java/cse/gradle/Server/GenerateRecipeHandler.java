@@ -69,69 +69,18 @@ public class GenerateRecipeHandler implements HttpHandler {
                 os.write(response.getBytes());
             }
         }
-        
-        // String CRLF = "\r\n";
-        // int fileSize = 0;
-
-        // URI uri = httpExchange.getRequestURI();
-        // System.out.println("URI: " + uri);
-        // String query = uri.getRawQuery();
-        // System.out.println("Query: " + query);
-        // String audioFile = query.substring(query.indexOf("=") + 1);
-        // System.out.println("audioFile parsed from URL: " + audioFile);
-        
-        // String FILE_TO_RECEIVED = "src/main/java/cse/gradle/Server/" + audioFile;
-        // File file = new File(FILE_TO_RECEIVED);
-        // System.out.println("created: " + FILE_TO_RECEIVED + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        // if (!file.exists()) {
-        //     file.createNewFile();
-        // }
-        
-        // InputStream input = httpExchange.getRequestBody();
-        // String nextLine = "";
-        // do {
-        //     nextLine = readLine(input, CRLF);
-        //     if (nextLine.startsWith("Content-Length:")) {
-        //         fileSize = 
-        //             Integer.parseInt(
-        //                 nextLine.replaceAll(" ", "").substring(
-        //                     "Content-Length:".length()
-        //                 )
-        //             );
-        //     }
-        //     System.out.println(nextLine);
-        // } while (!nextLine.equals(""));
-        
-        // byte[] midFileByteArray = new byte[fileSize];
-        // int readOffset = 0;
-        // while (readOffset < fileSize) {
-        //     int bytesRead = input.read(midFileByteArray, readOffset, fileSize);
-        //     readOffset += bytesRead;
-        // }
-        
-        // BufferedOutputStream bos = 
-        //     new BufferedOutputStream(new FileOutputStream(FILE_TO_RECEIVED));
-        
-        // bos.write(midFileByteArray, 0, fileSize);
-        // bos.flush();
-        // bos.close();
-        
-        // httpExchange.sendResponseHeaders(200, 0);
     }
 
+    // TODO: test needed
     // handle POST request to generate a recipe
     private String handlePost(HttpExchange httpExchange) throws IOException, URISyntaxException {
-            // get mealType and ingredients from whisper
-        String mealType = "";
-        String ingredients = "";
-        String mealTypeFilePath = "app/src/main/java/cse/gradle/Server/mealType.wav";
-        String ingredientsFilePath = "app/src/main/java/cse/gradle/Server/ingredients.wav";
-
-        String[] transcriptions = new String[2];
+        // get mealType and ingredients from whisper
+        String mealTypeFilePath = "src/main/java/cse/gradle/Server/mealType.wav";
+        String ingredientsFilePath = "src/main/java/cse/gradle/Server/ingredients.wav";
 
         WhisperApiClient whisperApi = new WhisperApiClient();
-        transcriptions[0] = whisperApi.generateResponse(mealTypeFilePath);
-        transcriptions[1] = whisperApi.generateResponse(ingredientsFilePath);
+        String mealType = whisperApi.generateResponse(mealTypeFilePath);
+        String ingredients = whisperApi.generateResponse(ingredientsFilePath);
 
         // use transcriptions to generate recipe
         String[] response = new String[4];
@@ -150,6 +99,7 @@ public class GenerateRecipeHandler implements HttpHandler {
         return jsonRecipe;
     }
 
+    // TODO: test needed
     private String handlePut(HttpExchange httpExchange) throws IOException {
         String CRLF = "\r\n";
         int fileSize = 0;
@@ -163,42 +113,44 @@ public class GenerateRecipeHandler implements HttpHandler {
         
         String FILE_TO_RECEIVED = "src/main/java/cse/gradle/Server/" + audioFile;
         File file = new File(FILE_TO_RECEIVED);
-        System.out.println("created: " + FILE_TO_RECEIVED + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        System.out.println("audio file stored at: " + FILE_TO_RECEIVED);
         if (!file.exists()) {
             file.createNewFile();
         }
-        
-        InputStream input = httpExchange.getRequestBody();
-        String nextLine = "";
-        do {
-            nextLine = readLine(input, CRLF);
-            if (nextLine.startsWith("Content-Length:")) {
-                fileSize = 
-                    Integer.parseInt(
-                        nextLine.replaceAll(" ", "").substring(
-                            "Content-Length:".length()
-                        )
-                    );
+        try {
+            InputStream input = httpExchange.getRequestBody();
+            String nextLine = "";
+            do {
+                nextLine = readLine(input, CRLF);
+                if (nextLine.startsWith("Content-Length:")) {
+                    fileSize = 
+                        Integer.parseInt(
+                            nextLine.replaceAll(" ", "").substring(
+                                "Content-Length:".length()
+                            )
+                        );
+                }
+                System.out.println(nextLine);
+            } while (!nextLine.equals(""));
+            
+            byte[] midFileByteArray = new byte[fileSize];
+            int readOffset = 0;
+            while (readOffset < fileSize) {
+                int bytesRead = input.read(midFileByteArray, readOffset, fileSize);
+                readOffset += bytesRead;
             }
-            System.out.println(nextLine);
-        } while (!nextLine.equals(""));
-        
-        byte[] midFileByteArray = new byte[fileSize];
-        int readOffset = 0;
-        while (readOffset < fileSize) {
-            int bytesRead = input.read(midFileByteArray, readOffset, fileSize);
-            readOffset += bytesRead;
+            
+            BufferedOutputStream bos = 
+                new BufferedOutputStream(new FileOutputStream(FILE_TO_RECEIVED));
+            
+            bos.write(midFileByteArray, 0, fileSize);
+            bos.flush();
+            bos.close();
+            return "File uploaded successfully!";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error uploading file: " + e.getMessage();
         }
-        
-        BufferedOutputStream bos = 
-            new BufferedOutputStream(new FileOutputStream(FILE_TO_RECEIVED));
-        
-        bos.write(midFileByteArray, 0, fileSize);
-        bos.flush();
-        bos.close();
-        
-        httpExchange.sendResponseHeaders(200, 0);
-        return null;
     }
 
     // helper method for handlePut()
@@ -235,36 +187,4 @@ public class GenerateRecipeHandler implements HttpHandler {
         throw new IOException(
             "Reached end of stream while reading the current line!");       
     }
-
-    // private String handlePost(HttpExchange httpExchange) throws IOException {
-
-    //     // decode audio file
-
-    //     // get mealType and ingredients from whisper
-    //     String mealType = "";
-    //     String ingredients = "";
-
-    //     String[] transcriptions = new String[2];
-
-    //     WhisperApiClient whisperApi = new WhisperApiClient();
-    //     transcriptions[0] = whisperApi.generateResponse(mealTypeFilePath);
-    //     transcriptions[1] = whisperApi.generateResponse(ingredientsFilePath);
-
-    //     // use transcriptions to generate recipe
-    //     String[] response = new String[4];
-
-    //     try {
-    //         ChatGPTApiClient chatGPTApi = new ChatGPTApiClient();
-    //         response = chatGPTApi.generateResponse(mealType, ingredients);
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-
-    //     // JSONify recipe
-    //     Recipe newRecipe = new Recipe(response[2], response[3], response[1], response[0]);
-    //     String jsonRecipe = newRecipe.toDocument().toJson();
-        
-    //     return jsonRecipe;
-    // }
-
 }
