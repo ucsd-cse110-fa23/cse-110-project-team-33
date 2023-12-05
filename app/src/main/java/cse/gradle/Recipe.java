@@ -2,6 +2,9 @@ package cse.gradle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import org.bson.Document;
 
@@ -15,6 +18,7 @@ public class Recipe {
     private String instructions;
     private String category;
     private String name;
+    private Date date;
     private UUID id;
 
     // empty constructor
@@ -23,6 +27,7 @@ public class Recipe {
         this.instructions = "";
         this.category = "";
         this.name = "";
+        this.date = new Date(); //date becomes date object is created
         this.id = UUID.randomUUID();
     }
     
@@ -35,6 +40,21 @@ public class Recipe {
         this.instructions = instructions;
         this.category = category;
         this.name = name;
+        this.date = new Date();
+        this.id = UUID.randomUUID();
+    }
+
+    // constructor with String and Date arguments
+    public Recipe(String ingredients,
+                  String instructions,
+                  String category,
+                  String name,
+                  Date dateCreated) {
+        this.ingredients = ingredients;
+        this.instructions = instructions;
+        this.category = category;
+        this.name = name;
+        this.date = dateCreated;
         this.id = UUID.randomUUID();
     }
 
@@ -48,6 +68,22 @@ public class Recipe {
         this.instructions = instructions;
         this.category = category;
         this.name = name;
+        this.date = new Date();
+        this.id = id;
+    }
+
+    // constructor with String and UUID arguments and Date argument
+    public Recipe(String ingredients,
+                  String instructions,
+                  String category,
+                  String name,
+                  Date dateCreated,
+                  UUID id) {
+        this.ingredients = ingredients;
+        this.instructions = instructions;
+        this.category = category;
+        this.name = name;
+        this.date = dateCreated;
         this.id = id;
     }
 
@@ -67,6 +103,11 @@ public class Recipe {
     public String getName() {
         return name;
     }
+
+    public Date getDate(){
+        return date;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -87,6 +128,11 @@ public class Recipe {
     public void setName(String newName) {
         name = newName;
     }
+
+    public void setDate(Date newDate){
+        this.date = newDate;
+    }
+
     public void setId(UUID newId) {
         id = newId;
     }
@@ -103,6 +149,7 @@ public class Recipe {
         doc.append("instructions", instructions);
         doc.append("category", category);
         doc.append("name", name);
+        doc.append("date", date.toString());
         doc.append("id", id.toString());
         return doc;
     }
@@ -121,12 +168,16 @@ public class Recipe {
     public static Recipe parseRecipeFromDocument(Document result) {
 
         Recipe recipe = new Recipe();
+        //DateFormat format = DateFormat.getDateInstance();
+        SimpleDateFormat format = new SimpleDateFormat("EEEE MMM dd HH:mm:ss z yyyy");
+
 
         try {
             recipe.setIngredients(result.getString("ingredients"));
             recipe.setInstructions(result.getString("instructions"));
             recipe.setCategory(result.getString("category"));
             recipe.setName(result.getString("name"));
+            recipe.setDate(format.parse(result.getString("date")));
             recipe.setId(UUID.fromString(result.getString("id")));
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,15 +188,24 @@ public class Recipe {
 
     // static parse method for populating a List<Recipe> from a JSON string
     public static List<Recipe> parseRecipeListFromString(String json) {
+        ArrayList<Recipe> recipeArrayList = new ArrayList<>();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            ArrayList<Recipe> recipeArrayList = (ArrayList<Recipe>)objectMapper.readValue(json, new TypeReference<List<Recipe>>() {});
+            JsonNode jsonNode = objectMapper.readTree(json);
+            if(jsonNode.isArray()){
+                for(final JsonNode objNode : jsonNode){
+                    recipeArrayList.add(parseRecipeFromString(objNode.toString()));
+                }
+            }
 
-            return recipeArrayList;
+            //ArrayList<Recipe> recipeArrayList = (ArrayList<Recipe>)objectMapper.readValue(json, new TypeReference<List<Recipe>>() {});
+            
+            
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            return null;
+            //return null;
         }
+        return recipeArrayList;
     }
 
     /*
@@ -166,16 +226,29 @@ public class Recipe {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(json);
 
+            Date tempDate = new Date();
+            //DateFormat format = DateFormat.getDateInstance();
+            SimpleDateFormat format = new SimpleDateFormat("EEEE MMM dd HH:mm:ss z yyyy");
             // Extract individual fields from the JSON
             String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
             String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
             String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
             String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
+            Date dateCreated = tempDate;
+            try {
+                dateCreated = jsonNode.has("date") ? format.parse(jsonNode.get("date").asText()) : tempDate;
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            
             UUID id = jsonNode.has("id") ? UUID.fromString(jsonNode.get("id").asText()) : UUID.randomUUID();
 
 
             // Create a recipe object
             Recipe recipe = new Recipe(ingredients, instructions, category, name);
+
+            recipe.setDate(dateCreated);
+            System.out.println("dateCreated: " + dateCreated);
             // set id
             recipe.setId(id);
 
@@ -210,4 +283,20 @@ public class Recipe {
             System.out.println(recipe.getName());
         }
     }
+
+
+    public static void sortByDate(List<Recipe> recipes, boolean ascending) {
+        if (ascending) {
+            recipes.sort((r1, r2) -> r2.getDate().compareTo(r1.getDate()));
+        }
+        else {
+            recipes.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
+        }
+        // print recipe names for debugging
+        for (Recipe recipe : recipes) {
+            System.out.println(recipe.getName());
+            System.out.println("Date: " + recipe.getDate());
+        }
+    }
+ 
 }
