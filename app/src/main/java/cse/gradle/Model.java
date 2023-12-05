@@ -247,10 +247,10 @@ public class Model {
         return response;
     }
 
-    public Recipe performRecipeGenerationRequest() throws MalformedURLException, IOException {
+    public Recipe performRecipeGenerationRequest(String audioFile) throws MalformedURLException, IOException {
         final int mid = 1;
-        final String POST_URL = "http://localhost:8100/generate";
-        final File uploadFile = new File("mealType.wav");
+        final String POST_URL = "http://localhost:8100/generate?audioFile=" + audioFile;
+        final File uploadFile = new File(audioFile);
 
         String boundary = Long.toHexString(System.currentTimeMillis()); 
         String CRLF = "\r\n";
@@ -276,7 +276,7 @@ public class Model {
             System.out.println("Response code: [" + responseCode + "]");
         }
         
-        
+         
 
         Recipe generatedRecipe = new Recipe();
         return generatedRecipe;

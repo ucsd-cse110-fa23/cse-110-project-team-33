@@ -38,18 +38,25 @@ public class GenerateRecipeHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange httpExchange) throws IOException {
         String CRLF = "\r\n";
         int fileSize = 0;
+
+        URI uri = httpExchange.getRequestURI();
+        System.out.println("URI: " + uri);
+        String query = uri.getRawQuery();
+        System.out.println("Query: " + query);
+        String audioFile = query.substring(query.indexOf("=") + 1);
+        System.out.println("audioFile parsed from URL: " + audioFile);
         
-        String FILE_TO_RECEIVED = "src/main/java/cse/gradle/Server/mealType.wav";
+        String FILE_TO_RECEIVED = "src/main/java/cse/gradle/Server/" + audioFile;
         File file = new File(FILE_TO_RECEIVED);
         System.out.println("created: " + FILE_TO_RECEIVED + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         if (!file.exists()) {
             file.createNewFile();
         }
         
-        InputStream input = exchange.getRequestBody();
+        InputStream input = httpExchange.getRequestBody();
         String nextLine = "";
         do {
             nextLine = readLine(input, CRLF);
@@ -78,7 +85,7 @@ public class GenerateRecipeHandler implements HttpHandler {
         bos.flush();
         bos.close();
         
-        exchange.sendResponseHeaders(200, 0);
+        httpExchange.sendResponseHeaders(200, 0);
     }
 
     // helper method for handle()
