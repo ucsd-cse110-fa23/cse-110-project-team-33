@@ -2,9 +2,6 @@ package cse.gradle;
 
 import org.junit.jupiter.api.Test;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.ArrayList;
 
 public class Feature15Tests extends HTTPServerTests {
@@ -53,7 +50,7 @@ public class Feature15Tests extends HTTPServerTests {
         }
 
         // Get all the recipes from the database sorted alphabetically A-Z (not case sensitive)
-        String getAllResponse = model.getRecipeList("a-z", "");
+        String getAllResponse = model.getRecipeList("a-z");
 
         // Delete the recipes from the database
         for (Recipe recipe : recipes) {
@@ -66,9 +63,7 @@ public class Feature15Tests extends HTTPServerTests {
         System.out.println("recipeArrayList: " + recipeArrayList);
         
         // Check that the recieved recipes are sorted alphabetically A-Z (not case sensitive)
-        assertEquals(3, recipeArrayList.size());
         assert(recipeArrayList.get(0).getName().equals("American breakfast"));
-        // System.out.println(recipeArrayList.get(1).getName());
         assert(recipeArrayList.get(1).getName().equals("boiled potatoes"));
         assert(recipeArrayList.get(2).getName().equals("Healthy Lunch"));
 

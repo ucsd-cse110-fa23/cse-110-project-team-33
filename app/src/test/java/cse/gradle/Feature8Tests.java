@@ -73,17 +73,17 @@ public class Feature8Tests extends HTTPServerTests{
     void getAllTest() throws JsonMappingException, JsonProcessingException {
         Recipe recipe1 = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
         Recipe recipe2 = new Recipe("cheese", "boil the cheese", "breakfast", "boiled cheese");
-        ArrayList<Recipe> rList = new ArrayList<Recipe>();      // original list of recipes                 
+        ArrayList<Recipe> rList = new ArrayList<Recipe>();
         rList.add(recipe1);
         rList.add(recipe2);
 
         Model model = new MockModel();
         for (int i = 0; i < rList.size(); i++) {
-            model.postRecipe(rList.get(i));                     // posting list of recipes 
+            model.postRecipe(rList.get(i));
         }
 
         String response = model.getRecipeList();
-        List<Recipe> rList2 = Recipe.parseRecipeListFromString(response);   // fetching recipes from database
+        List<Recipe> rList2 = Recipe.parseRecipeListFromString(response); 
 
         for (int i = 0; i < rList2.size(); i++) {
             System.out.println("rList.get(i) " + rList.get(i));
@@ -107,26 +107,24 @@ public class Feature8Tests extends HTTPServerTests{
         mongoDB.insertOne(recipe.toDocument());
 
         // find the recipe
-        Document result = mongoDB.findOne("id", recipe.getId().toString());
+        Document result = mongoDB.findOne("name", "boiled potatoes");
         Recipe resultRecipe = Recipe.parseRecipeFromDocument(result);
-        System.out.println("resultRecipe: " + resultRecipe);
-        System.out.println("originalRecipe: " + recipe);
         assertEquals(Recipe.equals(recipe, resultRecipe), true);
 
         // update the recipe
         recipe.setCategory("breakfast");
-        mongoDB.updateOne("id", recipe.getId().toString(), recipe.toDocument());
+        mongoDB.updateOne("name", "boiled potatoes", recipe.toDocument());
 
         // find the updated recipe
-        result = mongoDB.findOne("id", recipe.getId().toString());
+        result = mongoDB.findOne("name", "boiled potatoes");
         resultRecipe = Recipe.parseRecipeFromDocument(result);
         assertEquals(Recipe.equals(recipe, resultRecipe), true);
 
         // delete the recipe
-        mongoDB.deleteOne("id", recipe.getId().toString());
+        mongoDB.deleteOne("name", "boiled potatoes");
 
         // find the deleted recipe
-        result = mongoDB.findOne("id", recipe.getId().toString());
+        result = mongoDB.findOne("name", "boiled potatoes");
         assertEquals(result, null);
     }
 

@@ -60,7 +60,7 @@ public class LoginHandler implements HttpHandler {
     // Accepted JSON Format: {"username": "username", "password": "password"}
     private String handleGet(HttpExchange httpExchange) throws IOException {
 
-        String response = "Invalid GET request: ";
+        String response = "Invalid GET request";
 
         try {
 
