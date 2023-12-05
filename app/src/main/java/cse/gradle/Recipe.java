@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import org.bson.Document;
 
@@ -139,7 +140,7 @@ public class Recipe {
 
     // toString method for saving to file (csv)
     public String toString() {
-        return ingredients + "," + instructions + "," + category + "," + name + "," + id;
+        return ingredients + "," + instructions + "," + category + "," + name + "," + date + "," + id;
     }
 
     // toDocument method for saving to database
@@ -169,9 +170,9 @@ public class Recipe {
 
         Recipe recipe = new Recipe();
         //DateFormat format = DateFormat.getDateInstance();
-        SimpleDateFormat format = new SimpleDateFormat("EEEE MMM dd HH:mm:ss z yyyy");
-
-
+        //SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+        String resultString = result.toJson().toString();
+        /*
         try {
             recipe.setIngredients(result.getString("ingredients"));
             recipe.setInstructions(result.getString("instructions"));
@@ -182,8 +183,8 @@ public class Recipe {
         } catch (Exception e) {
             e.printStackTrace();
         }
-      
-        return recipe;
+       */
+        return parseRecipeFromString(resultString);
     }
 
     // static parse method for populating a List<Recipe> from a JSON string
@@ -228,7 +229,7 @@ public class Recipe {
 
             Date tempDate = new Date();
             //DateFormat format = DateFormat.getDateInstance();
-            SimpleDateFormat format = new SimpleDateFormat("EEEE MMM dd HH:mm:ss z yyyy");
+            SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
             // Extract individual fields from the JSON
             String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";
             String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
@@ -267,6 +268,7 @@ public class Recipe {
                r1.getInstructions().equals(r2.getInstructions()) &&
                r1.getCategory().equals(r2.getCategory()) &&
                r1.getName().equals(r2.getName()) &&
+               r1.getDate().toString().equals(r2.getDate().toString()) &&
                r1.getId().equals(r2.getId());
     }
 
