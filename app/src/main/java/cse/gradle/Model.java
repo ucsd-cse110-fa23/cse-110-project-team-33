@@ -13,6 +13,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 
@@ -65,6 +67,19 @@ public class Model {
                 ObjectMapper objectMapper = new ObjectMapper();
                 String jsonRecipe = objectMapper.writeValueAsString(recipe);
 
+                int startIndex = jsonRecipe.indexOf("\"date\"", 0);
+                startIndex += 7;
+                int endIndex = jsonRecipe.indexOf(",", startIndex);
+                String dateString = jsonRecipe.substring(startIndex, endIndex);
+
+                Date tempDate = new Date();
+                tempDate.setTime(Long.parseLong(dateString));
+
+                jsonRecipe = jsonRecipe.replaceFirst(dateString, "\"" + tempDate.toString() + "\"");
+
+                System.out.println("tempDate: " + tempDate.toString());
+                System.out.println("jsonRecipe: " + jsonRecipe);
+
                 try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
                     out.write(jsonRecipe);
                 }
@@ -88,10 +103,11 @@ public class Model {
     }
 
     // Calls the performRecipeRequest method with the GET method 
-    public String getRecipeList(String sortOption) {
+    public String getRecipeList(String sortOption, String filterOption) {
         try {
-            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&sort=a-z
-            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption;
+            
+            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&sort=a-z&filter=Breakfast
+            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption + "&filter=" + filterOption;
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -112,10 +128,10 @@ public class Model {
         }
     }
 
-    // Overloaded getRecipeList method that defaults to no sort option
+    // Overloaded getRecipeList method that defaults to no sort or filter option
     // TODO: Replace with newest to oldest sort option when implemented
     public String getRecipeList() {
-        return getRecipeList("");
+        return getRecipeList("", "");
     }
 
     // Calls the performRecipeRequest method with and an id for the recipe we want
