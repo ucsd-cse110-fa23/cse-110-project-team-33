@@ -201,8 +201,9 @@ public class Controller {
         });
     }
 
+    // TODO: Replace this method with an API call to the HTTP server using Model
     void handleRegenerateButton(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList){
-        Recipe newRecipe = new RecipeGenerator().reGenerateRecipe(recipe);
+        Recipe newRecipe = new RecipeGenerator().regenerateRecipe(recipe);
         popUp.getNameField().setText(newRecipe.getName());
         popUp.getCategoryField().setText(newRecipe.getCategory());
         popUp.getIngredientsField().setText(newRecipe.getIngredients());

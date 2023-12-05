@@ -60,7 +60,7 @@ public class RecipeGenerator {
         return returnRecipe;
     }
 
-    public Recipe reGenerateRecipe(Recipe existingRecipe){
+    public Recipe regenerateRecipe(Recipe existingRecipe){
         String mealtypeString = existingRecipe.getCategory();
         String ingredientsString = existingRecipe.getIngredients();
         String titleString = "";
