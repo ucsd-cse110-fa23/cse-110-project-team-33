@@ -39,10 +39,18 @@ public class RecipeGenerator {
     public Recipe regenerateRecipe(Recipe existingRecipe){
         String mealtypeString = existingRecipe.getCategory();
         String ingredientsString = existingRecipe.getIngredients();
-        String titleString = "";
-        String instructionsString = "";
 
-        try {
+        response = Model.performRecipeGenerationRequest(mealtypeString, ingredientsString);
+        
+        System.out.println("Title:\n" + response[0]);
+        System.out.println("Meal Type:\n" + response[1]);
+        System.out.println("Ingredients:\n" + response[2]);
+        System.out.println("Instructions:\n" + response[3]);
+        Recipe returnRecipe = new Recipe(response[2], response[3], response[1], response[0]);
+        
+        return returnRecipe;
+
+        /*try {
             System.out.println("Title:");
             titleString = Model.useChatGPT(100, ("Give a 3 to 5 word name for a " + mealtypeString + " recipe using the following ingredients: " + ingredientsString + ". Output nothing but the recipe name."));
             System.out.println("Instructions:");
@@ -65,6 +73,6 @@ public class RecipeGenerator {
         System.out.println("title: " + titleString);
         Recipe returnRecipe = new Recipe(ingredientsString, instructionsString, mealtypeString, titleString);
         
-        return returnRecipe;
+        return returnRecipe;*/
     }
 }
