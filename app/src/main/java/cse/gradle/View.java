@@ -416,8 +416,7 @@ class RecipeList extends BorderPane {
     private Button logoutButton;
     private ComboBox<String> sortDropDown; // drop down menu for sorting recipes
     private Button filterButton;
-    private ChoiceBox mealTypeChoice;
-    private String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
+    private ComboBox<String> mealTypeDropDown;
     private HBox newRecipeButtonBox;
     private HBox TitleBox;
     private HBox logoutButtonBox;
@@ -485,13 +484,13 @@ class RecipeList extends BorderPane {
         title.setStyle("-fx-font-size: 24;");
         logoutButton = new Button("Logout");
         // String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
-        mealTypeChoice = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
+        // mealTypeDropDown = new ChoiceBox<>(FXCollections.observableArrayList(Constants.mealTypes));
         title.setAlignment(Pos.CENTER);
         logoutButton.setAlignment(Pos.CENTER);
         TitleBox.setAlignment(Pos.TOP_CENTER);
         TitleBox.getChildren().add(title);
         logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
-        logoutButtonBox.getChildren().addAll(mealTypeChoice, logoutButton);
+        logoutButtonBox.getChildren().addAll(mealTypeDropDown, logoutButton);
         topBox.getChildren().addAll(TitleBox, logoutButtonBox);
         this.setTop(topBox);
 
@@ -539,14 +538,25 @@ class RecipeList extends BorderPane {
         refresh();
 
         Label title = new Label("Recipes");
+        title.setAlignment(Pos.CENTER);
         title.setStyle("-fx-font-size: 24;");
 
         filterButton = new Button("Filter");
-        Label choiceBoxLabel = new Label(" by: ");
-        choiceBoxLabel.setStyle("-fx-font-size: 15;");
-        choiceBoxLabel.setAlignment(Pos.CENTER);
-        mealTypeChoice = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
-        title.setAlignment(Pos.CENTER);
+        // Label choiceBoxLabel = new Label(" by: ");
+        // choiceBoxLabel.setStyle("-fx-font-size: 15;");
+        // choiceBoxLabel.setAlignment(Pos.CENTER);
+        // mealTypeDropDown = new ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
+        mealTypeDropDown = new ComboBox<String>();
+        mealTypeDropDown.getItems().addAll(Constants.mealTypes);
+        mealTypeDropDown.setValue(Constants.defaultMealType);
+
+        Label filterLabel = new Label("Filter by:");
+        filterLabel.setAlignment(Pos.CENTER_LEFT);
+        filterLabel.setPadding(new Insets(0, 10, 0, 0));
+        
+        HBox filterBox = new HBox();
+        filterBox.setAlignment(Pos.CENTER_LEFT);
+        filterBox.getChildren().addAll(filterLabel, mealTypeDropDown);
 
         logoutButton = new Button("Logout");
         logoutButton.setAlignment(Pos.CENTER);
@@ -558,7 +568,7 @@ class RecipeList extends BorderPane {
 
         logoutButtonBox = new HBox();
         logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
-        logoutButtonBox.getChildren().addAll(filterButton, choiceBoxLabel, mealTypeChoice, logoutButton);
+        logoutButtonBox.getChildren().addAll(logoutButton);
         // logoutButtonBox.getChildren().add(logoutButton);
 
         // Create a ComboBox with sorting options
@@ -569,7 +579,7 @@ class RecipeList extends BorderPane {
         Label sortLabel = new Label("Sort by:");
         sortLabel.setAlignment(Pos.CENTER_LEFT);
         sortLabel.setPadding(new Insets(0, 10, 0, 0));
-
+        
         HBox sortBox = new HBox();
         sortBox.setAlignment(Pos.CENTER_LEFT);
         sortBox.getChildren().addAll(sortLabel, sortDropDown);
@@ -577,7 +587,7 @@ class RecipeList extends BorderPane {
         // ToolBar to hold the sortBox and logoutButtonBox
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        ToolBar toolBar = new ToolBar(sortBox, spacer, logoutButtonBox);
+        ToolBar toolBar = new ToolBar(sortBox, filterBox, spacer, logoutButtonBox);
         toolBar.setPadding(new Insets(5, 10, 5, 10));
 
         topBox = new VBox();
@@ -699,16 +709,12 @@ class RecipeList extends BorderPane {
         return logoutButton;
     }
 
-    public ChoiceBox getMealTypeChoiceBox() {
-        return mealTypeChoice;
+    public ComboBox<String> getMealTypeDropDown() {
+        return mealTypeDropDown;
     }
 
     public Button getFilterButton() {
         return filterButton;
-    }
-
-    public String[] getMealTypes() {
-        return mealTypes;
     }
 
     public ComboBox<String> getSortDropDown() {
