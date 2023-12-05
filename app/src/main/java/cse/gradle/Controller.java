@@ -11,6 +11,7 @@ import cse.gradle.View.NewRecipePane;
 import cse.gradle.View.RecipeList;
 import cse.gradle.View.UserCreateAccount;
 import cse.gradle.View.UserLogin;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -35,8 +36,9 @@ public class Controller implements ModelObserver, ViewObserver {
         }
     }
 
-    public void loginUser(String username, String password, View appScenes, UserLogin loginPage) throws IOException {
-        // Checks if the automic login file exists; if it does, and username matches the one in file, do automatic login
+    public boolean loginUser(String username, String password, View appScenes, UserLogin loginPage) throws IOException {
+        // Checks if the automic login file exists; if it does, and username matches the
+        // one in file, do automatic login
         if ((new File("src/main/java/cse/gradle/local/login.txt")).exists()) {
             File loginFile = new File("src/main/java/cse/gradle/local/login.txt");
             BufferedReader reader = new BufferedReader(
@@ -46,23 +48,26 @@ public class Controller implements ModelObserver, ViewObserver {
                 String postResponse = model.performLoginRequest(loginFile);
                 if (postResponse.equals("Error: Server down")) {
                     appScenes.displayServerDownConstructor();
-                    return;
+                    return false;
+                } else if (postResponse.contains("Incorrect password")) {
+                    appScenes.displayIncorrectPassword();
+                    return false;
+                } else {
+                    reader.close();
+                    return loginUserWithButtonCheck(username, password, appScenes, loginPage);
                 }
-                System.out.println("login response: " + postResponse);
             } else {
-                reader.close();
-                loginUserWithButtonCheck(username, password, appScenes, loginPage);
+                return loginUserWithButtonCheck(username, password, appScenes, loginPage);
             }
-        } else {
-            loginUserWithButtonCheck(username, password, appScenes, loginPage);
+            // Get all recipes from the database and display
+            // When logging into account, start with default sorted list
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
         }
-        // Get all recipes from the database and display
-        // When logging into account, start with default sorted list
-        syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
     }
 
-    // Logs-in the user and writes to login.txt file if the automatic login checkbox is selected
-    public void loginUserWithButtonCheck(String username, String password, View appScenes, UserLogin loginPage) {
+    // Logs-in the user and writes to login.txt file if the automatic login checkbox
+    // is selected
+    public boolean loginUserWithButtonCheck(String username, String password, View appScenes, UserLogin loginPage) {
         String postResponse = model.performLoginRequest(username, password);
         if ((loginPage.getAutoLoginButton().isSelected()) && (!postResponse.contains("Invalid"))) {
             try {
@@ -75,9 +80,12 @@ public class Controller implements ModelObserver, ViewObserver {
         }
         if (postResponse.equals("Error: Server down")) {
             appScenes.displayServerDownConstructor();
-            return;
+            return false;
+        } else if (postResponse.contains("Incorrect password")) {
+            appScenes.displayIncorrectPassword();
+            return false;
         }
-        System.out.println("login response: " + postResponse);
+        return true;
     }
 
     // Handles the share button being pressed by the user
@@ -120,8 +128,9 @@ public class Controller implements ModelObserver, ViewObserver {
                 throw new Exception(response);
             }
 
+            String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
         } catch (Exception e) {
             if (e.getMessage().equals("Error: Server down"))
                 appScenes.displayServerDownConstructor();
@@ -141,10 +150,11 @@ public class Controller implements ModelObserver, ViewObserver {
                 appScenes.displayServerDownConstructor();
                 return;
             }
-
+            
+            String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
-
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
+            
             Stage current = (Stage) popUp.getScene().getWindow();
             current.close();
         } catch (Exception e) {
@@ -190,6 +200,7 @@ public class Controller implements ModelObserver, ViewObserver {
         });
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
+            // TODO: replace with using Model
             Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
 
             // Save the new recipe to the database
@@ -197,8 +208,9 @@ public class Controller implements ModelObserver, ViewObserver {
 
             // Update recipeList to reflect the state of the database
             // TODO: Refactor into a method so we can DRY
+            String filterOption = appScenes.getRecipeListRoot().getMealTypeDropDown().getValue();
             String sortOption = appScenes.getRecipeListRoot().getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
 
         // Display cancelScene when backButton is pushed
@@ -217,11 +229,12 @@ public class Controller implements ModelObserver, ViewObserver {
 
             // Get all recipes from the database and display
             // When create account, start with default sorted list
-            syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
+            syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
         });
 
         // Display cancelScene when backButton is pushed
-        createPane.getBackButton().setOnAction(e -> {
+        createPane.getBackButton().setOnAction(e->
+    {
             appScenes.displayUserLoginConstructor();
         });
     }
@@ -239,10 +252,12 @@ public class Controller implements ModelObserver, ViewObserver {
         userPane.getLoginButton().setOnAction(e -> {
             String username = userPane.getUsernameField().getText().toString();
             String password = userPane.getPasswordField().getText().toString();
-            try {
-                loginUser(username, password, appScenes, userPane);
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            boolean loginResult = loginUser(username, password, appScenes);
+
+            // Get all recipes from the database and display
+            // When logging into account, start with default sorted list
+            if (loginResult) {
+                syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
             }
         });
     }
@@ -272,17 +287,35 @@ public class Controller implements ModelObserver, ViewObserver {
             model.userId = null; // erase the userId
             // set the dropdown back to default sort option
             recipeList.getSortDropDown().setValue(Constants.defaultSortOption);
+            appScenes.UserLoginConstructor(); // recreate the login screen to clear the username and password fields
             appScenes.displayUserLoginConstructor();
         });
 
         recipeList.getSortDropDown().setOnAction(event -> {
+            String filterOption = recipeList.getMealTypeDropDown().getValue();
             String sortOption = recipeList.getSortDropDown().getValue();
-            syncRecipeListWithModel(appScenes, sortOption);
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
+
+        recipeList.getMealTypeDropDown().setOnAction(event -> {
+            String filterOption = recipeList.getMealTypeDropDown().getValue();
+            String sortOption = recipeList.getSortDropDown().getValue();
+            syncRecipeListWithModel(appScenes, sortOption, filterOption);
+        });
+
+        // recipeList.getMealTypeChoiceBox().getSelectionModel().selectedIndexProperty().addListener(
+        // (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
+        // // store selected mealtype
+        // recipeList.getFilterButton().setOnAction(e -> {
+        // String chosenMeal = (recipeList.getMealTypes()[new_val.intValue()]);
+
+        // });
+
+        // });
     }
 
-    private void syncRecipeListWithModel(View appScenes, String sortOption) {
-        String getAllResponse = model.getRecipeList(sortOption);
+    private void syncRecipeListWithModel(View appScenes, String sortOption, String filterOption) {
+        String getAllResponse = model.getRecipeList(sortOption, filterOption);
 
         // Make sure the server isn't down
         if (getAllResponse.equals("Error: Server down")) {
