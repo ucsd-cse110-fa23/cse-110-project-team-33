@@ -51,6 +51,9 @@ public class RecipeWebPageBuilder implements WebPageBuilder {
         // Display the recipe name as the title of the webpage
         webpage.append("<h1>" + recipe.getName() + "</h1>\n");
 
+        // Add the recipe image
+        webpage.append("<img src=\"" + recipe.getImgUrl() + "\" alt=\"Recipe Image\" width=\"500\" height=\"500\">\n");
+
         // Display the recipe category
         webpage.append("<h2>Category</h2>\n")
                 .append("<p>" + recipe.getCategory() + "</p>\n");
