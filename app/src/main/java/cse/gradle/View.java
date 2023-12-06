@@ -1,6 +1,9 @@
 package cse.gradle;
 
 import javafx.scene.Scene;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -234,6 +239,7 @@ class NewRecipePane extends BorderPane {
 class AppFramePopUp extends BorderPane {
     private Recipe recipe;
     private RecipeList recipeList;
+    private String imgFileName;
 
     private Button saveButton;
     private Button deleteButton;
@@ -249,12 +255,18 @@ class AppFramePopUp extends BorderPane {
     private Button shareButton;
     private Button regenerateButton;
 
+    private ImageView imgView = new ImageView();    
+    static final String IMG_NAME = "C:\\Users\\puppy\\Documents\\Classes\\Fall_2023\\CSE_110\\Project\\cse-110-project-team-33\\app\\image.png";
+    
     // empty constructor
     // initialize pop up window here
     public AppFramePopUp(RecipeList rList) {
         this.recipe = new Recipe();
         this.recipeList = rList;
+        this.imgFileName = IMG_NAME;
 
+        createImageView();
+        createToolBar();
         createFrame();
     }
 
@@ -263,7 +275,9 @@ class AppFramePopUp extends BorderPane {
     public AppFramePopUp(RecipeList rList, Recipe recipe) {
         this.recipe = recipe;
         this.recipeList = rList;
+        this.imgFileName = IMG_NAME;
 
+        createImageView();
         createToolBar();
         createFrame();
     }
@@ -279,6 +293,8 @@ class AppFramePopUp extends BorderPane {
         vBox.setPrefSize(500, 20); // sets size
         // sets background color
         vBox.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0; -fx-font-weight: bold;");
+
+         
 
         nameField.setPrefSize(500, 20); // set size of text field
         nameField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color of texfield
@@ -377,6 +393,29 @@ class AppFramePopUp extends BorderPane {
         });
     }
 
+    private void createImageView(){
+        //image displaying stuff
+        File imgFile = new File(imgFileName);
+
+        if(imgFile.isFile()){
+            System.out.println("image file found ");
+            try {
+                Image imgImage = new Image(new FileInputStream(imgFile));
+                imgView.setImage(imgImage);
+                imgView.setFitWidth(100);
+                imgView.setFitHeight(100);
+                imgView.setPreserveRatio(true);
+                
+                this.setTop(imgView);
+            } catch (Exception e) {
+                System.out.println(e);
+            }            
+        } else{
+            System.out.println("Image file not found RIP");
+        }
+        //vBox.getChildren().add(imgView);
+    }
+
     private void createToolBar() {
         toolBar = new HBox();
         toolBar.setPadding(new Insets(10));
@@ -385,6 +424,7 @@ class AppFramePopUp extends BorderPane {
 
         shareButton = new Button("Share");
 
+        toolBar.getChildren().add(imgView);
         toolBar.getChildren().add(shareButton);
         this.setTop(toolBar);
 
