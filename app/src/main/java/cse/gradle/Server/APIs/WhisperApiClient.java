@@ -14,6 +14,8 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.file.NoSuchFileException;
+
 public class WhisperApiClient implements WhisperApi {
 
     private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
@@ -27,6 +29,10 @@ public class WhisperApiClient implements WhisperApi {
 
         // Create file object from file path
         File file = new File(filePath);
+
+        if (!file.exists()) {
+            throw new NoSuchFileException(filePath);
+        }
 
         // Set up HTTP connection
         URL url = new URI(API_ENDPOINT).toURL();
