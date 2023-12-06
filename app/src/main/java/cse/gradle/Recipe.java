@@ -20,7 +20,7 @@ public class Recipe {
     private Date date;
     private UUID id;
 
-    private String imgUrl;
+    private String imgURLString;
 
     // empty constructor
     public Recipe() {
@@ -116,7 +116,7 @@ public class Recipe {
     }
 
     public String getImgUrl(){
-        return imgUrl;
+        return imgURLString;
     }
 
     // setters
@@ -145,12 +145,12 @@ public class Recipe {
     }
     
     public void setImgURL(String imgURL){
-        this.imgUrl = imgURL;
+        this.imgURLString = imgURL;
     }
 
     // toString method for saving to file (csv)
     public String toString() {
-        return ingredients + "," + instructions + "," + category + "," + name + "," + date + "," + id + "," + imgUrl;
+        return ingredients + "," + instructions + "," + category + "," + name + "," + date + "," + id;
     }
 
     // toDocument method for saving to database
@@ -162,7 +162,6 @@ public class Recipe {
         doc.append("name", name);
         doc.append("date", date.toString());
         doc.append("id", id.toString());
-        doc.append("imgUrl", imgUrl.toString());
         return doc;
     }
 
@@ -227,7 +226,6 @@ public class Recipe {
             String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
             String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
             String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
-            String imgUrl = jsonNode.has("imgUrl") ? jsonNode.get("imgUrl").asText() : "";
             Date dateCreated = tempDate;
             try {
                 dateCreated = jsonNode.has("date") ? format.parse(jsonNode.get("date").asText()) : tempDate;
@@ -240,7 +238,6 @@ public class Recipe {
 
             // Create a recipe object
             Recipe recipe = new Recipe(ingredients, instructions, category, name);
-            recipe.setImgURL(imgUrl);
 
             recipe.setDate(dateCreated);
             System.out.println("dateCreated: " + dateCreated);
