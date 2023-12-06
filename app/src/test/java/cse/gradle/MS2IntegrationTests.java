@@ -7,6 +7,57 @@
 
 package cse.gradle;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 public class MS2IntegrationTests {
-    
+    @Test
+    void fullCRUDTest() throws JsonMappingException, JsonProcessingException {
+        
+        // Create recipe and use model to POST it
+        Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(originalRecipe);
+
+        // MockModel is a mock of Model that accesses a test user in the database without requiring a login
+        Model model = new MockModel();
+
+        // Check that the response is correct
+        String response = model.postRecipe(originalRecipe);
+        String expectedResponse = "Posted entry: " +  originalRecipe.toString();
+        assertEquals(expectedResponse, response);
+
+        // Check that the recipe was added to the database with GET
+        String getResponse = model.getRecipe(originalRecipe.getId().toString());
+        Recipe getRecipe = Recipe.parseRecipeFromString(getResponse);
+        assertEquals(Recipe.equals(originalRecipe, getRecipe), true);
+
+        // Check that we can update the recipe with PUT
+        Recipe updatedRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "mashed potatoes");
+        updatedRecipe.setId(originalRecipe.getId());
+        
+        String putResponse = model.putRecipe(originalRecipe.getId().toString(), updatedRecipe);
+        String expectedPutResponse = "Updated entry: " + originalRecipe.toString() + " with: " + updatedRecipe.toString();
+        assertEquals(expectedPutResponse, putResponse);
+
+        // Check that the recipe was updated in the database GET
+        getResponse = model.getRecipe(originalRecipe.getId().toString());
+        getRecipe = Recipe.parseRecipeFromString(getResponse);
+        assertEquals(Recipe.equals(updatedRecipe, getRecipe), true);
+
+
+        // Delete the recipe from the database
+        String deleteResponse = model.deleteRecipe(originalRecipe.getId().toString());
+        String expectedDeleteResponse = "Deleted entry: " + updatedRecipe.toString();
+
+        // Check that the response is correct
+        assertEquals(expectedDeleteResponse, deleteResponse);
+    }
 }
