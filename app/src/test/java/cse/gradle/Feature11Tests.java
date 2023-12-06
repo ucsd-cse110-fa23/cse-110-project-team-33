@@ -7,6 +7,12 @@
 package cse.gradle;
 
 import org.junit.jupiter.api.Test;
+
+import cse.gradle.Server.APIs.ChatGPTApi;
+import cse.gradle.Server.APIs.DallEApi;
+import cse.gradle.Server.APIs.MockDallEApiClient;
+import cse.gradle.Server.APIs.MockGPT;
+
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 
@@ -14,5 +20,25 @@ import java.util.ArrayList;
 class Feature11Tests {
     /* --------------------------------- UNIT TESTS --------------------------------- */
     
-    /* --------------------------------- BDD TESTS --------------------------------- */
+    @Test
+    public void testDalleGenerateResponse() {
+        // Create an instance of the MockGPT for testing
+        DallEApi dallEApi = new MockDallEApiClient();
+
+        try {
+            // Test the generateResponse method with mock data
+            String mockResponse = dallEApi.generateChatResponse("Mock prompt");
+
+            // Add assertions to verify the correctness of the response
+            assertNotNull(mockResponse);
+            // Check if the response is a valid URL
+            mockResponse = mockResponse.toLowerCase();
+            assertTrue(mockResponse.startsWith("http"));
+            assertTrue(mockResponse.contains(".jpg"));
+        } catch (Exception e) {
+            // Handle exceptions or fail the test if an unexpected exception occurs
+            fail("Exception occurred: " + e.getMessage());
+        }
+    }
+
 }
