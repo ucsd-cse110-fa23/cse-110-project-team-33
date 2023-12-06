@@ -18,31 +18,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class Feature14Tests extends HTTPServerTests{
+class Feature14Tests extends HTTPServerTests {
     /* --------------------------------- UNIT TESTS --------------------------------- */
-    @Test 
-    void checkLoginError() {
-        Server.stopServer();
+    @Test
+    void editingTypeTags() {
+        Recipe r1 = new Recipe("eggs, bacon", "cook for 10 minutes", "breakfast", "American breakfast");
+        Recipe r2 = new Recipe("salmon, salad", "cook for 20 minutes", "lunch", "Healthy Lunch");
+        Recipe r3 = new Recipe("potatoes", "boil the potatoes", "dinner", "boiled potatoes");
+        List<Recipe> rList = new ArrayList<>();
+        rList.add(r1);
+        rList.add(r2);
+        rList.add(r3);
 
-        Model model = new MockModel();
-        String response = model.performLoginRequest("test_user", "password");
-        String error = "Error: Server down";
-        assertEquals(error, response);
+        assertEquals(rList.get(0).getCategory(), "breakfast");
+        assertEquals(rList.get(1).getCategory(), "lunch");
+        assertEquals(rList.get(2).getCategory(), "dinner");
     }
+    
 
     /* --------------------------------- BDD TESTS --------------------------------- */
-    @Test 
-    void completeServerErrorTest() {
-        // login with test user
-        Model model = new MockModel();
-        String retrievedUserId = model.performLoginRequest("test_user", "password");
-        assertEquals(MockModel.mockUserId, retrievedUserId);
-
-        // cut connection and ask for recipe
-        Server.stopServer();
-        Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
-        String response = model.postRecipe(originalRecipe);
-        String error = "Error: Server down";
-        assertEquals(error, response);
+    @Test
+    void manipulatingTypeTagsInView() {
+        Recipe r1 = new Recipe("eggs, bacon", "cook for 10 minutes", "breakfast", "American breakfast");
+        Recipe r2 = new Recipe("salmon, salad", "cook for 20 minutes", "lunch", "Healthy Lunch");
+        Recipe r3 = new Recipe("potatoes", "boil the potatoes", "dinner", "boiled potatoes");
+        List<Recipe> rList = new ArrayList<>();
+        rList.add(r1);
+        rList.add(r2);
+        rList.add(r3);
+        
+        MockView view = new MockView(rList);
+        List<Recipe> rList1 = view.getListOfRecipes();
+        
+        assertEquals(rList1.get(0).getCategory(), "breakfast");
+        assertEquals(rList1.get(1).getCategory(), "lunch");
+        assertEquals(rList1.get(2).getCategory(), "dinner");
     }
 }
