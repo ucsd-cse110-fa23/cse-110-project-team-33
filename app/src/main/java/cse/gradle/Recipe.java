@@ -20,6 +20,8 @@ public class Recipe {
     private Date date;
     private UUID id;
 
+    private String imgURLString;
+
     // empty constructor
     public Recipe() {
         this.ingredients = "";
@@ -86,6 +88,8 @@ public class Recipe {
         this.id = id;
     }
 
+    
+
     // getters
     public String getIngredients() {
         return ingredients;
@@ -111,6 +115,10 @@ public class Recipe {
         return id;
     }
 
+    public String getImgUrl(){
+        return imgURLString;
+    }
+
     // setters
     public void setIngredients(String newIngredients) {
         ingredients = newIngredients;
@@ -134,6 +142,10 @@ public class Recipe {
 
     public void setId(UUID newId) {
         id = newId;
+    }
+    
+    public void setImgURL(String imgURL){
+        this.imgURLString = imgURL;
     }
 
     // toString method for saving to file (csv)

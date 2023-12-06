@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -239,7 +240,6 @@ class NewRecipePane extends BorderPane {
 class AppFramePopUp extends BorderPane {
     private Recipe recipe;
     private RecipeList recipeList;
-    private String imgFileName;
 
     private Button saveButton;
     private Button deleteButton;
@@ -256,14 +256,13 @@ class AppFramePopUp extends BorderPane {
     private Button regenerateButton;
 
     private ImageView imgView = new ImageView();    
-    static final String IMG_NAME = "C:\\Users\\puppy\\Documents\\Classes\\Fall_2023\\CSE_110\\Project\\cse-110-project-team-33\\app\\image.png";
+    //static final String IMG_NAME = "C:\\Users\\puppy\\Documents\\Classes\\Fall_2023\\CSE_110\\Project\\cse-110-project-team-33\\app\\image.png";
     
     // empty constructor
     // initialize pop up window here
     public AppFramePopUp(RecipeList rList) {
         this.recipe = new Recipe();
         this.recipeList = rList;
-        this.imgFileName = IMG_NAME;
 
         createImageView();
         createToolBar();
@@ -275,7 +274,6 @@ class AppFramePopUp extends BorderPane {
     public AppFramePopUp(RecipeList rList, Recipe recipe) {
         this.recipe = recipe;
         this.recipeList = rList;
-        this.imgFileName = IMG_NAME;
 
         createImageView();
         createToolBar();
@@ -395,12 +393,13 @@ class AppFramePopUp extends BorderPane {
 
     private void createImageView(){
         //image displaying stuff
-        File imgFile = new File(imgFileName);
+        //File imgFile = new File(imgFileName);
+        //URL url = new URL(imgFileName);
 
-        if(imgFile.isFile()){
-            System.out.println("image file found ");
+        //if(imgFile.isFile()){
+        //    System.out.println("image file found ");
             try {
-                Image imgImage = new Image(new FileInputStream(imgFile));
+                Image imgImage = new Image(recipe.getImgUrl());
                 imgView.setImage(imgImage);
                 imgView.setFitWidth(100);
                 imgView.setFitHeight(100);
@@ -410,9 +409,9 @@ class AppFramePopUp extends BorderPane {
             } catch (Exception e) {
                 System.out.println(e);
             }            
-        } else{
-            System.out.println("Image file not found RIP");
-        }
+        //} else{
+        //    System.out.println("Image file not found RIP");
+        //}
         //vBox.getChildren().add(imgView);
     }
 

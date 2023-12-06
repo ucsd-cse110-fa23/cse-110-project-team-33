@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 
 import cse.gradle.Server.APIs.ChatGPTApiClient;
+import cse.gradle.Server.APIs.DallEApiClient;
 import cse.gradle.Server.APIs.WhisperApiClient;
 
 import java.net.URI;
@@ -272,6 +273,8 @@ public class Model {
         return response;
     }
 
+
+
     public String performFileWriteRequest(String audioFile) throws MalformedURLException, IOException {
         final String PUT_URL = "http://localhost:8100/generate?audioFile=" + audioFile;
         final File uploadFile = new File(audioFile);
@@ -345,5 +348,42 @@ public class Model {
         System.out.println("PARSED RECIPE: " + Recipe.parseRecipeFromString(generatedRecipe));
 
         return Recipe.parseRecipeFromString(generatedRecipe);
+    }
+
+    public static String performImageGenerateRequest(String prompt){
+        try {
+            String urlString = "http://localhost:8100/";
+            URL url = new URI(urlString).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+
+            //String jsonUser = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+            String jsonImageName = "{\"dallEPrompt\": \"" + prompt + "\"}";
+
+            try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
+                out.write(jsonImageName);
+            }
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                // Set the Model's userId to the one returned by the server if the registration
+                // was successful
+                //if (!response.toString().contains("Error")) {
+                 //   this.userId = response.toString();
+                //}
+                return response.toString();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
+            return "Error: " + ex.getMessage();
+        }
     }
 }

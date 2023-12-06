@@ -147,10 +147,13 @@ public class Controller {
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
             Recipe newRecipe = null;
+            String imageURLString = null;
             try {
                 model.performFileWriteRequest("mealType.wav");
                 model.performFileWriteRequest("ingredients.wav");
                 newRecipe = model.performRecipeGenerateRequest();
+                imageURLString = model.performImageGenerateRequest(newRecipe.getName());
+                newRecipe.setImgURL(imageURLString);
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
