@@ -9,13 +9,13 @@ package cse.gradle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 public class Feature20Tests extends HTTPServerTests{
-    /*
-     * --------------------------------- UNIT TESTS ---------------------------------
-     */
-
+    /* --------------------------------- UNIT TESTS --------------------------------- */
     // Login to test user
     @Test
     public void testLoginEndpoint() {
@@ -24,4 +24,57 @@ public class Feature20Tests extends HTTPServerTests{
         assertEquals(MockModel.mockUserId, retrievedUserId);
     }
 
+    /* --------------------------------- BDD TESTS --------------------------------- */
+    @Test
+    public void testLoginExistingRecipeList() {
+        // Create a new List<Recipe> with 3 recipes
+        List<Recipe> recipes = new ArrayList<Recipe>();
+        
+        recipes.add(new Recipe("eggs, bacon", "cook for 10 minutes", "breakfast", "American breakfast"));
+        recipes.add(new Recipe("salmon, salad", "cook for 20 minutes", "lunch", "Healthy Lunch"));
+        recipes.add(new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes"));
+
+
+        // Create a new Mock Model that accesses test_user in the database
+        Model model = new MockModel();
+
+        // Log into test_user's account
+        model.performLoginRequest("test_user", "password");
+
+        // Add the recipes to the database
+        for (Recipe recipe : recipes) {
+            model.postRecipe(recipe);
+        }
+
+        // Get all the recipes from the database sorted alphabetically A-Z (not case sensitive)
+        String getAllResponse = model.getRecipeList("z-a", "");
+
+        // Delete the recipes from the database
+        for (Recipe recipe : recipes) {
+            model.deleteRecipe(recipe.getId().toString());
+        }
+
+        // Parse the getAllResponse into a List<Recipe>
+        List<Recipe> recipeArrayList = Recipe.parseRecipeListFromString(getAllResponse);
+
+        System.out.println("recipeArrayList: " + recipeArrayList);
+        
+        // Check that the recieved recipes matches the test_user's list of recipes
+        assertEquals(3, recipeArrayList.size());
+        assert(recipeArrayList.get(2).getName().equals("American breakfast"));
+        // System.out.println(recipeArrayList.get(1).getName());
+        assert(recipeArrayList.get(1).getName().equals("boiled potatoes"));
+        assert(recipeArrayList.get(0).getName().equals("Healthy Lunch"));
+    }
+
+    @Test
+    public void testLoginIncorrectCredentials() {
+        Model model = new MockModel();
+
+        // Attempt to log in with incorrect credentials
+        String result = model.performLoginRequest("incorrect_user", "incorrect_password");
+
+        // Check that the result contains an error message
+        assertEquals(true, result.contains("Error!"));
+    }
 }
