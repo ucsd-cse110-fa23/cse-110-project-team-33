@@ -78,6 +78,7 @@ public class View implements ViewSubject {
 
     public void displayIncorrectPassword() {
         UserLogin userLoginAccount = new UserLogin(this);
+        userLoginAccount.displayIncorrectPassword();
         mainLoginScene = new Scene(userLoginAccount, 500, 600);
         displayScene(mainLoginScene);
     }
@@ -103,7 +104,6 @@ public class View implements ViewSubject {
 
     public void UserLoginConstructor() {
         UserLogin userLoginAccount = new UserLogin(this);
-        userLoginAccount.UserLoginConstructor();
         mainLoginScene = new Scene(userLoginAccount, 500, 600);
     }
 
@@ -446,6 +446,8 @@ public class View implements ViewSubject {
         private Button newRecipeButton;
         private Button logoutButton;
         private ComboBox<String> sortDropDown; // drop down menu for sorting recipes
+        private Button filterButton;
+        private ComboBox<String> mealTypeDropDown;
         private HBox newRecipeButtonBox;
         private HBox TitleBox;
         private HBox logoutButtonBox;
@@ -505,19 +507,46 @@ public class View implements ViewSubject {
             scrollPane.setFitToWidth(true);
             scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
+            title = new Label("Recipes");
+            TitleBox = new HBox();
+            logoutButtonBox = new HBox();
+            topBox = new VBox();
+            title.setStyle("-fx-font-size: 24;");
+            logoutButton = new Button("Logout");
+            // String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
+            // mealTypeDropDown = new
+            // ChoiceBox<>(FXCollections.observableArrayList(Constants.mealTypes));
+            title.setAlignment(Pos.CENTER);
+            logoutButton.setAlignment(Pos.CENTER);
+            TitleBox.setAlignment(Pos.TOP_CENTER);
+            TitleBox.getChildren().add(title);
+            logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
+            logoutButtonBox.getChildren().addAll(mealTypeDropDown, logoutButton);
+            topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+            this.setTop(topBox);
+
             // make "New Recipe" button
             newRecipeButton = new Button("New Recipe");
             newRecipeButton.setPrefSize(100, 20);
+            // sets style of button
             newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+            newRecipeButton.setOnAction(e -> {
+                this.appScenes.displayNewRecipeScene();
+                System.out.println("New Recipe pressed");
+            });
 
-            for (ViewObserver obs : obsList) {
-                obs.setRecipeListListeners(this, appScenes);
-            }
+            logoutButton.setOnAction(e -> {
+                this.appScenes.displayUserLoginConstructor();
+            });
 
             newRecipeButtonBox = new HBox();
             newRecipeButtonBox.setAlignment(Pos.CENTER);
             newRecipeButtonBox.getChildren().add(newRecipeButton);
             this.setBottom(newRecipeButtonBox);
+
+            for (ViewObserver obs : obsList) {
+                obs.setRecipeListListeners(this, appScenes);
+            }
         }
 
         public RecipeList(View appScenes, List<Recipe> rList) {
@@ -541,19 +570,39 @@ public class View implements ViewSubject {
             refresh();
 
             Label title = new Label("Recipes");
-            title.setStyle("-fx-font-size: 24;");
             title.setAlignment(Pos.CENTER);
+            title.setStyle("-fx-font-size: 24;");
+
+            filterButton = new Button("Filter");
+            // Label choiceBoxLabel = new Label(" by: ");
+            // choiceBoxLabel.setStyle("-fx-font-size: 15;");
+            // choiceBoxLabel.setAlignment(Pos.CENTER);
+            // mealTypeDropDown = new
+            // ChoiceBox<>(FXCollections.observableArrayList(mealTypes));
+            mealTypeDropDown = new ComboBox<String>();
+            mealTypeDropDown.getItems().addAll(Constants.mealTypes);
+            mealTypeDropDown.setValue(Constants.defaultMealType);
+
+            Label filterLabel = new Label("Filter by:");
+            filterLabel.setAlignment(Pos.CENTER_LEFT);
+            filterLabel.setPadding(new Insets(0, 10, 0, 0));
+
+            HBox filterBox = new HBox();
+            filterBox.setAlignment(Pos.CENTER_LEFT);
+            filterBox.getChildren().addAll(filterLabel, mealTypeDropDown);
 
             logoutButton = new Button("Logout");
             logoutButton.setAlignment(Pos.CENTER);
 
             TitleBox = new HBox();
+            filterButton.setAlignment(Pos.CENTER);
             TitleBox.setAlignment(Pos.TOP_CENTER);
             TitleBox.getChildren().add(title);
 
             logoutButtonBox = new HBox();
             logoutButtonBox.setAlignment(Pos.TOP_RIGHT);
-            logoutButtonBox.getChildren().add(logoutButton);
+            logoutButtonBox.getChildren().addAll(logoutButton);
+            // logoutButtonBox.getChildren().add(logoutButton);
 
             // Create a ComboBox with sorting options
             sortDropDown = new ComboBox<>();
@@ -571,12 +620,15 @@ public class View implements ViewSubject {
             // ToolBar to hold the sortBox and logoutButtonBox
             HBox spacer = new HBox();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            ToolBar toolBar = new ToolBar(sortBox, spacer, logoutButtonBox);
+            ToolBar toolBar = new ToolBar(sortBox, filterBox, spacer, logoutButtonBox);
             toolBar.setPadding(new Insets(5, 10, 5, 10));
 
             topBox = new VBox();
             topBox.getChildren().addAll(TitleBox, toolBar);
             this.setTop(topBox);
+
+            // topBox.getChildren().addAll(TitleBox, logoutButtonBox);
+            // this.setTop(topBox);
 
             ScrollPane scrollPane = new ScrollPane(vBox);
             this.setCenter(scrollPane);
@@ -587,8 +639,7 @@ public class View implements ViewSubject {
             // make "New Recipe" button
             newRecipeButton = new Button("New Recipe");
             newRecipeButton.setPrefSize(100, 20);
-            newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets
-
+            newRecipeButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
             newRecipeButtonBox = new HBox();
             newRecipeButtonBox.setAlignment(Pos.CENTER);
             newRecipeButtonBox.getChildren().add(newRecipeButton);
@@ -633,6 +684,14 @@ public class View implements ViewSubject {
 
         public ComboBox<String> getSortDropDown() {
             return sortDropDown;
+        }
+
+        public Button getFilterButton() {
+            return filterButton;
+        }
+
+        public ComboBox<String> getMealTypeDropDown() {
+            return mealTypeDropDown;
         }
 
         // adds button to the end of button array
@@ -772,9 +831,12 @@ public class View implements ViewSubject {
         private Button CreateButton;
         private Button LoginButton;
         private CheckBox autoLoginButton;
+        private VBox vbox;
+        private VBox vbox2;
+        private HBox hbox;
 
         public UserLogin(View appScenes) {
-            VBox vbox = new VBox();
+            vbox = new VBox();
             vbox.setAlignment(Pos.CENTER);
 
             Label title = new Label("Login");
@@ -801,7 +863,7 @@ public class View implements ViewSubject {
             autoLoginButton.setPrefSize(200, 20);
             autoLoginButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
 
-            HBox hbox = new HBox();
+            hbox = new HBox();
             hbox.setAlignment(Pos.CENTER);
             hbox.getChildren().addAll(CreateButton, LoginButton);
 
@@ -811,13 +873,23 @@ public class View implements ViewSubject {
             }
             vbox.getChildren().addAll(usernameField, passwordField, autoLoginButton);
 
-            VBox vbox2 = new VBox();
+            vbox2 = new VBox();
             vbox2.setAlignment(Pos.TOP_CENTER);
             vbox2.getChildren().addAll(title);
 
             this.setCenter(vbox);
             this.setBottom(hbox);
             this.setTop(vbox2);
+        }
+
+        public void displayIncorrectPassword() {
+            Label incorrectPassword = new Label("Incorrect Password");
+            incorrectPassword.setStyle("-fx-font-size: 14;");
+
+            // add label to hbox
+            vbox.getChildren().add(incorrectPassword);
+            // add hbox to bottom of borderpane
+            this.setCenter(vbox);
         }
 
         public TextField getUsernameField() {

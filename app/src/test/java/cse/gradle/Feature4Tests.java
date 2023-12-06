@@ -35,7 +35,7 @@ class Feature4Tests {
         Recipe r2 = mock.generateNewRecipe("lunch", "salmon, salad", "cook for 20 minutes", "Healthy Lunch");        
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(r2);
-        MockView view = new MockView(list);;
+        MockView view = new MockView(list);
         Recipe recipe = view.getRecipeList().get(0);
         assertEquals("lunch", recipe.getCategory());
         assertEquals("salmon, salad", recipe.getIngredients());

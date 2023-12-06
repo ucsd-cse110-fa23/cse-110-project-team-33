@@ -49,19 +49,14 @@ public class Controller implements ModelObserver, ViewObserver {
                 if (postResponse.equals("Error: Server down")) {
                     appScenes.displayServerDownConstructor();
                     return false;
-                } else if (postResponse.contains("Incorrect password")) {
-                    appScenes.displayIncorrectPassword();
-                    return false;
-                } else {
-                    reader.close();
-                    return loginUserWithButtonCheck(username, password, appScenes, loginPage);
                 }
-            } else {
-                return loginUserWithButtonCheck(username, password, appScenes, loginPage);
+                reader.close();
+                return true;
             }
-            // Get all recipes from the database and display
-            // When logging into account, start with default sorted list
-            syncRecipeListWithModel(appScenes, Constants.defaultSortOption);
+            reader.close();
+            return loginUserWithButtonCheck(username, password, appScenes, loginPage);
+        } else {
+            return loginUserWithButtonCheck(username, password, appScenes, loginPage);
         }
     }
 
@@ -83,6 +78,8 @@ public class Controller implements ModelObserver, ViewObserver {
             return false;
         } else if (postResponse.contains("Incorrect password")) {
             appScenes.displayIncorrectPassword();
+            return false;
+        } else if (postResponse.contains("does not exist")) {
             return false;
         }
         return true;
@@ -150,11 +147,11 @@ public class Controller implements ModelObserver, ViewObserver {
                 appScenes.displayServerDownConstructor();
                 return;
             }
-            
+
             String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
             syncRecipeListWithModel(appScenes, sortOption, filterOption);
-            
+
             Stage current = (Stage) popUp.getScene().getWindow();
             current.close();
         } catch (Exception e) {
@@ -233,31 +230,35 @@ public class Controller implements ModelObserver, ViewObserver {
         });
 
         // Display cancelScene when backButton is pushed
-        createPane.getBackButton().setOnAction(e->
-    {
+        createPane.getBackButton().setOnAction(e -> {
             appScenes.displayUserLoginConstructor();
         });
     }
 
     // Sets the listensers for all the buttons within the account login window
-    public void setLoginWindowListeners(UserLogin userPane, View appScenes) {
+    public void setLoginWindowListeners(UserLogin loginPage, View appScenes) {
 
-        userPane.getCreateButton().setOnAction(e -> {
+        loginPage.getCreateButton().setOnAction(e -> {
             appScenes.displayUserAccountSceneConstructor();
         });
 
         // When the login button is pressed, make a request to the server to login the
         // user
         // then make a get all recipes request and display the recipe list scene
-        userPane.getLoginButton().setOnAction(e -> {
-            String username = userPane.getUsernameField().getText().toString();
-            String password = userPane.getPasswordField().getText().toString();
-            boolean loginResult = loginUser(username, password, appScenes);
-
-            // Get all recipes from the database and display
-            // When logging into account, start with default sorted list
-            if (loginResult) {
-                syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+        loginPage.getLoginButton().setOnAction(e -> {
+            String username = loginPage.getUsernameField().getText().toString();
+            String password = loginPage.getPasswordField().getText().toString();
+            boolean loginResult;
+            try {
+                loginResult = loginUser(username, password, appScenes, loginPage);
+                // Get all recipes from the database and display
+                // When logging into account, start with default sorted list
+                if (loginResult) {
+                    syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+                }
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
             }
         });
     }
@@ -281,6 +282,7 @@ public class Controller implements ModelObserver, ViewObserver {
         // button
         recipeList.getNewRecipeButton().setOnAction(e -> {
             appScenes.displayNewRecipeScene();
+            System.out.println("New Recipe pressed");
         });
 
         recipeList.getLogoutButton().setOnAction(e -> {

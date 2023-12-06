@@ -36,7 +36,7 @@ class Feature3Tests {
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(r1);
         list.add(r2);
-        MockView view = new MockView(list);;
+        MockView view = new MockView(list);
         assertEquals("breakfast", r1.getCategory());
         assertEquals("eggs, bacon", r1.getIngredients());
         assertEquals("cook for 10 minutes", r1.getInstructions());
