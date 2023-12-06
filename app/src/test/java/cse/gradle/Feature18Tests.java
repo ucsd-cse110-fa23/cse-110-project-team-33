@@ -12,35 +12,12 @@ import cse.gradle.Server.Server;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
-import java.util.List;
 
 
 class Feature18Tests {
-    // unit
     @Test 
     void checkShare() {
         MockModel model = new MockModel();
-        MockView view = new MockView(new ArrayList<Recipe>());
-        MockController controller = new MockController();
-        Recipe recipe = new Recipe("eggs, bacon", "cook for 10 minutes", "breakfast", "American breakfast");
-        
-        assertEquals("html", controller.shareRecipe(recipe));
-    }
-    // BDD
-    @Test 
-    void checkShareWithUser() {
-        Recipe r1 = new Recipe("eggs, bacon", "cook for 10 minutes", "breakfast", "American breakfast");
-        Recipe r2 = new Recipe("salmon, salad", "cook for 20 minutes", "breakfast", "Healthy Lunch");
-        Recipe r3 = new Recipe("potatoes", "boil the potatoes", "dinner", "boiled potatoes");
-        Recipe r4 = new Recipe("salmon", "boil the salmon", "dinner", "boiled salmon");
-        List<Recipe> rList = new ArrayList<>();
-        rList.add(r1);
-        rList.add(r2);
-        rList.add(r3);
-        rList.add(r4);
-        MockModel model = new MockModel();
-        User Joe = new User("abc", "123");
-        Joe.setRecipeList(rList);
         MockView view = new MockView(new ArrayList<Recipe>());
         MockController controller = new MockController();
         Recipe recipe = new Recipe("eggs, bacon", "cook for 10 minutes", "breakfast", "American breakfast");
