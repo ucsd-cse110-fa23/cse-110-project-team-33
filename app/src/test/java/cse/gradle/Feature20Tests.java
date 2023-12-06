@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cse.gradle.Server.Server;
+
 public class Feature20Tests extends HTTPServerTests{
     /* --------------------------------- UNIT TESTS --------------------------------- */
     // Login to test user
@@ -22,6 +24,32 @@ public class Feature20Tests extends HTTPServerTests{
         Model model = new MockModel();
         String retrievedUserId = model.performLoginRequest("test_user", "password");
         assertEquals(MockModel.mockUserId, retrievedUserId);
+    }
+
+    @Test 
+    void checkLoginError() {
+        Server.stopServer();
+
+        Model model = new MockModel();
+        String response = model.performLoginRequest("test_user", "password");
+        String error = "Error: Server down";
+        assertEquals(error, response);
+    }
+
+    // BDD TEST
+    @Test 
+    void completeServerErrorTest() {
+        // login with test user
+        Model model = new MockModel();
+        String retrievedUserId = model.performLoginRequest("test_user", "password");
+        assertEquals(MockModel.mockUserId, retrievedUserId);
+
+        // cut connection and ask for recipe
+        Server.stopServer();
+        Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
+        String response = model.postRecipe(originalRecipe);
+        String error = "Error: Server down";
+        assertEquals(error, response);
     }
 
     /* --------------------------------- BDD TESTS --------------------------------- */
