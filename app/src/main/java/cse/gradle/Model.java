@@ -23,9 +23,15 @@ import cse.gradle.Server.APIs.WhisperApiClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class Model {
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import org.json.*;
+
+public class Model implements ModelSubject {
     protected String userId;
     protected String urlString;
+    protected ArrayList<ModelObserver> obsList = new ArrayList<ModelObserver>();
 
     public Model(String urlString) {
         this.userId = null;
@@ -199,6 +205,24 @@ public class Model {
         }
     }
 
+    // Overloaded method for automatic login
+    public String performLoginRequest(File loginFile) {
+        try {
+            BufferedReader reader = new BufferedReader(
+                    new FileReader(loginFile));
+            String username = reader.readLine();
+            String password = reader.readLine();
+            //System.out.println("\n" + username + "\n");
+
+            reader.close();
+
+            return performLoginRequest(username, password);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
+    }
+
     // make a request to register a new user
     public String performRegisterRequest(String username, String password) {
         try {
@@ -270,6 +294,11 @@ public class Model {
         }
 
         return response;
+    }
+
+    @Override
+    public void register(ModelObserver obs) {
+        obsList.add(obs);
     }
 
     public String performFileWriteRequest(String audioFile) throws MalformedURLException, IOException {
