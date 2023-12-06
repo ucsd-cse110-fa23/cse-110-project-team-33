@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 
 import cse.gradle.Server.APIs.ChatGPTApiClient;
+import cse.gradle.Server.APIs.DallEApiClient;
 import cse.gradle.Server.APIs.WhisperApiClient;
 
 import java.net.URI;
@@ -294,6 +295,7 @@ public class Model implements ModelSubject {
         return response;
     }
 
+
     @Override
     public void register(ModelObserver obs) {
         obsList.add(obs);
@@ -372,5 +374,45 @@ public class Model implements ModelSubject {
         System.out.println("PARSED RECIPE: " + Recipe.parseRecipeFromString(generatedRecipe));
 
         return Recipe.parseRecipeFromString(generatedRecipe);
+    }
+
+    public String performImageGenerateRequest(String prompt){
+        try {
+            //String urlString = "http://localhost:8100/";
+            String urlString = this.urlString + "/generateImage";
+            URL url = new URI(urlString).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+
+            //String jsonUser = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+            String jsonImageName = "{\"dallEPrompt\": \"" + prompt + "\"}";
+
+            try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream())) {
+                out.write(jsonImageName);
+            }
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                // Set the Model's userId to the one returned by the server if the registration
+                // was successful
+                //if (!response.toString().contains("Error")) {
+                 //   this.userId = response.toString();
+                //}
+                System.out.println("DALLE 2 MODEL RESPONSE: " + response.toString());
+                return response.toString();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            if (ex.getMessage().contains("Connection refused")) {
+                return "Error: Server down";
+            }
+            return "Error: " + ex.getMessage();
+        }
+        
     }
 }
