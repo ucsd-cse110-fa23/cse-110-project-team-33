@@ -1,6 +1,10 @@
 package cse.gradle;
 
 import javafx.scene.Scene;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +30,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -261,181 +265,233 @@ public class View implements ViewSubject {
 
     }
 
-    class AppFramePopUp extends BorderPane {
-        private Recipe recipe;
-        private RecipeList recipeList;
+   class AppFramePopUp extends BorderPane {
+    private Recipe recipe;
+    private RecipeList recipeList;
+    private String imgFileName;
 
-        private Button saveButton;
-        private Button deleteButton;
-        private HBox buttonsBox;
+    private Button saveButton;
+    private Button deleteButton;
+    private HBox buttonsBox;
 
-        private VBox vBox;
-        private TextField nameField;
-        private TextField categoryField;
-        private TextField ingredientsField;
-        private TextArea instructionsField;
+    private VBox vBox;
+    private TextField nameField;
+    private TextField categoryField;
+    private TextField ingredientsField;
+    private TextArea instructionsField;
 
-        private HBox toolBar;
-        private Button shareButton;
+    private HBox toolBar;
+    private Button shareButton;
+    private Button regenerateButton;
 
-        // empty constructor
-        // initialize pop up window here
-        public AppFramePopUp(RecipeList rList) {
-            this.recipe = new Recipe();
-            this.recipeList = rList;
+    private ImageView imgView = new ImageView();    
+    //static final String IMG_NAME = "C:\\Users\\puppy\\Documents\\Classes\\Fall_2023\\CSE_110\\Project\\cse-110-project-team-33\\app\\image.png";
+    
+    // empty constructor
+    // initialize pop up window here
+    public AppFramePopUp(RecipeList rList) {
+        this.recipe = new Recipe();
+        this.recipeList = rList;
+        this.imgFileName = this.recipe.getImgUrl();
 
-            createFrame();
-        }
+        createImageView();
+        createToolBar();
+        createFrame();
+    }
 
-        // constructor with arguments
-        // initialize pop up window here
-        public AppFramePopUp(RecipeList rList, Recipe recipe) {
-            this.recipe = recipe;
-            this.recipeList = rList;
+    // constructor with arguments
+    // initialize pop up window here
+    public AppFramePopUp(RecipeList rList, Recipe recipe) {
+        this.recipe = recipe;
+        this.recipeList = rList;
+        this.imgFileName = this.recipe.getImgUrl();
 
-            createToolBar();
-            createFrame();
+        createImageView();
+        createToolBar();
+        createFrame();
 
-            for (ViewObserver obs : obsList) {
-                obs.setRecipePopUpListeners(this, recipeList, recipe);
-            }
-        }
-
-        private void createFrame() {
-            nameField = new TextField(recipe.getName());
-            categoryField = new TextField(recipe.getCategory());
-            ingredientsField = new TextField(recipe.getIngredients());
-            instructionsField = new TextArea(recipe.getInstructions());
-
-            vBox = new VBox();
-            vBox.setAlignment(Pos.CENTER);
-            vBox.setPrefSize(500, 20); // sets size
-            vBox.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0; -fx-font-weight: bold;"); // sets
-                                                                                                         // background
-                                                                                                         // color
-
-            nameField.setPrefSize(500, 20); // set size of text field
-            nameField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color of
-                                                                                       // texfield
-            nameField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
-
-            Label nameLabel = new Label();
-            nameLabel.setText("Recipe name: "); // create index label
-            nameLabel.setPrefSize(300, 20); // set size of Index label
-            nameLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
-            nameLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
-
-            vBox.getChildren().add(nameLabel); // add index label to task
-            vBox.getChildren().add(nameField); // add textlabel
-
-            categoryField.setPrefSize(500, 20); // set size of text field
-            categoryField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color of
-                                                                                           // texfield
-            categoryField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
-
-            Label categoryLabel = new Label();
-            categoryLabel.setText("Meal type: "); // create index label
-            categoryLabel.setPrefSize(300, 20); // set size of Index label
-            categoryLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
-            categoryLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
-
-            vBox.getChildren().add(categoryLabel); // add index label to task
-            vBox.getChildren().add(categoryField); // add textlabel
-
-            ingredientsField.setPrefSize(500, 20); // set size of text field
-            ingredientsField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color of
-                                                                                              // texfield
-            ingredientsField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
-
-            Label ingredientsLabel = new Label();
-            ingredientsLabel.setText("Ingredients: "); // create index label
-            ingredientsLabel.setPrefSize(300, 20); // set size of Index label
-            ingredientsLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
-            ingredientsLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
-
-            vBox.getChildren().add(ingredientsLabel); // add index label to task
-            vBox.getChildren().add(ingredientsField); // add textlabel
-
-            instructionsField.setPrefSize(500, 100); // set size of text field
-            instructionsField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color
-                                                                                               // of
-                                                                                               // texfield
-            instructionsField.setWrapText(true);
-            ScrollPane scrollPane = new ScrollPane(instructionsField);
-            scrollPane.setFitToHeight(true);
-            scrollPane.setFitToWidth(true);
-            scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
-
-            Label instructionsLabel = new Label();
-            instructionsLabel.setText("Instructions: "); // create index label
-            instructionsLabel.setPrefSize(300, 20); // set size of Index label
-            instructionsLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
-            instructionsLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
-
-            vBox.getChildren().add(instructionsLabel); // add index label to task
-            vBox.getChildren().add(scrollPane); // add textlabel
-
-            this.setCenter(vBox);
-
-            // Creating buttons
-            buttonsBox = new HBox();
-
-            saveButton = new Button("Save");
-            saveButton.setStyle(
-                    "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
-
-            deleteButton = new Button("Delete");
-            deleteButton.setStyle(
-                    "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
-
-            buttonsBox.getChildren().add(saveButton);
-            buttonsBox.getChildren().add(deleteButton);
-            buttonsBox.setAlignment(Pos.CENTER);
-
-            this.setBottom(buttonsBox);
-
-        }
-
-        private void createToolBar() {
-            toolBar = new HBox();
-            toolBar.setPadding(new Insets(10));
-            toolBar.setSpacing(10);
-            toolBar.setAlignment(Pos.TOP_RIGHT);
-
-            shareButton = new Button("Share");
-
-            toolBar.getChildren().add(shareButton);
-            this.setTop(toolBar);
-        }
-
-        public TextField getNameField() {
-            return nameField;
-        }
-
-        public TextField getCategoryField() {
-            return categoryField;
-        }
-
-        public TextField getIngredientsField() {
-            return ingredientsField;
-        }
-
-        public TextArea getInstructionsField() {
-            return instructionsField;
-        }
-
-        public Button getSaveButton() {
-            return saveButton;
-        }
-
-        public Button getDeleteButton() {
-            return deleteButton;
-        }
-
-        public Button getShareButton() {
-            return shareButton;
+        for (ViewObserver obs : obsList) { 
+            obs.setRecipePopUpListeners(recipeList.getView(), this, recipeList, recipe);
         }
     }
+
+    private void createFrame() {
+        nameField = new TextField(recipe.getName());
+        categoryField = new TextField(recipe.getCategory());
+        ingredientsField = new TextField(recipe.getIngredients());
+        instructionsField = new TextArea(recipe.getInstructions());
+
+        vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setPrefSize(500, 20); // sets size
+        // sets background color
+        vBox.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0; -fx-font-weight: bold;");
+
+         
+
+        nameField.setPrefSize(500, 20); // set size of text field
+        nameField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;"); // set background color of texfield
+        nameField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
+
+        Label nameLabel = new Label();
+        nameLabel.setText("Recipe name: "); // create index label
+        nameLabel.setPrefSize(300, 20); // set size of Index label
+        nameLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
+        nameLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
+
+        vBox.getChildren().add(nameLabel); // add index label to task
+        vBox.getChildren().add(nameField); // add textlabel
+
+        categoryField.setPrefSize(500, 20); // set size of text field
+        // set background color of textfield
+        categoryField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;");
+        categoryField.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
+
+        Label categoryLabel = new Label();
+        categoryLabel.setText("Meal type: "); // create index label
+        categoryLabel.setPrefSize(300, 20); // set size of Index label
+        categoryLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
+        categoryLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
+
+        vBox.getChildren().add(categoryLabel); // add index label to task
+        vBox.getChildren().add(categoryField); // add textlabel
+
+        ingredientsField.setPrefSize(500, 20); // set size of text field
+        // set background color of textfield
+        ingredientsField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;");
+        // adds some padding to the text field
+        ingredientsField.setPadding(new Insets(10, 0, 10, 0));
+
+        Label ingredientsLabel = new Label();
+        ingredientsLabel.setText("Ingredients: "); // create index label
+        ingredientsLabel.setPrefSize(300, 20); // set size of Index label
+        ingredientsLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
+        ingredientsLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
+
+        vBox.getChildren().add(ingredientsLabel); // add index label to task
+        vBox.getChildren().add(ingredientsField); // add textlabel
+
+        instructionsField.setPrefSize(500, 100); // set size of text field
+        // set background color of text field
+        instructionsField.setStyle("-fx-background-color: #ADB6BA; -fx-border-width: 2;");
+        instructionsField.setWrapText(true);
+        ScrollPane scrollPane = new ScrollPane(instructionsField);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+
+        Label instructionsLabel = new Label();
+        instructionsLabel.setText("Instructions: "); // create index label
+        instructionsLabel.setPrefSize(300, 20); // set size of Index label
+        instructionsLabel.setTextAlignment(TextAlignment.LEFT); // Set alignment of index label
+        instructionsLabel.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
+
+        vBox.getChildren().add(instructionsLabel); // add index label to task
+        vBox.getChildren().add(scrollPane); // add textlabel
+
+        this.setCenter(vBox);
+
+        // Creating buttons
+        buttonsBox = new HBox();
+
+        saveButton = new Button("Save");
+        saveButton.setStyle(
+                "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
+
+        deleteButton = new Button("Delete");
+        deleteButton.setStyle(
+                "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
+
+        regenerateButton = new Button("Regenerate Recipe");
+        regenerateButton.setStyle(
+                "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 20 arial;");
+
+        buttonsBox.getChildren().add(saveButton);
+        buttonsBox.getChildren().add(deleteButton);
+        buttonsBox.getChildren().add(regenerateButton);
+        buttonsBox.setAlignment(Pos.CENTER);
+
+        this.setBottom(buttonsBox);
+    }
+
+    private void createImageView(){
+        //image displaying stuff
+        //File imgFile = new File(imgFileName);
+        //URL url = new URL(imgFileName);
+
+        //if(imgFile.isFile()){s
+        //    System.out.println("image file found ");
+            try {
+                Image imgImage = new Image(imgFileName);
+                imgView.setImage(imgImage);
+                imgView.setFitWidth(100);
+                imgView.setFitHeight(100);
+                imgView.setPreserveRatio(true);
+                
+                this.setTop(imgView);
+            } catch (Exception e) {
+                System.out.println(e);
+            }            
+        //} else{
+        //    System.out.println("Image file not found RIP");
+        //}
+        //vBox.getChildren().add(imgView);
+    }
+
+    private void createToolBar() {
+        toolBar = new HBox();
+        toolBar.setPadding(new Insets(10));
+        toolBar.setSpacing(10);
+        toolBar.setAlignment(Pos.TOP_RIGHT);
+
+        shareButton = new Button("Share");
+
+        toolBar.getChildren().add(imgView);
+        toolBar.getChildren().add(shareButton);
+        this.setTop(toolBar);
+    }
+
+    public TextField getNameField() {
+        return nameField;
+    }
+
+    public TextField getCategoryField() {
+        return categoryField;
+    }
+
+    public TextField getIngredientsField() {
+        return ingredientsField;
+    }
+
+    public TextArea getInstructionsField() {
+        return instructionsField;
+    }
+
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
+    public Button getDeleteButton() {
+        return deleteButton;
+    }
+
+    public Button getShareButton() {
+        return shareButton;
+    }
+
+    public Button getRegenerateButton(){
+        return regenerateButton;
+    }
+    public ImageView getImageView(){
+        return imgView;
+    }
+    public Recipe getRecipe(){
+        return recipe;
+    }
+    public void setRecipe(Recipe r){
+        this.recipe = r;
+    }
+}
 
     class RecipeList extends BorderPane {
         public View appScenes;
@@ -648,6 +704,10 @@ public class View implements ViewSubject {
             for (ViewObserver obs : obsList) {
                 obs.setRecipeListListeners(this, appScenes);
             }
+        }
+
+        public View getView() {
+            return this.appScenes;
         }
 
         public void updateRecipeList(List<Recipe> rList) {
