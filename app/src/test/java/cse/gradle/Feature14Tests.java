@@ -37,8 +37,11 @@ class Feature14Tests {
         Recipe r2 = new Recipe("salmon, salad", "cook for 20 minutes", "lunch", "Healthy Lunch");
         Recipe r3 = new Recipe("potatoes", "boil the potatoes", "dinner", "boiled potatoes");
         List<Recipe> rList = new ArrayList<>();
+        rList.add(r1);
+        rList.add(r2);
+        rList.add(r3);
         
-        View view = new MockView(rList);
+        MockView view = new MockView(rList);
         List<Recipe> rList1 = view.getListOfRecipes();
         
         assertEquals(rList1.get(0).getCategory(), "breakfast");
