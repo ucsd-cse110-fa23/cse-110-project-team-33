@@ -24,9 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
-import org.json.*;
 
 public class Model implements ModelSubject {
     protected String userId;

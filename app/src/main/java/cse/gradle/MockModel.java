@@ -9,7 +9,7 @@ public class MockModel extends Model {
 
     public MockModel() {
         // call the super constructor with the test server url
-        super(mockUrlString); 
+        super(mockUrlString);
         // hard code the user id to be the test user
         this.userId = mockUserId;
     }
