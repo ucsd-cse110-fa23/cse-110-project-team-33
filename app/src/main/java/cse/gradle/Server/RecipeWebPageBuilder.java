@@ -14,7 +14,7 @@ public class RecipeWebPageBuilder implements WebPageBuilder {
 
     private void appendStyles() {
         webpage.append("<style>\n");
-        
+
         webpage.append("body {\n");
         webpage.append("    font-family: 'Arial', sans-serif;\n");
         webpage.append("    background-color: #f4f4f4;\n");
@@ -37,31 +37,31 @@ public class RecipeWebPageBuilder implements WebPageBuilder {
 
     private String buildRecipeDisplay() {
         webpage
-            .append("<html>\n")
-            .append("<head>\n")
-            .append("<title>" + recipe.getName() + "</title>\n");
+                .append("<html>\n")
+                .append("<head>\n")
+                .append("<title>" + recipe.getName() + "</title>\n");
 
         // Append styles
         appendStyles();
 
         webpage
-            .append("</head>\n")
-            .append("<body>\n");
+                .append("</head>\n")
+                .append("<body>\n");
 
         // Display the recipe name as the title of the webpage
         webpage.append("<h1>" + recipe.getName() + "</h1>\n");
 
         // Display the recipe category
         webpage.append("<h2>Category</h2>\n")
-            .append("<p>" + recipe.getCategory() + "</p>\n");
-        
+                .append("<p>" + recipe.getCategory() + "</p>\n");
+
         // Display the recipe ingredients
         webpage.append("<h2>Ingredients</h2>\n")
-            .append("<p>" + recipe.getIngredients() + "</p>\n");
+                .append("<p>" + recipe.getIngredients() + "</p>\n");
 
         // Display the recipe instructions
         webpage.append("<h2>Instructions</h2>\n");
-        String[] instructions = recipe.getInstructions().split("\\d+\\."); 
+        String[] instructions = recipe.getInstructions().split("\\d+\\.");
         webpage.append("<ol>\n");
         for (int i = 1; i < instructions.length; i++) {
             webpage.append("<li>" + instructions[i] + "</li>\n");
@@ -69,12 +69,11 @@ public class RecipeWebPageBuilder implements WebPageBuilder {
 
         // Close remaining tags
         webpage.append("</ol>\n")
-            .append("</body>\n")
-            .append("</html>\n");
+                .append("</body>\n")
+                .append("</html>\n");
 
         return webpage.toString();
     }
-
 
     public String getWebpage() {
         return buildRecipeDisplay();

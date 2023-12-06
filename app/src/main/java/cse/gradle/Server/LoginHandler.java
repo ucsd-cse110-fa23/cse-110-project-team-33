@@ -6,9 +6,6 @@ import com.sun.net.httpserver.HttpHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cse.gradle.Recipe;
-import cse.gradle.User;
-
 import java.io.*;
 import java.util.*;
 
@@ -90,7 +87,7 @@ public class LoginHandler implements HttpHandler {
             if (user != null) {
                 // If the user exists, check if the password is correct
                 if (user.get("password").equals(password)) {
-                    // If the password is correct, return the user's id 
+                    // If the password is correct, return the user's id
                     return user.get("userId").toString();
                 } else {
                     // If the password is incorrect, return an error message
@@ -107,7 +104,6 @@ public class LoginHandler implements HttpHandler {
             e.printStackTrace();
         }
         return response;
-    } 
-
+    }
 
 }

@@ -1,6 +1,5 @@
 package cse.gradle;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -197,11 +196,18 @@ public class Controller implements ModelObserver, ViewObserver {
         });
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
-            // TODO: replace with using Model
-            Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
+            Recipe newRecipe = null;
+            try {
+                model.performFileWriteRequest("mealType.wav");
+                model.performFileWriteRequest("ingredients.wav");
+                newRecipe = model.performRecipeGenerateRequest();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
 
             // Save the new recipe to the database
             String postResponse = model.postRecipe(newRecipe);
+            System.out.println(postResponse);
 
             // Update recipeList to reflect the state of the database
             // TODO: Refactor into a method so we can DRY
@@ -242,8 +248,7 @@ public class Controller implements ModelObserver, ViewObserver {
             appScenes.displayUserAccountSceneConstructor();
         });
 
-        // When the login button is pressed, make a request to the server to login the
-        // user
+        // When the login button is pressed, make a request to the server to login the user
         // then make a get all recipes request and display the recipe list scene
         loginPage.getLoginButton().setOnAction(e -> {
             String username = loginPage.getUsernameField().getText().toString();
@@ -304,16 +309,6 @@ public class Controller implements ModelObserver, ViewObserver {
             String sortOption = recipeList.getSortDropDown().getValue();
             syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
-
-        // recipeList.getMealTypeChoiceBox().getSelectionModel().selectedIndexProperty().addListener(
-        // (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
-        // // store selected mealtype
-        // recipeList.getFilterButton().setOnAction(e -> {
-        // String chosenMeal = (recipeList.getMealTypes()[new_val.intValue()]);
-
-        // });
-
-        // });
     }
 
     private void syncRecipeListWithModel(View appScenes, String sortOption, String filterOption) {
@@ -329,4 +324,16 @@ public class Controller implements ModelObserver, ViewObserver {
         appScenes.updateRecipeListView(recipeArrayList);
         appScenes.displayRecipeListScene();
     }
+
+
+    // TODO: Replace this method with an API call to the HTTP server using Model
+    void handleRegenerateButton(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList){
+        Recipe newRecipe = new RecipeGenerator().regenerateRecipe(recipe);
+        popUp.getNameField().setText(newRecipe.getName());
+        popUp.getCategoryField().setText(newRecipe.getCategory());
+        popUp.getIngredientsField().setText(newRecipe.getIngredients());
+        popUp.getInstructionsField().setText(newRecipe.getInstructions());
+        rList.refresh();
+    }
 }
+

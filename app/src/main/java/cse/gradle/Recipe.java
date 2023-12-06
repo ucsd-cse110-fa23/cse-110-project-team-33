@@ -3,14 +3,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Date;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import org.bson.Document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -166,25 +164,10 @@ public class Recipe {
     }
 
     // parse method for populating a recipe from a database document
-    public static Recipe parseRecipeFromDocument(Document result) {
+    public static Recipe parseRecipeFromDocument(Document recipe) {
 
-        Recipe recipe = new Recipe();
-        //DateFormat format = DateFormat.getDateInstance();
-        //SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        String resultString = result.toJson().toString();
-        /*
-        try {
-            recipe.setIngredients(result.getString("ingredients"));
-            recipe.setInstructions(result.getString("instructions"));
-            recipe.setCategory(result.getString("category"));
-            recipe.setName(result.getString("name"));
-            recipe.setDate(format.parse(result.getString("date")));
-            recipe.setId(UUID.fromString(result.getString("id")));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-       */
-        return parseRecipeFromString(resultString);
+        String recipeString = recipe.toJson().toString();
+        return parseRecipeFromString(recipeString);
     }
 
     // static parse method for populating a List<Recipe> from a JSON string
@@ -198,13 +181,9 @@ public class Recipe {
                     recipeArrayList.add(parseRecipeFromString(objNode.toString()));
                 }
             }
-
-            //ArrayList<Recipe> recipeArrayList = (ArrayList<Recipe>)objectMapper.readValue(json, new TypeReference<List<Recipe>>() {});
-            
             
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            //return null;
         }
         return recipeArrayList;
     }
@@ -228,7 +207,7 @@ public class Recipe {
             JsonNode jsonNode = objectMapper.readTree(json);
 
             Date tempDate = new Date();
-            //DateFormat format = DateFormat.getDateInstance();
+            // DateFormat format = DateFormat.getDateInstance();
             SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
             // Extract individual fields from the JSON
             String ingredients = jsonNode.has("ingredients") ? jsonNode.get("ingredients").asText() : "";

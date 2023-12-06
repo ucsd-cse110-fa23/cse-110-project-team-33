@@ -1,15 +1,21 @@
 package cse.gradle;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Files;
 
 import cse.gradle.Server.APIs.ChatGPTApiClient;
 import cse.gradle.Server.APIs.WhisperApiClient;
@@ -102,12 +108,14 @@ public class Model implements ModelSubject {
         }
     }
 
-    // Calls the performRecipeRequest method with the GET method 
+    // Calls the performRecipeRequest method with the GET method
     public String getRecipeList(String sortOption, String filterOption) {
         try {
-            
-            // Builds a URL string in the format http://localhost:8100/recipe?userId=123&sort=a-z&filter=Breakfast
-            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption + "&filter=" + filterOption;
+
+            // Builds a URL string in the format
+            // http://localhost:8100/recipe?userId=123&sort=a-z&filter=Breakfast
+            String recipeRequestURL = urlString + "/recipe?userId=" + userId + "&sort=" + sortOption + "&filter="
+                    + filterOption;
 
             URL url = new URI(recipeRequestURL).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -252,28 +260,30 @@ public class Model implements ModelSubject {
         }
     }
 
-    // TODO: Move this logic to execute on server (in GenerateRecipeHandler's handlePost())
+    // TODO: Move this logic to execute on server (in GenerateRecipeHandler's
+    // handlePost())
     // IN FUTURE IMPLEMENTATION, this method:
-    // SENDS meal type and ingredients audio files in a single request, 
+    // SENDS meal type and ingredients audio files in a single request,
     // RECEIVES String transcript for each audio file
-    public static String[] performAudioTranscriptionRequest(String mealTypeFilePath, String ingredientsFilePath)
+    public static String[] performAudioTranscriptionRequest(String mealTypeFile, String ingredientsFile)
             throws IOException, URISyntaxException {
-                
+
         String[] response = new String[2];
 
         WhisperApiClient whisperApi = new WhisperApiClient();
-        response[0] = whisperApi.generateResponse(mealTypeFilePath);
-        response[1] = whisperApi.generateResponse(ingredientsFilePath);
+        response[0] = whisperApi.generateResponse(mealTypeFile);
+        response[1] = whisperApi.generateResponse(ingredientsFile);
 
         return response;
     }
 
-    // TODO: Move this logic to execute on server (in generateRecipeHandler's handlePost())
+    // TODO: Move this logic to execute on server (in generateRecipeHandler's
+    // handlePost())
     // IN FUTURE IMPLEMENTATION, this method:
     // SENDS 2 String audio transcriptions (meal type and ingredients),
     // RECEIVES JSONified recipe
     public static String[] performRecipeGenerationRequest(String mealType, String ingredients) {
-        
+
         String[] response = new String[4];
 
         try {
@@ -285,13 +295,84 @@ public class Model implements ModelSubject {
 
         return response;
     }
-    // public static String performRecipeGenerationRequest(String audioFilePath) {
-        
-    // }
 
     @Override
     public void register(ModelObserver obs) {
         obsList.add(obs);
     }
 
+    public String performFileWriteRequest(String audioFile) throws MalformedURLException, IOException {
+        final String PUT_URL = "http://localhost:8100/generate?audioFile=" + audioFile;
+        final File uploadFile = new File(audioFile);
+
+        String boundary = Long.toHexString(System.currentTimeMillis());
+        String CRLF = "\r\n";
+        String charset = "UTF-8";
+        URL url = new URL(PUT_URL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+        try (
+                OutputStream output = connection.getOutputStream();
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);) {
+            writer.append("--" + boundary).append(CRLF);
+            writer.append(
+                    "Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + uploadFile.getName() + "\"")
+                    .append(CRLF);
+            writer.append("Content-Length: " + uploadFile.length()).append(CRLF);
+            writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(uploadFile.getName())).append(CRLF);
+            writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+            writer.append(CRLF).flush();
+            Files.copy(uploadFile, output);
+            output.flush();
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                return response.toString();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return "Error: " + ex.getMessage();
+            }
+        }
+    }
+
+    // sets request method to POST -> reads in the JSON recipe received from the
+    // server -> parses JSON recipe into Recipe object and returns the Recipe to
+    // Controller
+    public Recipe performRecipeGenerateRequest() throws URISyntaxException, IOException {
+        final String POST_URL = "http://localhost:8100/generate";
+        URL url = new URI(POST_URL).toURL();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+
+        String generatedRecipe = "";
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            generatedRecipe = response.toString();
+            System.out.println(generatedRecipe);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            if (exception.getMessage().contains("Connection refused")) {
+                System.out.println("Error: Server down");
+            }
+            System.out.println("Error: " + exception.getMessage());
+        }
+
+        System.out.println("GENERATED JSON RECIPE: " + generatedRecipe);
+        System.out.println("PARSED RECIPE: " + Recipe.parseRecipeFromString(generatedRecipe));
+
+        return Recipe.parseRecipeFromString(generatedRecipe);
+    }
 }
