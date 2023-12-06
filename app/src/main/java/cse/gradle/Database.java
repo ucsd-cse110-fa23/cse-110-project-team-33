@@ -1,7 +1,5 @@
 package cse.gradle;
 
-import java.util.List;
-
 public interface Database {
 
     public String readDatabase();

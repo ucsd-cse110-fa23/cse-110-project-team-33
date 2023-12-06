@@ -1,6 +1,5 @@
 package cse.gradle.Server;
 
-
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -10,7 +9,6 @@ import java.util.List;
 
 import org.bson.Document;
 import static com.mongodb.client.model.Filters.*;
-
 
 public class MongoDB {
     private String uri;
@@ -61,10 +59,11 @@ public class MongoDB {
     // find one document that matches key-value pair
     // if no document is found, return null
     public Document findOne(String keyUsername, String valueUsername, String keyPassword, String valuePassword) {
-        Document document = collection.find(and(eq(keyUsername, valueUsername), eq(keyPassword, valuePassword))).first();
+        Document document = collection.find(and(eq(keyUsername, valueUsername), eq(keyPassword, valuePassword)))
+                .first();
         if (document == null) {
-            System.out.println("No document found with " + keyUsername + " = " + valueUsername + 
-                               " and " + keyPassword + " = " + valuePassword);
+            System.out.println("No document found with " + keyUsername + " = " + valueUsername +
+                    " and " + keyPassword + " = " + valuePassword);
             return null;
         }
         System.out.println("Found document: " + document.toJson());
@@ -77,12 +76,15 @@ public class MongoDB {
         System.out.println("Updated document: " + document.toJson());
     }
 
-
     /*
      * Pushes a new document to a list in a document
+     * 
      * @param key: the key of the document to update
+     * 
      * @param value: the value of the document to update
+     * 
      * @param listName: the name of the list in the document to push to
+     * 
      * @param newDocument: the document to push to the list
      */
     public void pushToDocumentList(String key, String value, String listName, Document newDocument) {
@@ -120,8 +122,7 @@ public class MongoDB {
     public void close() {
         mongoClient.close();
         db = null;
-        collection = null;  
+        collection = null;
     }
 
-    
 }

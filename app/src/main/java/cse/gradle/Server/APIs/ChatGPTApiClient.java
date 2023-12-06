@@ -18,10 +18,10 @@ public class ChatGPTApiClient implements ChatGPTApi {
     private static final int MAX_TOKENS = 100;
 
     public ChatGPTApiClient() {
-        
+
     }
 
-    public String[] generateResponse(String mealType, String ingredients) 
+    public String[] generateResponse(String mealType, String ingredients)
             throws IOException, InterruptedException, IllegalArgumentException {
 
         String[] response = new String[4];
@@ -42,7 +42,10 @@ public class ChatGPTApiClient implements ChatGPTApi {
 
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", MODEL_GPT);
-        requestBody.put("prompt", "Give a 3 to 5 word name for a " + mealType + " recipe using the following ingredients: " + ingredients + ". Output nothing but the recipe name.");
+        requestBody.put("prompt",
+                "Give a 3 to 5 word name for a " + mealType
+                        + " recipe using the following ingredients: " + ingredients
+                        + ". Output nothing but the recipe name.");
         requestBody.put("max_tokens", MAX_TOKENS);
         requestBody.put("temperature", 1.0);
 
@@ -66,16 +69,20 @@ public class ChatGPTApiClient implements ChatGPTApi {
 
         JSONArray choices = responseJSON.getJSONArray("choices");
         String title = choices.getJSONObject(0).getString("text");
-        
+
         return title;
     }
 
     public String generateInstructions(String mealType, String ingredients, String title)
             throws IOException, InterruptedException, IllegalArgumentException {
-        
+
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", MODEL_GPT);
-        requestBody.put("prompt", "Give only instructions to make a recipe for a " + mealType + " meal using only the following ingredients: " + ingredients + ". Base it on this recipe name: " + title + ". Make this concise and within 100 words");
+        requestBody.put("prompt",
+                "Give only instructions to make a recipe for a " + mealType
+                        + " meal using only the following ingredients: " + ingredients
+                        + ". Base it on this recipe name: " + title
+                        + ". Make this concise and within 100 words");
         requestBody.put("max_tokens", MAX_TOKENS);
         requestBody.put("temperature", 1.0);
 

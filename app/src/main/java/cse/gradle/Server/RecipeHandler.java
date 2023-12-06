@@ -3,11 +3,6 @@ package cse.gradle.Server;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-
 import cse.gradle.Recipe;
 
 import java.io.*;
@@ -15,8 +10,6 @@ import java.net.URI;
 import java.util.*;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.checkerframework.checker.units.qual.m;
 import org.json.JSONArray;
 
 // remake to recipe handler which requires a user id as a part of the http request
@@ -38,16 +31,17 @@ public class RecipeHandler implements HttpHandler {
         String method = httpExchange.getRequestMethod();
         try {
 
-            // Get user id from request, first query is user id, second is recipe id (if applicable) or sort method (if applicable)
-            // Example: http://localhost:8100/recipes?userId=1&recipeId=1 
+            // Get user id from request, first query is user id, second is recipe id (if
+            // applicable) or sort method (if applicable)
+            // Example: http://localhost:8100/recipes?userId=1&recipeId=1
             // Example: http://localhost:8100/recipes?userId=1&sort="a-z"
             // Example: http://localhost:8100/recipes?userId=1
-            
+
             URI uri = httpExchange.getRequestURI();
             System.out.println("URI: " + uri);
             String query = uri.getRawQuery();
             System.out.println("Query: " + query);
-            String userId = query.substring(query.indexOf("=") + 1, query.indexOf("&"));    // correct substring indeces?
+            String userId = query.substring(query.indexOf("=") + 1, query.indexOf("&")); // correct substring indeces?
 
             String recipeId = "";
             if (query.contains("recipeId")) {
@@ -59,16 +53,16 @@ public class RecipeHandler implements HttpHandler {
                 sortOption = query.substring(query.indexOf("sort=") + "sort=".length(), query.indexOf("&filter="));
             }
             // substring from first char after "sort=" to last char before "filter="
-            
+
             String filterOption = "";
             if (query.contains("filter")) {
                 filterOption = query.substring(query.indexOf("filter=") + "filter=".length());
-            }  
+            }
 
-             // If there is no user id, return an error
-             if (userId.equals("")) {
-                 throw new Exception("No user id provided");
-             }
+            // If there is no user id, return an error
+            if (userId.equals("")) {
+                throw new Exception("No user id provided");
+            }
 
             if (method.equals("GET")) {
                 if (recipeId.equals("")) {
@@ -111,8 +105,8 @@ public class RecipeHandler implements HttpHandler {
     }
 
     /*
-    * Handles GET requests by returning the recipe associated with the id
-    */
+     * Handles GET requests by returning the recipe associated with the id
+     */
     private String handleGet(HttpExchange httpExchange, String userId, String recipeId) throws IOException {
         String query = httpExchange.getRequestURI().getQuery();
         String response = "Invalid GET request";
@@ -151,7 +145,7 @@ public class RecipeHandler implements HttpHandler {
 
             // Otherwise return the recipe
             response = recipe.toJson();
-            
+
         }
         return response;
     }
@@ -161,12 +155,13 @@ public class RecipeHandler implements HttpHandler {
      * Optional sort options: "a-z", "z-a", "newest-oldest", "oldest-newest"
      * Optional filter options: "Breakfast", "Dinner", "Lunch", "All", ""
      */
-    private String handleGetAll(HttpExchange httpExchange, String userId, String sortOption, String filterOption) throws IOException {
+    private String handleGetAll(HttpExchange httpExchange, String userId, String sortOption, String filterOption)
+            throws IOException {
         System.out.println("sort: " + sortOption);
         System.out.println("filter: " + filterOption);
-        
+
         String response = "Invalid GET request";
-        
+
         // Search for the current user's recipe list
         Document user = usersDB.findOne("userId", userId);
 
@@ -191,7 +186,7 @@ public class RecipeHandler implements HttpHandler {
         // Filter recipes if a meal type filter is provided
         switch (filterOption) {
             case "Breakfast": {
-                Recipe.filterByMealType(recipeList, "Breakfast"); 
+                Recipe.filterByMealType(recipeList, "Breakfast");
                 break;
             }
             case "Lunch": {
@@ -202,27 +197,28 @@ public class RecipeHandler implements HttpHandler {
                 Recipe.filterByMealType(recipeList, "Dinner");
                 break;
             }
-            case "All": { break; }
-            default: { break; }
+            case "All": {
+                break;
+            }
+            default: {
+                break;
+            }
         }
-        
-        // TODO: If no sort option was provided, return the recipes in newest-oldest order by default
+
+        // TODO: If no sort option was provided, return the recipes in newest-oldest
+        // order by default
         // Sort the recipes if a sort option was provided
         if (!sortOption.equals("")) {
             if (sortOption.equals("a-z")) {
                 Recipe.sortByName(recipeList, false);
             } else if (sortOption.equals("z-a")) {
                 Recipe.sortByName(recipeList, true);
-            }
-            else if(sortOption.equals("newest-oldest")){
+            } else if (sortOption.equals("newest-oldest")) {
                 Recipe.sortByDate(recipeList, true);
-            }
-            else if(sortOption.equals("oldest-newest")){
+            } else if (sortOption.equals("oldest-newest")) {
                 Recipe.sortByDate(recipeList, false);
             }
         }
-
-
 
         // Convert recipeList back into a document list
         recipeDocumentList = new ArrayList<Document>();
@@ -247,7 +243,7 @@ public class RecipeHandler implements HttpHandler {
         while (scanner.hasNextLine()) {
             postData.append(scanner.nextLine());
         }
-        
+
         scanner.close();
 
         System.out.println("Received JSON data: " + postData);
@@ -292,7 +288,7 @@ public class RecipeHandler implements HttpHandler {
             if (user == null) {
                 return "No user found for id " + userId;
             }
-        
+
             List<Document> recipeList = user.getList("recipeList", Document.class);
 
             // Break if no recipe list was found
@@ -324,7 +320,7 @@ public class RecipeHandler implements HttpHandler {
             Scanner scanner = new Scanner(inStream);
             StringBuilder postData = new StringBuilder();
             while (scanner.hasNextLine()) {
-                postData.append(scanner.nextLine());       
+                postData.append(scanner.nextLine());
             }
 
             // Print JSON data
@@ -343,7 +339,8 @@ public class RecipeHandler implements HttpHandler {
             usersDB.updateDocumentList("userId", userId, "recipeList", recipeList);
 
             // Response
-            response = "Updated entry: " + Recipe.parseRecipeFromDocument(existingRecipeDocument).toString() + " with: " + newRecipe.toString();
+            response = "Updated entry: " + Recipe.parseRecipeFromDocument(existingRecipeDocument).toString() + " with: "
+                    + newRecipe.toString();
 
             // Close scanner
             scanner.close();
@@ -353,16 +350,14 @@ public class RecipeHandler implements HttpHandler {
     }
 
     /*
-     * Handles DELETE requests by deleting the recipe associated with the id. The
-     * recipe id is
-     * expected to be in the query string.
+     * Handles DELETE requests by deleting the recipe associated with the id.
+     * The recipe id is expected to be in the query string.
      */
     private String handleDelete(HttpExchange httpExchange, String userId, String recipeId) throws IOException {
         String query = httpExchange.getRequestURI().getQuery();
         String response = "Invalid DELETE request";
 
         if (query != null) {
-
 
             // get existing recipe list
             Document user = usersDB.findOne("userId", userId);
@@ -398,7 +393,7 @@ public class RecipeHandler implements HttpHandler {
             // Delete the recipe
             recipeList.remove(existingRecipeDocument);
 
-            // Update the user with the new recipe list 
+            // Update the user with the new recipe list
             usersDB.updateDocumentList("userId", userId, "recipeList", recipeList);
 
             // Response

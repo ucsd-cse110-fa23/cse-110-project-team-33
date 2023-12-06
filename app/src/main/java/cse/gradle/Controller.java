@@ -1,11 +1,7 @@
 package cse.gradle;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -21,25 +17,27 @@ public class Controller {
 
     public void createUser(String username, String password, View appScenes) {
         String postResponse = model.performRegisterRequest(username, password);
-        if(postResponse.equals("Error: Server down")){
-                appScenes.displayServerDownConstructor();
+        if (postResponse.equals("Error: Server down")) {
+            appScenes.displayServerDownConstructor();
         }
     }
 
-    public void loginUser(String username, String password, View appScenes) {
+    public boolean loginUser(String username, String password, View appScenes) {
         String postResponse = model.performLoginRequest(username, password);
-        if(postResponse.equals("Error: Server down")){
-                appScenes.displayServerDownConstructor();
-                return;
+        if (postResponse.equals("Error: Server down")) {
+            appScenes.displayServerDownConstructor();
+            return false;
+        } else if (postResponse.contains("Incorrect password")) {
+            appScenes.displayIncorrectPassword();
+            return false;
         }
-        System.out.println("login response: " + postResponse);
+        return true;
     }
-
 
     // Handles the share button being pressed by the user
     public void shareRecipe(Recipe recipe) {
 
-        // Get the share link from the model 
+        // Get the share link from the model
         String shareLink = model.getShareLink(recipe.getId().toString());
 
         // Copy the share link to the user's clipboard
@@ -51,7 +49,8 @@ public class Controller {
         System.out.println("Share link copied to clipboard: " + shareLink);
     }
 
-    // Handles the saving of a recipe in the database caused by the UI save button being pressed
+    // Handles the saving of a recipe in the database caused by the UI save button
+    // being pressed
     public void saveRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
 
         try {
@@ -61,7 +60,7 @@ public class Controller {
             recipe.setInstructions(popUp.getInstructionsField().getText());
 
             // Update the recipe in the database
-            String response = model.putRecipe(recipe.getId().toString(), recipe);  
+            String response = model.putRecipe(recipe.getId().toString(), recipe);
             System.out.println("save recipe put response: " + response);
 
             if (response.contains("No recipe found")) {
@@ -71,7 +70,7 @@ public class Controller {
             }
 
             // Make sure the server isn't down
-            if(response.equals("Error: Server down")){
+            if (response.equals("Error: Server down")) {
                 throw new Exception(response);
             }
 
@@ -85,23 +84,23 @@ public class Controller {
 
     }
 
-    // Handles the deletion of a recipe in the database caused by the UI delete button being pressed
+    // Handles the deletion of a recipe in the database caused by the UI delete
+    // button being pressed
     public void deleteRecipe(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList) {
         try {
             // saveRecipe(popUp, recipe, rList);
             Recipe rcp = null;
             String response = model.deleteRecipe(recipe.getId().toString());
 
-
-            if(response.equals("Error: Server down")){
+            if (response.equals("Error: Server down")) {
                 appScenes.displayServerDownConstructor();
                 return;
             }
-            
+
             String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
             syncRecipeListWithModel(appScenes, sortOption, filterOption);
-            
+
             Stage current = (Stage) popUp.getScene().getWindow();
             current.close();
         } catch (Exception e) {
@@ -147,13 +146,20 @@ public class Controller {
         });
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
-            // TODO: replace with using Model
-            Recipe newRecipe = new RecipeGenerator().generateNewRecipe();
+            Recipe newRecipe = null;
+            try {
+                model.performFileWriteRequest("mealType.wav");
+                model.performFileWriteRequest("ingredients.wav");
+                newRecipe = model.performRecipeGenerateRequest();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
 
             // Save the new recipe to the database
             String postResponse = model.postRecipe(newRecipe);
+            System.out.println(postResponse);
 
-            // Update recipeList to reflect the state of the database 
+            // Update recipeList to reflect the state of the database
             // TODO: Refactor into a method so we can DRY
             String filterOption = appScenes.getRecipeListRoot().getMealTypeDropDown().getValue();
             String sortOption = appScenes.getRecipeListRoot().getSortDropDown().getValue();
@@ -177,7 +183,7 @@ public class Controller {
             // Get all recipes from the database and display
             // When create account, start with default sorted list
             syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
-        });    
+        });
 
         // Display cancelScene when backButton is pushed
         createPane.getBackButton().setOnAction(e -> {
@@ -190,18 +196,20 @@ public class Controller {
 
         userPane.getCreateButton().setOnAction(e -> {
             appScenes.displayUserAccountSceneConstructor();
-        });    
+        });
 
-        // When the login button is pressed, make a request to the server to login the user
-        // then make a get all recipes request and display the recipe list scene
+        // When the login button is pressed, make a request to the server to login the
+        // user, then make a get all recipes request and display the recipe list scene
         userPane.getLoginButton().setOnAction(e -> {
             String username = userPane.getUsernameField().getText().toString();
             String password = userPane.getPasswordField().getText().toString();
-            loginUser(username, password, appScenes);
+            boolean loginResult = loginUser(username, password, appScenes);
 
             // Get all recipes from the database and display
             // When logging into account, start with default sorted list
-            syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+            if (loginResult) {
+                syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+            }
         });
     }
 
@@ -215,6 +223,7 @@ public class Controller {
             model.userId = null; // erase the userId
             // set the dropdown back to default sort option
             recipeList.getSortDropDown().setValue(Constants.defaultSortOption);
+            appScenes.UserLoginConstructor(); // recreate the login screen to clear the username and password fields
             appScenes.displayUserLoginConstructor();
         });
 
@@ -223,29 +232,19 @@ public class Controller {
             String sortOption = recipeList.getSortDropDown().getValue();
             syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
-        
+
         recipeList.getMealTypeDropDown().setOnAction(event -> {
             String filterOption = recipeList.getMealTypeDropDown().getValue();
             String sortOption = recipeList.getSortDropDown().getValue();
             syncRecipeListWithModel(appScenes, sortOption, filterOption);
         });
-        
-        // recipeList.getMealTypeChoiceBox().getSelectionModel().selectedIndexProperty().addListener(
-        //     (ObservableValue<? extends Number> ov, Number old_val, Number new_val) -> {
-        //         // store selected mealtype
-        //         recipeList.getFilterButton().setOnAction(e -> {
-        //             String chosenMeal = (recipeList.getMealTypes()[new_val.intValue()]);
-                    
-        //         });
-
-        // });
     }
 
     private void syncRecipeListWithModel(View appScenes, String sortOption, String filterOption) {
         String getAllResponse = model.getRecipeList(sortOption, filterOption);
 
         // Make sure the server isn't down
-        if(getAllResponse.equals("Error: Server down")){
+        if (getAllResponse.equals("Error: Server down")) {
             appScenes.displayServerDownConstructor();
         }
 
@@ -254,4 +253,16 @@ public class Controller {
         appScenes.updateRecipeListView(recipeArrayList);
         appScenes.displayRecipeListScene();
     }
+
+
+    // TODO: Replace this method with an API call to the HTTP server using Model
+    void handleRegenerateButton(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList){
+        Recipe newRecipe = new RecipeGenerator().regenerateRecipe(recipe);
+        popUp.getNameField().setText(newRecipe.getName());
+        popUp.getCategoryField().setText(newRecipe.getCategory());
+        popUp.getIngredientsField().setText(newRecipe.getIngredients());
+        popUp.getInstructionsField().setText(newRecipe.getInstructions());
+        rList.refresh();
+    }
 }
+
