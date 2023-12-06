@@ -30,4 +30,7 @@ public class MockController {
         return false;
     }
 
+    public String shareRecipe(Recipe recipe) {
+        return "html";
+    }
 }
