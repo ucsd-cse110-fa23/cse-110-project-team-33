@@ -52,7 +52,6 @@ public class AudioRecorder {
                         @Override
                         public void run() {
                             try {
-                                // System.out.println("Start recording");
                                 // the format of the TargetDataLine
                                 DataLine.Info dataLineInfo = new DataLine.Info(
                                         TargetDataLine.class,
@@ -67,12 +66,12 @@ public class AudioRecorder {
                                         targetDataLine);
 
                                 // the file that will contain the audio data
-                                // File audioFile = new File("recording.wav");
                                 File audioFile = new File(fileName);
                                 AudioSystem.write(
                                         audioInputStream,
                                         AudioFileFormat.Type.WAVE,
                                         audioFile);
+                                audioInputStream.close();
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
