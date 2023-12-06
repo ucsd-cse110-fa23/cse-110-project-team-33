@@ -96,7 +96,7 @@ public class LoginHandler implements HttpHandler {
                 }
             } else {
                 // If the user does not exist, return an error message
-                response += "User " + username + " does not exist";
+                response += "Error! User " + username + " does not exist";
                 throw new Exception(response);
             }
         } catch (Exception e) {
