@@ -92,6 +92,7 @@ public class GenerateImageHandler implements HttpHandler{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            System.out.println("DALLE 2 RESPONSE: " + response);
             
             /*
             // Check if username password pair is in the database

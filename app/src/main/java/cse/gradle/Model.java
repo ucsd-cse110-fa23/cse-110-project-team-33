@@ -350,9 +350,10 @@ public class Model {
         return Recipe.parseRecipeFromString(generatedRecipe);
     }
 
-    public static String performImageGenerateRequest(String prompt){
+    public String performImageGenerateRequest(String prompt){
         try {
-            String urlString = "http://localhost:8100/";
+            //String urlString = "http://localhost:8100/";
+            String urlString = this.urlString + "/generateImage";
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -376,6 +377,7 @@ public class Model {
                 //if (!response.toString().contains("Error")) {
                  //   this.userId = response.toString();
                 //}
+                System.out.println("DALLE 2 MODEL RESPONSE: " + response.toString());
                 return response.toString();
             }
         } catch (Exception ex) {
@@ -385,5 +387,6 @@ public class Model {
             }
             return "Error: " + ex.getMessage();
         }
+        
     }
 }

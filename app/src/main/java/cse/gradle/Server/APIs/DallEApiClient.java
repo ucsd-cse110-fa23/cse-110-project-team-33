@@ -23,7 +23,11 @@ public class DallEApiClient implements DallEApi {
         //String prompt = "Sackboy from Little Big Planet";
         int n = 1;
 
+        if(prompt == null){
+            prompt = "";
+        }
 
+        System.out.println("DALLE 2 PROMPT: " + prompt);
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", MODEL);
