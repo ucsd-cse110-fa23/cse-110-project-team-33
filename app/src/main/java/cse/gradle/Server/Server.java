@@ -30,6 +30,7 @@ public class Server {
         server.createContext("/register", new RegisterHandler(usersDb));
         server.createContext("/share", new ShareHandler(usersDb));
         server.createContext("/generate", new GenerateRecipeHandler(usersDb));
+        server.createContext("/generateImage", new GenerateImageHandler());
 
         // Set the server's executor object to be threadPoolExecutor
         server.setExecutor(threadPoolExecutor);

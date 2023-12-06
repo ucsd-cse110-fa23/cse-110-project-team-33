@@ -1,18 +1,32 @@
 package cse.gradle;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.io.*;
 
+import cse.gradle.View.AppFramePopUp;
+import cse.gradle.View.NewRecipePane;
+import cse.gradle.View.RecipeList;
+import cse.gradle.View.UserCreateAccount;
+import cse.gradle.View.UserLogin;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.stage.Stage;
 
-public class Controller {
+public class Controller implements ModelObserver, ViewObserver {
 
     private Model model;
+    private View view;
 
-    public Controller(Model model) {
+    public Controller(Model model, View view) {
         this.model = model;
+        this.view = view;
+        model.register(this);
+        view.register(this);
     }
 
     public void createUser(String username, String password, View appScenes) {
@@ -22,13 +36,50 @@ public class Controller {
         }
     }
 
-    public boolean loginUser(String username, String password, View appScenes) {
+    public boolean loginUser(String username, String password, View appScenes, UserLogin loginPage) throws IOException {
+        // Checks if the automic login file exists; if it does, and username matches the
+        // one in file, do automatic login
+        if ((new File("src/main/java/cse/gradle/local/login.txt")).exists()) {
+            File loginFile = new File("src/main/java/cse/gradle/local/login.txt");
+            BufferedReader reader = new BufferedReader(
+                    new FileReader(loginFile));
+            if (username.equals(reader.readLine())) {
+                reader.close();
+                String postResponse = model.performLoginRequest(loginFile);
+                if (postResponse.equals("Error: Server down")) {
+                    appScenes.displayServerDownConstructor();
+                    return false;
+                }
+                reader.close();
+                return true;
+            }
+            reader.close();
+            return loginUserWithButtonCheck(username, password, appScenes, loginPage);
+        } else {
+            return loginUserWithButtonCheck(username, password, appScenes, loginPage);
+        }
+    }
+
+    // Logs-in the user and writes to login.txt file if the automatic login checkbox
+    // is selected
+    public boolean loginUserWithButtonCheck(String username, String password, View appScenes, UserLogin loginPage) {
         String postResponse = model.performLoginRequest(username, password);
+        if ((loginPage.getAutoLoginButton().isSelected()) && (!postResponse.contains("Invalid"))) {
+            try {
+                FileWriter writer = new FileWriter("src/main/java/cse/gradle/local/login.txt");
+                writer.write(username + "\n" + password);
+                writer.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
         if (postResponse.equals("Error: Server down")) {
             appScenes.displayServerDownConstructor();
             return false;
         } else if (postResponse.contains("Incorrect password")) {
             appScenes.displayIncorrectPassword();
+            return false;
+        } else if (postResponse.contains("does not exist")) {
             return false;
         }
         return true;
@@ -58,6 +109,7 @@ public class Controller {
             recipe.setCategory(popUp.getCategoryField().getText());
             recipe.setIngredients(popUp.getIngredientsField().getText());
             recipe.setInstructions(popUp.getInstructionsField().getText());
+            recipe.setImgURL(popUp.getRecipe().getImgUrl());
 
             // Update the recipe in the database
             String response = model.putRecipe(recipe.getId().toString(), recipe);
@@ -77,6 +129,9 @@ public class Controller {
             String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
             syncRecipeListWithModel(appScenes, sortOption, filterOption);
+
+            // After saving disable regenreate button
+            //popUp.getRegenerateButton().setDisable(true);
         } catch (Exception e) {
             if (e.getMessage().equals("Error: Server down"))
                 appScenes.displayServerDownConstructor();
@@ -111,7 +166,7 @@ public class Controller {
     }
 
     // Sets the listensers for all the buttons within the recipe creation window
-    void setListeners(NewRecipePane recipePane, View appScenes, Scene cancelScene) {
+    public void setRecipeCreationListeners(NewRecipePane recipePane, View appScenes, Scene cancelScene) {
 
         recipePane.getRecordMealTypeButton().setOnAction(e -> {
             if (!recipePane.getRecordingInProgress()) {
@@ -147,10 +202,13 @@ public class Controller {
 
         recipePane.getGenerateRecipeButton().setOnAction(e -> {
             Recipe newRecipe = null;
+            String imageURLString = null;
             try {
                 model.performFileWriteRequest("mealType.wav");
                 model.performFileWriteRequest("ingredients.wav");
                 newRecipe = model.performRecipeGenerateRequest();
+                imageURLString = model.performImageGenerateRequest(newRecipe.getName());
+                newRecipe.setImgURL(imageURLString);
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -173,7 +231,7 @@ public class Controller {
     }
 
     // Sets the listensers for all the buttons within the account creation window
-    void setListeners(UserCreateAccount createPane, View appScenes) {
+    public void setAccountWindowListeners(UserCreateAccount createPane, View appScenes) {
 
         createPane.getCreateButton().setOnAction(e -> {
             String username = createPane.getUsernameField().getText().toString();
@@ -192,31 +250,56 @@ public class Controller {
     }
 
     // Sets the listensers for all the buttons within the account login window
-    void setListeners(UserLogin userPane, View appScenes) {
+    public void setLoginWindowListeners(UserLogin loginPage, View appScenes) {
 
-        userPane.getCreateButton().setOnAction(e -> {
+        loginPage.getCreateButton().setOnAction(e -> {
             appScenes.displayUserAccountSceneConstructor();
         });
 
-        // When the login button is pressed, make a request to the server to login the
-        // user, then make a get all recipes request and display the recipe list scene
-        userPane.getLoginButton().setOnAction(e -> {
-            String username = userPane.getUsernameField().getText().toString();
-            String password = userPane.getPasswordField().getText().toString();
-            boolean loginResult = loginUser(username, password, appScenes);
-
-            // Get all recipes from the database and display
-            // When logging into account, start with default sorted list
-            if (loginResult) {
-                syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+        // When the login button is pressed, make a request to the server to login the user
+        // then make a get all recipes request and display the recipe list scene
+        loginPage.getLoginButton().setOnAction(e -> {
+            String username = loginPage.getUsernameField().getText().toString();
+            String password = loginPage.getPasswordField().getText().toString();
+            boolean loginResult;
+            try {
+                loginResult = loginUser(username, password, appScenes, loginPage);
+                // Get all recipes from the database and display
+                // When logging into account, start with default sorted list
+                if (loginResult) {
+                    syncRecipeListWithModel(appScenes, Constants.defaultSortOption, Constants.defaultMealType);
+                }
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
             }
         });
     }
 
-    void setListeners(RecipeList recipeList, View appScenes) {
+    // Sets the listensers for all buttons within the AppFramePopUp window
+    public void setRecipePopUpListeners(View appScenes, AppFramePopUp recipePopUp, RecipeList recipeList, Recipe recipe) {
+
+        recipePopUp.getSaveButton().setOnAction(e -> {
+            this.saveRecipe(recipePopUp, recipeList.appScenes, recipe, recipeList);
+        });
+
+        recipePopUp.getDeleteButton().setOnAction(e -> {
+            this.deleteRecipe(recipePopUp, recipeList.appScenes, recipe, recipeList);
+        });
+        recipePopUp.getShareButton().setOnAction(e -> {
+            this.shareRecipe(recipe);
+        });
+
+        recipePopUp.getRegenerateButton().setOnAction(e -> {
+            this.handleRegenerateButton(recipePopUp, appScenes, recipe, recipeList);
+        });
+    }
+
+    public void setRecipeListListeners(RecipeList recipeList, View appScenes) {
         // button
         recipeList.getNewRecipeButton().setOnAction(e -> {
             appScenes.displayNewRecipeScene();
+            System.out.println("New Recipe pressed");
         });
 
         recipeList.getLogoutButton().setOnAction(e -> {
@@ -258,17 +341,22 @@ public class Controller {
     // TODO: Replace this method with an API call to the HTTP server using Model
     void handleRegenerateButton(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList){
         Recipe newRecipe;
+        String imageURLString = model.performImageGenerateRequest(newRecipe.getName());
 
         try {
-            newRecipe = model.performRecipeGenerateRequest();    
+            newRecipe = model.performRecipeGenerateRequest();   
+            newRecipe.setImgURL(imageURLString);
+            popUp.getImageView().setImage(new Image(newRecipe.getImgUrl()));
             popUp.getNameField().setText(newRecipe.getName());
             popUp.getCategoryField().setText(newRecipe.getCategory());
             popUp.getIngredientsField().setText(newRecipe.getIngredients());
             popUp.getInstructionsField().setText(newRecipe.getInstructions());
+            popUp.setRecipe(newRecipe);
             rList.refresh();        
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+        System.out.println("Calling regenerate button");
     }
 }
 

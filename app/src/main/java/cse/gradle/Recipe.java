@@ -20,6 +20,8 @@ public class Recipe {
     private Date date;
     private UUID id;
 
+    private String imgURLString;
+
     // empty constructor
     public Recipe() {
         this.ingredients = "";
@@ -86,6 +88,8 @@ public class Recipe {
         this.id = id;
     }
 
+    
+
     // getters
     public String getIngredients() {
         return ingredients;
@@ -109,6 +113,10 @@ public class Recipe {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getImgUrl(){
+        return imgURLString;
     }
 
     // setters
@@ -135,6 +143,10 @@ public class Recipe {
     public void setId(UUID newId) {
         id = newId;
     }
+    
+    public void setImgURL(String imgURL){
+        this.imgURLString = imgURL;
+    }
 
     // toString method for saving to file (csv)
     public String toString() {
@@ -150,6 +162,7 @@ public class Recipe {
         doc.append("name", name);
         doc.append("date", date.toString());
         doc.append("id", id.toString());
+        doc.append("imgUrl", imgURLString);
         return doc;
     }
 
@@ -214,6 +227,8 @@ public class Recipe {
             String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
             String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
             String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
+            String urlString = jsonNode.has("imgUrl") ? jsonNode.get("imgUrl").asText() : "";
+
             Date dateCreated = tempDate;
             try {
                 dateCreated = jsonNode.has("date") ? format.parse(jsonNode.get("date").asText()) : tempDate;
@@ -231,6 +246,7 @@ public class Recipe {
             System.out.println("dateCreated: " + dateCreated);
             // set id
             recipe.setId(id);
+            recipe.setImgURL(urlString);
 
             Recipe.clean(recipe);
             

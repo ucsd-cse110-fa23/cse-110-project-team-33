@@ -32,9 +32,9 @@ class Feature5Tests {
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(recipe);
         list.add(recipe2);
-        RecipeList rl = new RecipeList(list);
-        Recipe listRecipe = rl.getRecipes().get(0);
-        Recipe listRecipe2 = rl.getRecipes().get(1);
+        MockView view = new MockView(list);;
+        Recipe listRecipe = view.getRecipeList().get(0);
+        Recipe listRecipe2 = view.getRecipeList().get(1);
         assertEquals("4", listRecipe.getName());
         assertEquals("boiled potatoes", recipe2.getName());
     }
