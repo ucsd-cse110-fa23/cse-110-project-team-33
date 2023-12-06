@@ -13,6 +13,39 @@ import static org.junit.jupiter.api.Assertions.*;
 class Feature21Tests {
     /* --------------------------------- UNIT TESTS --------------------------------- */
     @Test
+    void autoLogin() {
+        MockController controller = new MockController();
+        boolean loginStatus = false;
+        try {
+             loginStatus = controller.loginUser("abc", "abc");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        assert(!loginStatus);
+    }
+    /* --------------------------------- BDD TESTS --------------------------------- */
+    @Test 
+    void loginLogout() {
+        User Joe = new User("abc", "abc");
+        MockController controller = new MockController();
+        boolean loginStatus = false;
+        try {
+             loginStatus = controller.loginUser(Joe.getUsername(), Joe.getPassword());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        assert(!loginStatus);
+        Joe = new User("login", "checked");
+        loginStatus = true;
+        try {
+             loginStatus = controller.loginUser(Joe.getUsername(), Joe.getPassword());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        assert(loginStatus);
+    }
+
+    @Test
     public void testLogoutButton() {
         // Create a new Mock Model
         Model model = new MockModel();
