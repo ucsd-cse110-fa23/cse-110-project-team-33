@@ -21,19 +21,39 @@ import java.util.List;
 class Feature13Tests extends HTTPServerTests{
     /* --------------------------------- UNIT TESTS --------------------------------- */
     @Test 
-    void checkServerError() {
+    void checkLoginError() {
         Server.stopServer();
 
-        // Check for login error
         Model model = new MockModel();
         String response = model.performLoginRequest("test_user", "password");
         String error = "Error: Server down";
         assertEquals(error, response);
+    }
 
-        // Check for generic request error
+    @Test 
+    void checkRecipeError() {
+        Server.stopServer();
+
+        Model model = new MockModel();
         Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
-        response = model.postRecipe(originalRecipe);
-        error = "Error: Server down";
+        String response = model.postRecipe(originalRecipe);
+        String error = "Error: Server down";
+        assertEquals(error, response);
+    }
+
+    /* --------------------------------- BDD TESTS --------------------------------- */
+    @Test 
+    void completeServerErrorTest() {
+        // login with test user
+        Model model = new MockModel();
+        String retrievedUserId = model.performLoginRequest("test_user", "password");
+        assertEquals(MockModel.mockUserId, retrievedUserId);
+
+        // cut connection and ask for recipe
+        Server.stopServer();
+        Recipe originalRecipe = new Recipe("potatoes", "boil the potatoes", "brunch", "boiled potatoes");
+        String response = model.postRecipe(originalRecipe);
+        String error = "Error: Server down";
         assertEquals(error, response);
     }
 }
