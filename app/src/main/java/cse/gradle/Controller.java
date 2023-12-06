@@ -12,6 +12,7 @@ import cse.gradle.View.UserCreateAccount;
 import cse.gradle.View.UserLogin;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.stage.Stage;
@@ -108,6 +109,7 @@ public class Controller implements ModelObserver, ViewObserver {
             recipe.setCategory(popUp.getCategoryField().getText());
             recipe.setIngredients(popUp.getIngredientsField().getText());
             recipe.setInstructions(popUp.getInstructionsField().getText());
+            recipe.setImgURL(popUp.getRecipe().getImgUrl());
 
             // Update the recipe in the database
             String response = model.putRecipe(recipe.getId().toString(), recipe);
@@ -127,6 +129,9 @@ public class Controller implements ModelObserver, ViewObserver {
             String filterOption = rList.getMealTypeDropDown().getValue();
             String sortOption = rList.getSortDropDown().getValue();
             syncRecipeListWithModel(appScenes, sortOption, filterOption);
+
+            // After saving disable regenreate button
+            //popUp.getRegenerateButton().setDisable(true);
         } catch (Exception e) {
             if (e.getMessage().equals("Error: Server down"))
                 appScenes.displayServerDownConstructor();
@@ -336,11 +341,17 @@ public class Controller implements ModelObserver, ViewObserver {
     // TODO: Replace this method with an API call to the HTTP server using Model
     void handleRegenerateButton(AppFramePopUp popUp, View appScenes, Recipe recipe, RecipeList rList){
         Recipe newRecipe = new RecipeGenerator().regenerateRecipe(recipe);
+        String imageURLString = model.performImageGenerateRequest(newRecipe.getName());
+        
+        newRecipe.setImgURL(imageURLString);
+        popUp.getImageView().setImage(new Image(newRecipe.getImgUrl()));
         popUp.getNameField().setText(newRecipe.getName());
         popUp.getCategoryField().setText(newRecipe.getCategory());
         popUp.getIngredientsField().setText(newRecipe.getIngredients());
         popUp.getInstructionsField().setText(newRecipe.getInstructions());
+        popUp.setRecipe(newRecipe);
         rList.refresh();
+
         System.out.println("Calling regenerate button");
     }
 }

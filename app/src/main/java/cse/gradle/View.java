@@ -482,6 +482,15 @@ public class View implements ViewSubject {
     public Button getRegenerateButton(){
         return regenerateButton;
     }
+    public ImageView getImageView(){
+        return imgView;
+    }
+    public Recipe getRecipe(){
+        return recipe;
+    }
+    public void setRecipe(Recipe r){
+        this.recipe = r;
+    }
 }
 
     class RecipeList extends BorderPane {
