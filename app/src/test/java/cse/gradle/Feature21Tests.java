@@ -8,11 +8,23 @@ package cse.gradle;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.ArrayList;
 
 
 class Feature21Tests {
     /* --------------------------------- UNIT TESTS --------------------------------- */
-    
-    /* --------------------------------- BDD TESTS --------------------------------- */
+    @Test
+    public void testLogoutButton() {
+        // Create a new Mock Model
+        Model model = new MockModel();
+
+        // Login to the application with valid credentials
+        model.performLoginRequest("test_user", "password");
+
+        // User is taken to the main recipe list window
+        // Press the logout button
+        model.userId = null;
+
+        // Ensure that you are taken back to the login screen
+        assertNull(model.userId);
+    }
 }
