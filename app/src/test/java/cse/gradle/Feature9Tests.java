@@ -9,18 +9,19 @@ package cse.gradle;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
+import java.util.List;
 
 
 class Feature9Tests {
     /* --------------------------------- UNIT TESTS --------------------------------- */
-    @Test 
-    void createNewUserValidUserName() {
-               
-    }
 
     @Test 
     void createNewUserInvalidUserName() {
-               
+        Model mockModel = new MockModel();
+        User Joe = new User("test_user", "password");
+        String response = mockModel.performRegisterRequest(Joe.getUsername(), Joe.getPassword());
+        
+        assert(response.contains("Error"));
     }
     /* --------------------------------- BDD TESTS --------------------------------- */
     @Test 
