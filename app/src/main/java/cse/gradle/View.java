@@ -648,10 +648,14 @@ class RecipeList extends BorderPane {
         System.out.println("new recipe name: " + r.getName());
         Label mealTypeLabel = new Label("[" + r.getCategory() + "]");
         //mealTypeLabel.setPadding(new Insets(0, 0, 0, 20)); // Adjust padding as needed
-        HBox buttonWithMealType = new HBox(b, mealTypeLabel);
-        buttonWithMealType.setAlignment(Pos.CENTER);
+        mealTypeLabel.setPrefSize(80, 20);
+        mealTypeLabel.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;");
+        mealTypeLabel.setPadding(new Insets(4, 5, 4, 5));
+        mealTypeLabel.setWrapText(true);
+        b.setWrapText(true);
+
         //buttons.add(b);
-        b.setPrefSize(400, 20);
+        b.setPrefSize(420, 20);
         b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
                                                                                                       // button
         b.setOnAction(e -> {
@@ -659,6 +663,10 @@ class RecipeList extends BorderPane {
         });
         // add button to vBox
         //vBox.getChildren().add(b);
+        HBox buttonWithMealType = new HBox(b, mealTypeLabel);
+        buttonWithMealType.setPrefSize(500, 20);
+        buttonWithMealType.setAlignment(Pos.CENTER);
+
         buttons.add(buttonWithMealType);
         vBox.getChildren().add(buttonWithMealType);
         System.err.println("vbox size: " + vBox.getChildren().size());
@@ -671,17 +679,25 @@ class RecipeList extends BorderPane {
         System.out.println("new recipe name: " + r.getName());
         Label mealTypeLabel = new Label("[" + r.getCategory() + "]");
         //mealTypeLabel.setPadding(new Insets(0, 0, 0, 20)); // Adjust padding as needed
-        HBox buttonWithMealType = new HBox(b, mealTypeLabel);
-        buttonWithMealType.setAlignment(Pos.CENTER);
+        mealTypeLabel.setPrefSize(80, 20);
+        mealTypeLabel.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 2; -fx-border-color: #737778; -fx-font-size: 12;");
+        mealTypeLabel.setPadding(new Insets(4, 5, 4, 5));
+        mealTypeLabel.setWrapText(true);
+        b.setWrapText(true);
+
         //buttons.add(index, b);
-        b.setPrefSize(400, 20);
-        b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778;"); // sets style of
+        b.setPrefSize(420, 20);
+        b.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 1; -fx-border-color: #737778; -fx-font-size: 12;"); // sets style of
                                                                                                       // button
         b.setOnAction(e -> {
             DisplayRecipe.display(new AppFramePopUp(this, r));
         });
         // add button to vBox
         //vBox.getChildren().add(index, b);
+        HBox buttonWithMealType = new HBox(b, mealTypeLabel);
+        buttonWithMealType.setPrefSize(500, 20);
+        buttonWithMealType.setAlignment(Pos.CENTER);
+
         buttons.add(buttonWithMealType);
         vBox.getChildren().add(index, buttonWithMealType);
         // refresh();
