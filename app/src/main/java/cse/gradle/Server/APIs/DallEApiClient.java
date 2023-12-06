@@ -72,12 +72,12 @@ public class DallEApiClient implements DallEApi {
 
 
         // Download the Generated Image to Current Directory
-        try(
-            InputStream in = new URI(generatedImageURL).toURL().openStream()
-        )
-        {
-            Files.copy(in, Paths.get("image.jpg"));
-        }
+        // try(
+        //     InputStream in = new URI(generatedImageURL).toURL().openStream()
+        // )
+        // {
+        //     Files.copy(in, Paths.get("image.jpg"));
+        // }
 
         return generatedImageURL;
     }
