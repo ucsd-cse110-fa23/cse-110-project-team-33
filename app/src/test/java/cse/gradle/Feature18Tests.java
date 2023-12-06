@@ -7,13 +7,21 @@
 package cse.gradle;
 
 import org.junit.jupiter.api.Test;
+
+import cse.gradle.Server.Server;
+
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 
 
 class Feature18Tests {
-    /* --------------------------------- UNIT TESTS --------------------------------- */
-    
-    
-    /* --------------------------------- BDD TESTS --------------------------------- */
+    @Test 
+    void checkShare() {
+        MockModel model = new MockModel();
+        MockView view = new MockView(new ArrayList<Recipe>());
+        MockController controller = new MockController();
+        Recipe recipe = new Recipe("eggs, bacon", "cook for 10 minutes", "breakfast", "American breakfast");
+        
+        assertEquals("html", controller.shareRecipe(recipe));
+    }
 }
