@@ -162,6 +162,7 @@ public class Recipe {
         doc.append("name", name);
         doc.append("date", date.toString());
         doc.append("id", id.toString());
+        doc.append("imgUrl", imgURLString);
         return doc;
     }
 
@@ -226,6 +227,8 @@ public class Recipe {
             String instructions = jsonNode.has("instructions") ? jsonNode.get("instructions").asText() : "";
             String category = jsonNode.has("category") ? jsonNode.get("category").asText() : "";
             String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "";
+            String urlString = jsonNode.has("imgUrl") ? jsonNode.get("imgUrl").asText() : "";
+
             Date dateCreated = tempDate;
             try {
                 dateCreated = jsonNode.has("date") ? format.parse(jsonNode.get("date").asText()) : tempDate;
@@ -243,6 +246,7 @@ public class Recipe {
             System.out.println("dateCreated: " + dateCreated);
             // set id
             recipe.setId(id);
+            recipe.setImgURL(urlString);
 
             Recipe.clean(recipe);
             
