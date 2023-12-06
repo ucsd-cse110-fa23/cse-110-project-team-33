@@ -7,6 +7,10 @@
 package cse.gradle;
 
 import org.junit.jupiter.api.Test;
+
+import cse.gradle.*;
+import cse.gradle.View.RecipeList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -31,8 +35,8 @@ class Feature4Tests {
         Recipe r2 = mock.generateNewRecipe("lunch", "salmon, salad", "cook for 20 minutes", "Healthy Lunch");        
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(r2);
-        RecipeList rl = new RecipeList(list);
-        Recipe recipe = rl.getRecipes().get(0);
+        MockView view = new MockView(list);
+        Recipe recipe = view.getRecipeList().get(0);
         assertEquals("lunch", recipe.getCategory());
         assertEquals("salmon, salad", recipe.getIngredients());
         assertEquals("cook for 20 minutes", recipe.getInstructions());

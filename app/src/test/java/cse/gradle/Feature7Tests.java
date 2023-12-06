@@ -7,6 +7,9 @@
 package cse.gradle;
 
 import org.junit.jupiter.api.Test;
+
+import cse.gradle.View.RecipeList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -20,9 +23,9 @@ class Feature7Tests {
         Recipe r = new Recipe("breakfast", "eggs, bacon", "cook for 10 minutes", "American breakfast");        
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(r);
-        RecipeList rl = new RecipeList(list);
-        rl.getRecipes().remove(0);
-        assertEquals(true, rl.getRecipes().isEmpty());
+        MockView view = new MockView(list);;
+        view.getRecipeList().remove(0);
+        assertEquals(true, view.getRecipeList().isEmpty());
     }
     /* --------------------------------- BDD TESTS --------------------------------- */
     @Test
@@ -31,8 +34,8 @@ class Feature7Tests {
         Recipe r = mock.generateNewRecipe("breakfast", "eggs, bacon", "cook for 10 minutes", "American breakfast");
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(r);
-        RecipeList rl = new RecipeList(list);
-        rl.getRecipes().remove(0);
-        assertEquals(true, rl.getRecipes().isEmpty());
+        MockView view = new MockView(list);;
+        view.getRecipeList().remove(0);
+        assertEquals(true, view.getRecipeList().isEmpty());
     }   
 }

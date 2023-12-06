@@ -31,7 +31,7 @@ class Feature1Tests {
         Recipe r = mock.generateNewRecipe("breakfast", "eggs, bacon", "cook for 10 minutes", "American breakfast");
         List<Recipe> list = new ArrayList<Recipe>();
         list.add(r);
-        RecipeList rl = new RecipeList(list);
-        assertEquals(list, rl.getRecipes());
+        MockView view = new MockView(list);
+        assertEquals(list, view.getRecipeList());
     }
 }
